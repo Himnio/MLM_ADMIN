@@ -57,6 +57,7 @@ function LoginPage({ onLogin }: { onLogin: () => void }) {
   const [error, setError] = useState('');
 
   const handleLogin = async () => {
+    setError('');
     const res = await api.post<{ access_token: string; refresh_token: string }>('/auth/login', { email, password });
     if (res.success && res.data) {
       api.setTokens(res.data.access_token, res.data.refresh_token);

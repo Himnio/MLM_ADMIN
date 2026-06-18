@@ -18,14 +18,19 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (email, password) => {
     set({ isLoading: true });
-    const res = await api.post<{ access_token: string; refresh_token: string; admin: AdminResponse }>('/auth/login', { email, password });
-    if (res.success && res.data) {
-      api.setTokens(res.data.access_token, res.data.refresh_token);
-      set({ admin: res.data.admin, isAuthenticated: true, isLoading: false });
-      return null;
+    try {
+      const res = await api.post<{ access_token: string; refresh_token: string; admin: AdminResponse }>('/auth/login', { email, password });
+      if (res.success && res.data) {
+        api.setTokens(res.data.access_token, res.data.refresh_token);
+        set({ admin: res.data.admin, isAuthenticated: true, isLoading: false });
+        return null;
+      }
+      set({ isLoading: false });
+      return res.message || res.error || 'Login failed';
+    } catch {
+      set({ isLoading: false });
+      return 'An unexpected error occurred';
     }
-    set({ isLoading: false });
-    return res.message || res.error || 'Login failed';
   },
 
   logout: () => {
