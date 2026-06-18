@@ -42,6 +42,9 @@ func RunMigrations(cfg *config.DatabaseConfig, migrationsDir string) error {
 }
 
 func postgresMigrateDSN(cfg *config.DatabaseConfig) (string, error) {
+	if cfg.DatabaseURL != "" {
+		return cfg.DatabaseURL, nil
+	}
 	u := &url.URL{
 		Scheme: "postgres",
 		User:   url.UserPassword(cfg.User, cfg.Password),
