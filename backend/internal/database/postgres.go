@@ -21,15 +21,24 @@ type PostgresDB struct {
 
 // NewPostgresDB creates a new PostgreSQL database connection
 func NewPostgresDB(cfg *config.DatabaseConfig, log *utils.Logger) (*PostgresDB, error) {
-	dsn := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=UTC",
-		cfg.Host,
-		cfg.Port,
-		cfg.User,
-		cfg.Password,
-		cfg.Name,
-		cfg.SSLMode,
-	)
+	// Use DATABASE_URL if provided (Render.com format), otherwise build DSN from individual fields
+	var dsn string
+	if cfg.DatabaseURL != "" {
+		dsn = cfg.DatabaseURL
+		if cfg.SSLMode != "" {
+			dsn += "?sslmode=" + cfg.SSLMode
+		}
+	} else {
+		dsn = fmt.Sprintf(
+			"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=UTC",
+			cfg.Host,
+			cfg.Port,
+			cfg.User,
+			cfg.Password,
+			cfg.Name,
+			cfg.SSLMode,
+		)
+	}
 
 	// Configure GORM logger based on environment
 	var gormLogger logger.Interface
@@ -145,17 +154,22 @@ func SetupTestDatabase(cfg *config.DatabaseConfig) (*PostgresDB, error) {
 // WaitForDatabase waits for the database to be available
 func WaitForDatabase(cfg *config.DatabaseConfig, timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
-	
+
 	for time.Now().Before(deadline) {
-		dsn := fmt.Sprintf(
-			"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=UTC",
-			cfg.Host,
-			cfg.Port,
-			cfg.User,
-			cfg.Password,
-			cfg.Name,
-			cfg.SSLMode,
-		)
+		var dsn string
+		if cfg.DatabaseURL != "" {
+			dsn = cfg.DatabaseURL
+		} else {
+			dsn = fmt.Sprintf(
+				"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=UTC",
+				cfg.Host,
+				cfg.Port,
+				cfg.User,
+				cfg.Password,
+				cfg.Name,
+				cfg.SSLMode,
+			)
+		}
 
 		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err == nil {

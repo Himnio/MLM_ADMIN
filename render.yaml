@@ -1,0 +1,88 @@
+# ============================================================
+# Render Blueprint - MLM Admin Deployment
+# ============================================================
+# How to use:
+#   1. Push this repo to GitHub
+#   2. In Render dashboard: New -> Blueprint -> Connect your repo
+#   3. Render auto-detects this file and provisions all services
+#   4. After first deploy, set these env vars manually in dashboard:
+#      - Frontend: NEXT_PUBLIC_API_URL = https://mlm-backend.onrender.com/api/v1
+#      - Backend:  CORS_ALLOWED_ORIGINS = https://mlm-frontend.onrender.com
+#   5. Redeploy both services (Manual Deploy -> Clear build cache & deploy)
+# ============================================================
+
+services:
+  # -------------------- PostgreSQL --------------------
+  - type: postgres
+    name: mlm-postgres
+    plan: free
+    databaseName: mlm_admin
+    user: mlm_admin
+
+  # -------------------- Redis --------------------
+  - type: redis
+    name: mlm-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+
+  # -------------------- Backend API --------------------
+  - type: web
+    name: mlm-backend
+    plan: free
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_NAME
+        value: mlm-admin-api
+      - key: APP_VERSION
+        value: 1.0.0
+      - key: LOG_LEVEL
+        value: info
+      - key: LOG_FORMAT
+        value: json
+      - key: DB_SSL_MODE
+        value: require
+      - key: JWT_ACCESS_EXPIRY
+        value: 15m
+      - key: JWT_REFRESH_EXPIRY
+        value: 7d
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromService:
+          type: postgres
+          name: mlm-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: mlm-redis
+          property: connectionString
+      - key: FRONTEND_URL
+        value: https://mlm-frontend.onrender.com
+      # Set CORS_ALLOWED_ORIGINS manually in Render dashboard after deploy:
+      #   https://mlm-frontend.onrender.com,http://localhost:3000
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://mlm-frontend.onrender.com
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+
+  # -------------------- Frontend --------------------
+  - type: web
+    name: mlm-frontend
+    plan: free
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Set NEXT_PUBLIC_API_URL manually in Render dashboard after deploy:
+      #   https://mlm-backend.onrender.com/api/v1
+      - key: NEXT_PUBLIC_API_URL
+        value: https://mlm-backend.onrender.com/api/v1
+    healthCheckPath: /
+    autoDeploy: true

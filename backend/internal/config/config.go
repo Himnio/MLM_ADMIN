@@ -36,6 +36,7 @@ type AppConfig struct {
 
 // DatabaseConfig holds database configuration
 type DatabaseConfig struct {
+	DatabaseURL     string // Render PostgreSQL connection string (postgresql://user:pass@host:port/db)
 	Host            string
 	Port            string
 	Name            string
@@ -130,21 +131,27 @@ func Load() (*Config, error) {
 	}
 
 	// Parse configuration
+	// Render.com injects PORT env var; APP_PORT takes priority, fallback to PORT, then default 8080
+	port := getEnv("APP_PORT", "")
+	if port == "" {
+		port = getEnv("PORT", "8080")
+	}
 	config := &Config{
 		App: AppConfig{
 			Env:         getEnv("APP_ENV", "development"),
-			Port:        getEnv("APP_PORT", "8080"),
+			Port:        port,
 			Name:        getEnv("APP_NAME", "mlm-admin-api"),
 			Version:     getEnv("APP_VERSION", "1.0.0"),
 			URL:         getEnv("APP_URL", "http://localhost:8080"),
 			FrontendURL: getEnv("FRONTEND_URL", "http://localhost:3000"),
 		},
 		Database: DatabaseConfig{
+			DatabaseURL:     getEnv("DATABASE_URL", ""),
 			Host:            getEnv("DB_HOST", "localhost"),
 			Port:            getEnv("DB_PORT", "5432"),
 			Name:            getEnv("DB_NAME", "mlm_admin"),
 			User:            getEnv("DB_USER", "admin"),
-			Password:        getEnvOrPanic("DB_PASSWORD"),
+			Password:        getEnv("DB_PASSWORD", ""),
 			SSLMode:         getEnv("DB_SSL_MODE", "disable"),
 			MaxOpenConns:    getEnvInt("DB_MAX_OPEN_CONNS", 25),
 			MaxIdleConns:    getEnvInt("DB_MAX_IDLE_CONNS", 5),
@@ -206,16 +213,15 @@ func Load() (*Config, error) {
 
 // validateRequiredEnv checks that all required environment variables are set
 func validateRequiredEnv() error {
-	requiredVars := []string{
-		"DB_PASSWORD",
-		"JWT_SECRET",
+	var missingVars []string
+
+	if os.Getenv("JWT_SECRET") == "" {
+		missingVars = append(missingVars, "JWT_SECRET")
 	}
 
-	var missingVars []string
-	for _, varName := range requiredVars {
-		if os.Getenv(varName) == "" {
-			missingVars = append(missingVars, varName)
-		}
+	// DB_PASSWORD is only required if DATABASE_URL is not set
+	if os.Getenv("DATABASE_URL") == "" && os.Getenv("DB_PASSWORD") == "" {
+		missingVars = append(missingVars, "DB_PASSWORD (or DATABASE_URL)")
 	}
 
 	if len(missingVars) > 0 {
