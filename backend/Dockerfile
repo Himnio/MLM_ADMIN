@@ -14,9 +14,6 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Run go mod tidy to ensure go.mod is up to date
-RUN go mod tidy
-
 # Build the application
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/server ./cmd/server
 
@@ -38,9 +35,6 @@ COPY --from=builder /app/server .
 
 # Copy migrations directory
 COPY --from=builder /app/migrations ./migrations
-
-# Copy swagger docs directory
-COPY --from=builder /app/docs ./docs
 
 # Note: .env file is copied from host during docker-compose up via environment variables
 # Do not copy .env in Dockerfile as it's in .dockerignore

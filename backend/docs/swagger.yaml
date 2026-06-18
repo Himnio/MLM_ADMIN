@@ -1,0 +1,1997 @@
+basePath: /api/v1
+definitions:
+  auth.TokenPair:
+    properties:
+      access_token:
+        type: string
+      expires_at:
+        type: string
+      refresh_token:
+        type: string
+      token_type:
+        type: string
+    type: object
+  handlers.CalculateIncomeRequest:
+    properties:
+      level:
+        maximum: 10
+        minimum: 1
+        type: integer
+      member_id:
+        type: string
+      sponsor_id:
+        type: string
+      transaction_type:
+        enum:
+        - registration
+        - referral
+        - upgrade
+        - bonus
+        type: string
+    required:
+    - level
+    - member_id
+    - sponsor_id
+    - transaction_type
+    type: object
+  handlers.ChangePasswordRequest:
+    properties:
+      new_password:
+        minLength: 8
+        type: string
+      old_password:
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+  handlers.ComponentState:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  handlers.HealthResponse:
+    properties:
+      database:
+        $ref: '#/definitions/handlers.ComponentState'
+      redis:
+        $ref: '#/definitions/handlers.ComponentState'
+      service:
+        $ref: '#/definitions/handlers.ServiceInfo'
+      status:
+        type: string
+      system:
+        $ref: '#/definitions/handlers.SystemInfo'
+      timestamp:
+        type: string
+    type: object
+  handlers.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  handlers.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  handlers.RegisterRequest:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      role:
+        enum:
+        - admin
+        - viewer
+        - super_admin
+        type: string
+    required:
+    - email
+    - full_name
+    - password
+    - role
+    type: object
+  handlers.ReverseIncomeRequest:
+    properties:
+      reason:
+        type: string
+    required:
+    - reason
+    type: object
+  handlers.ServiceInfo:
+    properties:
+      env:
+        type: string
+      name:
+        type: string
+      version:
+        type: string
+    type: object
+  handlers.SystemInfo:
+    properties:
+      go_version:
+        type: string
+      memory_alloc:
+        type: string
+      num_cpu:
+        type: integer
+      num_goroutine:
+        type: integer
+    type: object
+  handlers.UpdateCommissionConfigRequest:
+    properties:
+      commission_percentage:
+        type: number
+      income_amount:
+        type: number
+      is_active:
+        type: boolean
+      seat_capacity:
+        type: integer
+    type: object
+  models.AdminResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      last_login:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.CommissionResponse:
+    properties:
+      commission_percentage:
+        type: number
+      id:
+        type: string
+      income_amount:
+        type: number
+      is_active:
+        type: boolean
+      level:
+        type: integer
+      seat_capacity:
+        type: integer
+    type: object
+  models.CreateMemberInput:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      phone:
+        type: string
+      sponsor_id:
+        type: string
+    required:
+    - full_name
+    type: object
+  models.Income:
+    properties:
+      amount:
+        type: number
+      created_at:
+        type: string
+      description:
+        type: string
+      from_member:
+        $ref: '#/definitions/models.Member'
+      from_member_id:
+        type: string
+      id:
+        type: string
+      level:
+        type: integer
+      member:
+        allOf:
+        - $ref: '#/definitions/models.Member'
+        description: Relationships
+      member_id:
+        type: string
+      percentage:
+        type: number
+      processed_at:
+        type: string
+      status:
+        type: string
+      transaction_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.Member:
+    properties:
+      created_at:
+        type: string
+      downlines:
+        description: Relationships
+        items:
+          $ref: '#/definitions/models.Member'
+        type: array
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      incomes:
+        items:
+          $ref: '#/definitions/models.Income'
+        type: array
+      joined_at:
+        type: string
+      member_code:
+        type: string
+      phone:
+        type: string
+      referrals:
+        items:
+          $ref: '#/definitions/models.Referral'
+        type: array
+      sponsor:
+        $ref: '#/definitions/models.Member'
+      sponsor_id:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.MemberResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      joined_at:
+        type: string
+      member_code:
+        type: string
+      phone:
+        type: string
+      sponsor_id:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.MemberWithDownlineCount:
+    properties:
+      created_at:
+        type: string
+      downline_count:
+        type: integer
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      joined_at:
+        type: string
+      level_1_count:
+        type: integer
+      level_2_count:
+        type: integer
+      level_3_count:
+        type: integer
+      member_code:
+        type: string
+      phone:
+        type: string
+      sponsor_id:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.MemberWithLevel:
+    properties:
+      created_at:
+        type: string
+      downlines:
+        description: Relationships
+        items:
+          $ref: '#/definitions/models.Member'
+        type: array
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      incomes:
+        items:
+          $ref: '#/definitions/models.Income'
+        type: array
+      joined_at:
+        type: string
+      member_code:
+        type: string
+      phone:
+        type: string
+      referrals:
+        items:
+          $ref: '#/definitions/models.Referral'
+        type: array
+      relationship_level:
+        type: integer
+      sponsor:
+        $ref: '#/definitions/models.Member'
+      sponsor_id:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.Referral:
+    properties:
+      child:
+        $ref: '#/definitions/models.Member'
+      child_id:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      level:
+        type: integer
+      parent:
+        allOf:
+        - $ref: '#/definitions/models.Member'
+        description: Relationships
+      parent_id:
+        type: string
+    type: object
+  models.UpdateMemberInput:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      phone:
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        - pending
+        - suspended
+        type: string
+    type: object
+  services.ActivityLog:
+    properties:
+      action:
+        type: string
+      admin_name:
+        type: string
+      created_at:
+        type: string
+      details:
+        type: string
+      id:
+        type: string
+      type:
+        type: string
+    type: object
+  services.ChartDataset:
+    properties:
+      color:
+        type: string
+      data:
+        items:
+          type: number
+        type: array
+      label:
+        type: string
+    type: object
+  services.DashboardOverview:
+    properties:
+      active_members:
+        type: integer
+      commission_rate:
+        type: number
+      growth_rate:
+        type: number
+      new_members_today:
+        type: integer
+      pending_income:
+        type: number
+      total_income:
+        type: number
+      total_members:
+        type: integer
+      total_referrals:
+        type: integer
+    type: object
+  services.GrowthProjection:
+    properties:
+      description:
+        type: string
+      percentage:
+        type: number
+      total_income:
+        type: number
+    type: object
+  services.GrowthProjectionResponse:
+    properties:
+      level:
+        type: integer
+      projections:
+        items:
+          $ref: '#/definitions/services.GrowthProjection'
+        type: array
+    type: object
+  services.IncomeChartData:
+    properties:
+      datasets:
+        items:
+          $ref: '#/definitions/services.ChartDataset'
+        type: array
+      labels:
+        items:
+          type: string
+        type: array
+    type: object
+  services.IncomeDashboardStats:
+    properties:
+      avg_per_member:
+        type: number
+      highest_amount:
+        type: number
+      highest_earner:
+        type: string
+      pending_payout:
+        type: number
+      total_distributed:
+        type: number
+      transactions:
+        type: integer
+    type: object
+  services.IncomeProjectionResponse:
+    properties:
+      growth_projections:
+        items:
+          $ref: '#/definitions/services.GrowthProjection'
+        type: array
+      level_projections:
+        items:
+          $ref: '#/definitions/services.LevelProjection'
+        type: array
+      member_id:
+        type: string
+      total_actual:
+        type: number
+      total_potential:
+        type: number
+    type: object
+  services.LevelBreakdown:
+    properties:
+      income_amount:
+        type: number
+      level:
+        type: integer
+      percentage:
+        type: number
+      seat_capacity:
+        type: integer
+      seat_filled:
+        type: integer
+      total_income:
+        type: number
+    type: object
+  services.LevelDetail:
+    properties:
+      actual_income:
+        type: number
+      income_per_seat:
+        type: number
+      level:
+        type: integer
+      members:
+        items:
+          $ref: '#/definitions/models.MemberWithLevel'
+        type: array
+      potential_income:
+        type: number
+      seat_capacity:
+        type: integer
+      total_members:
+        type: integer
+    type: object
+  services.LevelDistribution:
+    properties:
+      counts:
+        items:
+          type: integer
+        type: array
+      levels:
+        items:
+          type: integer
+        type: array
+    type: object
+  services.LevelProjection:
+    properties:
+      actual_income:
+        type: number
+      income_per_seat:
+        type: number
+      level:
+        type: integer
+      percentage_complete:
+        type: number
+      potential_income:
+        type: number
+      seat_capacity:
+        type: integer
+      seat_filled:
+        type: integer
+    type: object
+  services.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      admin:
+        $ref: '#/definitions/models.AdminResponse'
+      expires_at:
+        type: string
+      refresh_token:
+        type: string
+      token_type:
+        type: string
+    type: object
+  services.MemberDashboardStats:
+    properties:
+      active:
+        type: integer
+      by_referral_count:
+        additionalProperties:
+          type: integer
+        type: object
+      by_status:
+        additionalProperties:
+          type: integer
+        type: object
+      inactive:
+        type: integer
+      pending:
+        type: integer
+      suspended:
+        type: integer
+      total:
+        type: integer
+    type: object
+  services.MemberGrowthChart:
+    properties:
+      growth:
+        items:
+          type: number
+        type: array
+      labels:
+        items:
+          type: string
+        type: array
+      members:
+        items:
+          type: integer
+        type: array
+    type: object
+  services.ReferralStatsResponse:
+    properties:
+      direct_referrals:
+        type: integer
+      indirect_referrals:
+        type: integer
+      level_distribution:
+        additionalProperties:
+          type: integer
+        type: object
+      max_tree_depth:
+        type: integer
+      total_referrals:
+        type: integer
+    type: object
+  services.ReferralTreeResponse:
+    properties:
+      levels:
+        items:
+          $ref: '#/definitions/services.LevelDetail'
+        type: array
+      max_depth:
+        type: integer
+      member:
+        $ref: '#/definitions/models.MemberResponse'
+      total_downline:
+        type: integer
+    type: object
+  services.SystemAlert:
+    properties:
+      actions:
+        type: string
+      id:
+        type: string
+      message:
+        type: string
+      severity:
+        type: string
+      type:
+        type: string
+    type: object
+  services.SystemHealth:
+    properties:
+      api_version:
+        type: string
+      cpu_load:
+        type: number
+      db_status:
+        type: string
+      memory_free:
+        type: integer
+      memory_used:
+        type: integer
+      status:
+        type: string
+      uptime:
+        type: string
+    type: object
+  services.TopEarner:
+    properties:
+      direct_count:
+        type: integer
+      member_id:
+        type: string
+      member_name:
+        type: string
+      total_income:
+        type: number
+    type: object
+  services.TreeSummaryResponse:
+    properties:
+      active_members:
+        type: integer
+      level_breakdown:
+        items:
+          $ref: '#/definitions/services.LevelBreakdown'
+        type: array
+      potential_income:
+        type: number
+      total_income:
+        type: number
+      total_levels:
+        type: integer
+      total_members:
+        type: integer
+    type: object
+  services.UpdateCommissionInput:
+    properties:
+      commission_percentage:
+        type: number
+      income_amount:
+        type: number
+      seat_capacity:
+        type: integer
+    type: object
+  utils.Meta:
+    properties:
+      has_next:
+        type: boolean
+      has_prev:
+        type: boolean
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  utils.Response:
+    properties:
+      data: {}
+      error:
+        type: string
+      message:
+        type: string
+      meta:
+        $ref: '#/definitions/utils.Meta'
+      success:
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: |-
+    Admin API for MLM management system
+
+    This API provides endpoints for managing MLM operations including:
+    - Admin authentication and authorization
+    - Member management
+    - Referral tree management
+    - Income calculations and distributions
+    - Reports and analytics
+    - Audit logging
+  title: MLM Admin API
+  version: 1.0.0
+paths:
+  /api/v1/auth/change-password:
+    post:
+      consumes:
+      - application/json
+      description: Change the password of the currently logged in admin
+      parameters:
+      - description: Password change request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Change password
+      tags:
+      - auth
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate admin and return JWT tokens
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/services.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Admin login
+      tags:
+      - auth
+  /api/v1/auth/logout:
+    post:
+      description: Logout admin and invalidate token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Admin logout
+      tags:
+      - auth
+  /api/v1/auth/me:
+    get:
+      description: Get the profile of the currently logged in admin
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AdminResponse'
+      security:
+      - Bearer: []
+      summary: Get current admin profile
+      tags:
+      - auth
+  /api/v1/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Get new access token using refresh token
+      parameters:
+      - description: Refresh token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.TokenPair'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Refresh access token
+      tags:
+      - auth
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new admin (super_admin only)
+      parameters:
+      - description: Admin registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.AdminResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Register new admin
+      tags:
+      - auth
+  /api/v1/commission/config:
+    get:
+      description: Get all MLM commission configurations for all levels
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Get commission configuration
+      tags:
+      - commission
+  /api/v1/commission/config/{level}:
+    put:
+      consumes:
+      - application/json
+      description: Update commission configuration for a specific MLM level
+      parameters:
+      - description: MLM Level (1-10)
+        in: path
+        name: level
+        required: true
+        type: integer
+      - description: Commission config update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateCommissionConfigRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Update commission configuration
+      tags:
+      - commission
+  /api/v1/dashboard/activity:
+    get:
+      description: Get recent system activity
+      parameters:
+      - default: 20
+        description: Number of activities
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/services.ActivityLog'
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: Recent activity
+      tags:
+      - dashboard
+  /api/v1/dashboard/alerts:
+    get:
+      description: Get system alerts and notifications
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/services.SystemAlert'
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: System alerts
+      tags:
+      - dashboard
+  /api/v1/dashboard/charts/growth:
+    get:
+      description: Get member growth chart data
+      parameters:
+      - default: yearly
+        description: Period (yearly, monthly)
+        in: query
+        name: period
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.MemberGrowthChart'
+              type: object
+      security:
+      - Bearer: []
+      summary: Member growth chart
+      tags:
+      - dashboard
+  /api/v1/dashboard/charts/income:
+    get:
+      description: Get income chart data for dashboard
+      parameters:
+      - default: yearly
+        description: Period (yearly, monthly)
+        in: query
+        name: period
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.IncomeChartData'
+              type: object
+      security:
+      - Bearer: []
+      summary: Income chart data
+      tags:
+      - dashboard
+  /api/v1/dashboard/health:
+    get:
+      description: Get system health status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.SystemHealth'
+              type: object
+      security:
+      - Bearer: []
+      summary: System health
+      tags:
+      - dashboard
+  /api/v1/dashboard/income:
+    get:
+      description: Get income statistics for the dashboard
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.IncomeDashboardStats'
+              type: object
+      security:
+      - Bearer: []
+      summary: Income dashboard stats
+      tags:
+      - dashboard
+  /api/v1/dashboard/levels:
+    get:
+      description: Get member distribution across MLM levels
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.LevelDistribution'
+              type: object
+      security:
+      - Bearer: []
+      summary: Level distribution
+      tags:
+      - dashboard
+  /api/v1/dashboard/members:
+    get:
+      description: Get detailed member statistics
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.MemberDashboardStats'
+              type: object
+      security:
+      - Bearer: []
+      summary: Member dashboard stats
+      tags:
+      - dashboard
+  /api/v1/dashboard/overview:
+    get:
+      description: Get high-level dashboard overview stats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.DashboardOverview'
+              type: object
+      security:
+      - Bearer: []
+      summary: Dashboard overview
+      tags:
+      - dashboard
+  /api/v1/dashboard/top-earners:
+    get:
+      description: Get top earning members
+      parameters:
+      - default: 10
+        description: Number of top earners
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/services.TopEarner'
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: Top earners
+      tags:
+      - dashboard
+  /api/v1/income/{income_id}/reverse:
+    post:
+      consumes:
+      - application/json
+      description: Reverse a previously calculated income record (Super Admin only)
+      parameters:
+      - description: Income ID
+        in: path
+        name: income_id
+        required: true
+        type: string
+      - description: Reversal reason
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ReverseIncomeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Reverse an income record
+      tags:
+      - income
+  /api/v1/income/calculate:
+    post:
+      consumes:
+      - application/json
+      description: Calculate and distribute income for a member based on their level
+        and transaction type
+      parameters:
+      - description: Income calculation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CalculateIncomeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Calculate income for a member
+      tags:
+      - income
+  /api/v1/income/level/{level}:
+    get:
+      description: Get paginated income records filtered by MLM level
+      parameters:
+      - description: MLM Level (1-10)
+        in: path
+        name: level
+        required: true
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Get income by level
+      tags:
+      - income
+  /api/v1/income/member/{member_id}/history:
+    get:
+      description: Get paginated income history for a specific member
+      parameters:
+      - description: Member ID
+        in: path
+        name: member_id
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Get member income history
+      tags:
+      - income
+  /api/v1/income/member/{member_id}/projection:
+    get:
+      description: Get projected future income for a member based on their referral
+        tree
+      parameters:
+      - description: Member ID
+        in: path
+        name: member_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Get income projection for a member
+      tags:
+      - income
+  /api/v1/income/member/{member_id}/snapshot/{level}:
+    get:
+      description: Get snapshot history for a specific member at a specific MLM level
+      parameters:
+      - description: Member ID
+        in: path
+        name: member_id
+        required: true
+        type: string
+      - description: MLM Level (1-10)
+        in: path
+        name: level
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Get level snapshot history
+      tags:
+      - income
+  /api/v1/income/member/{member_id}/total:
+    get:
+      description: Get the total income accumulated for a specific member
+      parameters:
+      - description: Member ID
+        in: path
+        name: member_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Get member total income
+      tags:
+      - income
+  /api/v1/income/statistics:
+    get:
+      description: Get overall income statistics and commission configuration summary
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Get income statistics
+      tags:
+      - income
+  /api/v1/members:
+    get:
+      consumes:
+      - application/json
+      description: Get paginated list of members with filtering
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by status
+        enum:
+        - active
+        - inactive
+        - pending
+        - suspended
+        in: query
+        name: status
+        type: string
+      - description: Search by name, code, email, or phone
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.MemberResponse'
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: List members
+      tags:
+      - members
+    post:
+      consumes:
+      - application/json
+      description: Create a new member in the MLM system
+      parameters:
+      - description: Member creation details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateMemberInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.MemberResponse'
+              type: object
+      security:
+      - Bearer: []
+      summary: Create member
+      tags:
+      - members
+  /api/v1/members/{id}:
+    delete:
+      description: Soft delete a member (cannot delete members with downlines)
+      parameters:
+      - description: Member ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Delete member
+      tags:
+      - members
+    get:
+      description: Get a single member by their ID
+      parameters:
+      - description: Member ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.MemberResponse'
+              type: object
+      security:
+      - Bearer: []
+      summary: Get member by ID
+      tags:
+      - members
+    put:
+      consumes:
+      - application/json
+      description: Update an existing member's details
+      parameters:
+      - description: Member ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Member update details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateMemberInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.MemberResponse'
+              type: object
+      security:
+      - Bearer: []
+      summary: Update member
+      tags:
+      - members
+  /api/v1/members/{id}/downline:
+    get:
+      description: Get the downline tree for a member
+      parameters:
+      - description: Member ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: 10
+        description: Max depth level
+        in: query
+        name: level
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.MemberWithDownlineCount'
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: Get member downline tree
+      tags:
+      - members
+  /api/v1/members/{id}/upline:
+    get:
+      description: Get the upline chain for a member
+      parameters:
+      - description: Member ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: 10
+        description: Max depth level
+        in: query
+        name: level
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.MemberResponse'
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: Get member upline
+      tags:
+      - members
+  /api/v1/members/search:
+    get:
+      description: Search members by keyword
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.MemberResponse'
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: Search members
+      tags:
+      - members
+  /api/v1/members/stats:
+    get:
+      description: Get member statistics (total, active, inactive counts)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Bearer: []
+      summary: Get member stats
+      tags:
+      - members
+  /api/v1/referrals/{id}/downline:
+    get:
+      description: Get the downline referral tree for a member
+      parameters:
+      - description: Member ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: 10
+        description: Max depth level
+        in: query
+        name: level
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.ReferralTreeResponse'
+              type: object
+      security:
+      - Bearer: []
+      summary: Get downline tree
+      tags:
+      - referrals
+  /api/v1/referrals/{id}/income-projection:
+    get:
+      description: Get income projections for a member across all levels
+      parameters:
+      - description: Member ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.IncomeProjectionResponse'
+              type: object
+      security:
+      - Bearer: []
+      summary: Get income projection
+      tags:
+      - referrals
+  /api/v1/referrals/{id}/stats:
+    get:
+      description: Get referral statistics for a member
+      parameters:
+      - description: Member ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.ReferralStatsResponse'
+              type: object
+      security:
+      - Bearer: []
+      summary: Get referral stats
+      tags:
+      - referrals
+  /api/v1/referrals/{id}/summary:
+    get:
+      description: Get a summary of the referral tree for a member
+      parameters:
+      - description: Member ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.TreeSummaryResponse'
+              type: object
+      security:
+      - Bearer: []
+      summary: Get tree summary
+      tags:
+      - referrals
+  /api/v1/referrals/{id}/upline:
+    get:
+      description: Get the upline chain for a member
+      parameters:
+      - description: Member ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: 10
+        description: Max depth level
+        in: query
+        name: level
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.ReferralTreeResponse'
+              type: object
+      security:
+      - Bearer: []
+      summary: Get upline
+      tags:
+      - referrals
+  /api/v1/referrals/commission-config:
+    get:
+      description: Get the MLM commission structure for all levels
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.CommissionResponse'
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: Get commission config
+      tags:
+      - referrals
+  /api/v1/referrals/commission-config/{level}:
+    put:
+      consumes:
+      - application/json
+      description: Update commission configuration for a specific level
+      parameters:
+      - description: Level number
+        in: path
+        name: level
+        required: true
+        type: integer
+      - description: Commission config update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/services.UpdateCommissionInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CommissionResponse'
+              type: object
+      security:
+      - Bearer: []
+      summary: Update commission config
+      tags:
+      - referrals
+  /api/v1/referrals/projected-growth/{level}:
+    get:
+      description: Calculate projected income growth at different percentages for
+        a level
+      parameters:
+      - description: Level number (1-10)
+        in: path
+        name: level
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.GrowthProjectionResponse'
+              type: object
+      security:
+      - Bearer: []
+      summary: Calculate projected growth
+      tags:
+      - referrals
+  /health:
+    get:
+      description: Check the health status of the API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.HealthResponse'
+      summary: Health check
+      tags:
+      - health
+  /health/live:
+    get:
+      description: Check if the API is alive
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Liveness check
+      tags:
+      - health
+  /health/ready:
+    get:
+      description: Check if the API is ready to accept requests
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Readiness check
+      tags:
+      - health
+schemes:
+- http
+- https
+securityDefinitions:
+  Bearer:
+    description: Type "Bearer" followed by a space and JWT token
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

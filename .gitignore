@@ -97,8 +97,8 @@ docker-compose.override.yml
 *.prof
 *.pprof
 
-# Swagger generated docs (regenerated)
-backend/docs/
+# Swagger generated docs (committed for Docker build on Render)
+# backend/docs/
 
 # Test coverage
 coverage/
