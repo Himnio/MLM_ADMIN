@@ -1,0 +1,71 @@
+# Binaries
+/server
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test files
+*_test.go
+*_test.go.orig
+
+# Go workspace file
+go.work
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Documentation
+*.md
+
+# Scripts
+scripts/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Coverage
+coverage.txt
+*.out
+
+# Build artifacts
+bin/
+dist/
+vendor/
+
+# Logs
+*.log
+logs/
+
+# Temp files
+tmp/
+temp/
+*.tmp
+
+# Upload files
+uploads/
+data/
+
+# Certificates
+ssl/
+*.pem
+*.key
+*.crt
