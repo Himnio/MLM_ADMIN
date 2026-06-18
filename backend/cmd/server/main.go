@@ -60,6 +60,12 @@ func main() {
 		"port":    cfg.App.Port,
 	})
 
+	// Wait for database to be ready (important for containerized environments)
+	logger.Info("Waiting for database to be ready...", nil)
+	if err := database.WaitForDatabase(&cfg.Database, 30*time.Second); err != nil {
+		logger.Fatal(err, "Database not available", nil)
+	}
+
 	// Initialize database
 	db, err := database.NewPostgresDB(&cfg.Database, logger)
 	if err != nil {

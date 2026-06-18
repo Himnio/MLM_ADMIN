@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"net/url"
 	"time"
 
 	"mlm-admin-backend/internal/config"
@@ -19,26 +20,28 @@ type PostgresDB struct {
 	logger *utils.Logger
 }
 
+func postgresDSN(cfg *config.DatabaseConfig) string {
+	if cfg.DatabaseURL != "" {
+		u, err := url.Parse(cfg.DatabaseURL)
+		if err == nil {
+			q := u.Query()
+			if cfg.SSLMode != "" && !q.Has("sslmode") {
+				q.Set("sslmode", cfg.SSLMode)
+				u.RawQuery = q.Encode()
+			}
+			return u.String()
+		}
+		return cfg.DatabaseURL
+	}
+	return fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=UTC",
+		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Name, cfg.SSLMode,
+	)
+}
+
 // NewPostgresDB creates a new PostgreSQL database connection
 func NewPostgresDB(cfg *config.DatabaseConfig, log *utils.Logger) (*PostgresDB, error) {
-	// Use DATABASE_URL if provided (Render.com format), otherwise build DSN from individual fields
-	var dsn string
-	if cfg.DatabaseURL != "" {
-		dsn = cfg.DatabaseURL
-		if cfg.SSLMode != "" {
-			dsn += "?sslmode=" + cfg.SSLMode
-		}
-	} else {
-		dsn = fmt.Sprintf(
-			"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=UTC",
-			cfg.Host,
-			cfg.Port,
-			cfg.User,
-			cfg.Password,
-			cfg.Name,
-			cfg.SSLMode,
-		)
-	}
+	dsn := postgresDSN(cfg)
 
 	// Configure GORM logger based on environment
 	var gormLogger logger.Interface
@@ -156,32 +159,19 @@ func WaitForDatabase(cfg *config.DatabaseConfig, timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
 
 	for time.Now().Before(deadline) {
-		var dsn string
-		if cfg.DatabaseURL != "" {
-			dsn = cfg.DatabaseURL
-		} else {
-			dsn = fmt.Sprintf(
-				"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=UTC",
-				cfg.Host,
-				cfg.Port,
-				cfg.User,
-				cfg.Password,
-				cfg.Name,
-				cfg.SSLMode,
-			)
-		}
-
+		dsn := postgresDSN(cfg)
 		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err == nil {
 			if sqlDB, err := db.DB(); err == nil {
 				if err := sqlDB.Ping(); err == nil {
+					sqlDB.Close()
 					return nil
 				}
 			}
 		}
-		
+
 		time.Sleep(2 * time.Second)
 	}
-	
+
 	return fmt.Errorf("database connection timeout after %v", timeout)
 }
