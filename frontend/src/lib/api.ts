@@ -1,4 +1,4 @@
-const API_TIMEOUT = 15000;
+const API_TIMEOUT = 45000;
 
 function getApiBaseUrl(): string {
   const buildUrl = process.env.NEXT_PUBLIC_API_URL;
