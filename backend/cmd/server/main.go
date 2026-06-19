@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"sync/atomic"
 	"syscall"
 	"time"
@@ -53,41 +52,33 @@ var (
 func main() {
 	fmt.Fprintf(os.Stderr, "MLM_ADMIN_BOOT: main() started\n")
 
-	cfg, err := config.Load()
-	if err != nil {
-		log.Fatalf("Failed to load configuration: %v", err)
+	// --- ONE gateway HTTP server from the very first moment ---
+	bootPort := os.Getenv("PORT")
+	if bootPort == "" {
+		bootPort = os.Getenv("APP_PORT")
 	}
+	if bootPort == "" {
+		bootPort = "8080"
+	}
+	fmt.Fprintf(os.Stderr, "MLM_ADMIN_BOOT: binding to port %s\n", bootPort)
 
-	fmt.Fprintf(os.Stderr, "MLM_ADMIN_BOOT: config loaded, port=%s env=%s\n", cfg.App.Port, cfg.App.Env)
+	var (
+		backendReady atomic.Bool
+		ginEngine    http.Handler
+	)
 
-	logger := utils.NewLogger(cfg.App.Env, cfg.Logging.Level, cfg.Logging.Format, cfg.Logging.Output)
-	utils.InitGlobalLogger(cfg.App.Env, cfg.Logging.Level, cfg.Logging.Format, cfg.Logging.Output)
-
-	logger.Info("Starting MLM Admin API", map[string]interface{}{
-		"version": cfg.App.Version,
-		"env":     cfg.App.Env,
-		"port":    cfg.App.Port,
-	})
-
-	// Gateway handler: responds immediately even before DB is ready
 	gateway := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if serverReady.Load() && fullRouter != nil {
-			fullRouter.ServeHTTP(w, r)
+		if backendReady.Load() && ginEngine != nil {
+			ginEngine.ServeHTTP(w, r)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		path := r.URL.Path
-		if strings.HasPrefix(path, "/api/v1/health") || strings.HasPrefix(path, "/health") || strings.HasPrefix(path, "/ready") || strings.HasPrefix(path, "/live") {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{"status":"starting","message":"Server is initializing"}`))
-		} else {
-			w.WriteHeader(http.StatusServiceUnavailable)
-			w.Write([]byte(`{"status":"not_ready","message":"Server is starting up, please retry in a few seconds"}`))
-		}
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"starting","message":"Server initializing"}`))
 	})
 
 	srv := &http.Server{
-		Addr:         ":" + cfg.App.Port,
+		Addr:         ":" + bootPort,
 		Handler:      gateway,
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
@@ -95,46 +86,55 @@ func main() {
 	}
 
 	go func() {
-		logger.Info(fmt.Sprintf("Server listening on port %s", cfg.App.Port), nil)
+		fmt.Fprintf(os.Stderr, "MLM_ADMIN_BOOT: gateway listening\n")
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Fatal(err, "Failed to start server", nil)
+			fmt.Fprintf(os.Stderr, "MLM_ADMIN_BOOT: ListenAndServe error: %v\n", err)
 		}
 	}()
 
-	// ---- initialize database (server is already running) ----
-	{
-		logger.Info("Waiting for database to be ready...", nil)
-		if err := database.WaitForDatabase(&cfg.Database, 30*time.Second); err != nil {
-			logger.Fatal(err, "Database not available", nil)
-		}
+	// Small pause so the gateway can bind before any following work
+	time.Sleep(50 * time.Millisecond)
 
-		db, err := database.NewPostgresDB(&cfg.Database, logger)
-		if err != nil {
-			logger.Fatal(err, "Failed to connect to database", nil)
-		}
-		defer db.Close()
+	// ---- Now do all initialization while the gateway handles health checks ----
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("Failed to load configuration: %v", err)
+	}
+	fmt.Fprintf(os.Stderr, "MLM_ADMIN_BOOT: config loaded, env=%s\n", cfg.App.Env)
 
-		logger.Info("Running database migrations", nil)
-		if err := database.RunMigrations(&cfg.Database, "migrations"); err != nil {
-			logger.Fatal(err, "Failed to run migrations", nil)
-		}
+	logger := utils.NewLogger(cfg.App.Env, cfg.Logging.Level, cfg.Logging.Format, cfg.Logging.Output)
+	utils.InitGlobalLogger(cfg.App.Env, cfg.Logging.Level, cfg.Logging.Format, cfg.Logging.Output)
+	logger.Info("Starting MLM Admin API", map[string]interface{}{"version": cfg.App.Version, "env": cfg.App.Env, "port": cfg.App.Port})
 
-		fullRouter = setupRouter(cfg, db, logger)
-		serverReady.Store(true)
-		logger.Info("Database initialized, server is ready", nil)
+	logger.Info("Waiting for database to be ready...", nil)
+	if err := database.WaitForDatabase(&cfg.Database, 30*time.Second); err != nil {
+		logger.Fatal(err, "Database not available", nil)
 	}
 
+	db, err := database.NewPostgresDB(&cfg.Database, logger)
+	if err != nil {
+		logger.Fatal(err, "Failed to connect to database", nil)
+	}
+	defer db.Close()
+
+	logger.Info("Running database migrations", nil)
+	if err := database.RunMigrations(&cfg.Database, "migrations"); err != nil {
+		logger.Fatal(err, "Failed to run migrations", nil)
+	}
+
+	ginEngine = setupRouter(cfg, db, logger)
+	backendReady.Store(true)
+	logger.Info("Server ready", nil)
+
+	// Wait for shutdown signal
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
 	logger.Info("Shutting down server...", nil)
-
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	if err := srv.Shutdown(ctx); err != nil {
-		logger.Fatal(err, "Server forced to shutdown", nil)
-	}
+	srv.Shutdown(ctx)
 	logger.Info("Server exited gracefully", nil)
 }
 
