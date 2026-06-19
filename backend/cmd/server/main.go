@@ -44,11 +44,15 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token
 func main() {
+	fmt.Fprintf(os.Stderr, "MLM_ADMIN_BOOT: main() started\n")
+
 	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
+
+	fmt.Fprintf(os.Stderr, "MLM_ADMIN_BOOT: config loaded, port=%s env=%s\n", cfg.App.Port, cfg.App.Env)
 
 	// Initialize logger
 	logger := utils.NewLogger(cfg.App.Env, cfg.Logging.Level, cfg.Logging.Format, cfg.Logging.Output)

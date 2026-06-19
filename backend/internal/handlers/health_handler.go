@@ -108,13 +108,7 @@ func (h *HealthHandler) Health(c *gin.Context) {
 		},
 	}
 
-	// Set status code based on overall health
-	statusCode := http.StatusOK
-	if response.Status != "healthy" {
-		statusCode = http.StatusServiceUnavailable
-	}
-
-	c.JSON(statusCode, response)
+	c.JSON(http.StatusOK, response)
 }
 
 // @Summary Readiness check
@@ -126,7 +120,7 @@ func (h *HealthHandler) Health(c *gin.Context) {
 func (h *HealthHandler) Ready(c *gin.Context) {
 	// Check if database is connected
 	if err := h.db.Health(); err != nil {
-		c.JSON(http.StatusServiceUnavailable, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"status":  "not_ready",
 			"message": err.Error(),
 		})
