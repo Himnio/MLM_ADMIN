@@ -20,6 +20,7 @@ type ReferralLinkRepository interface {
 	GetRegistrationsByReferralCode(code string) ([]*models.ReferralRegistration, error)
 	CheckUsernameExists(username string) (bool, error)
 	CheckEmailExists(email string) (bool, error)
+	DeleteReferralCode(code string) error
 }
 
 type referralLinkRepository struct {
@@ -84,4 +85,8 @@ func (r *referralLinkRepository) CheckEmailExists(email string) (bool, error) {
 	var count int64
 	err := r.db.DB.Model(&models.ReferralRegistration{}).Where("email = ?", email).Count(&count).Error
 	return count > 0, err
+}
+
+func (r *referralLinkRepository) DeleteReferralCode(code string) error {
+	return r.db.DB.Where("referral_code = ?", code).Delete(&models.ReferralCode{}).Error
 }

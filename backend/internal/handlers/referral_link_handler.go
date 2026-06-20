@@ -267,6 +267,26 @@ func (h *ReferralLinkHandler) ListReferralCodes(c *gin.Context) {
 	})
 }
 
+func (h *ReferralLinkHandler) DeleteReferralCode(c *gin.Context) {
+	code := c.Param("code")
+	if code == "" {
+		utils.BadRequestResponse(c, "Referral code is required", "")
+		return
+	}
+
+	if err := h.service.DeleteReferralCode(code); err != nil {
+		if err.Error() == "referral code not found" {
+			utils.NotFoundResponse(c, "Referral code not found", "")
+			return
+		}
+		h.logger.Error(err, "Failed to delete referral code", nil)
+		utils.InternalServerErrorResponse(c, "Failed to delete referral code", err.Error())
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Referral code deleted successfully", nil)
+}
+
 func (h *ReferralLinkHandler) SearchByCreator(c *gin.Context) {
 	username := c.Query("username")
 	if username == "" {

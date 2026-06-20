@@ -115,32 +115,51 @@ export default function ReferralSearchView() {
                     <span className="badge-primary">{r.total_registrations} signup{r.total_registrations !== 1 ? 's' : ''}</span>
                   </div>
                   {r.registrations.length > 0 ? (
-                    <div className="overflow-x-auto">
-                      <table className="data-table">
-                        <thead>
-                          <tr>
-                            <th>Name</th>
-                            <th className="hidden sm:table-cell">Username</th>
-                            <th className="hidden md:table-cell">Email</th>
-                            <th className="hidden lg:table-cell">PAN Card</th>
-                            <th>Full Name</th>
-                            <th className="hidden sm:table-cell">Date</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border">
-                          {r.registrations.map(reg => (
-                            <tr key={reg.id} className="hover:bg-surface-hover transition-colors">
-                              <td className="text-sm font-medium text-text-primary">{reg.name}</td>
-                              <td className="text-sm text-text-secondary hidden sm:table-cell">{reg.username}</td>
-                              <td className="text-sm text-text-secondary hidden md:table-cell">{reg.email}</td>
-                              <td className="text-sm font-mono text-text-secondary hidden lg:table-cell">{reg.pan_card_id}</td>
-                              <td className="text-sm text-text-secondary">{reg.full_name}</td>
-                              <td className="text-sm text-text-muted hidden sm:table-cell">{new Date(reg.registered_at).toLocaleDateString()}</td>
+                    <>
+                      {/* Mobile cards */}
+                      <div className="sm:hidden divide-y divide-border">
+                        {r.registrations.map(reg => (
+                          <div key={reg.id} className="p-4 space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-semibold text-text-primary">{reg.name}</p>
+                              <span className="text-xs text-text-muted">{new Date(reg.registered_at).toLocaleDateString()}</span>
+                            </div>
+                            <p className="text-xs text-text-secondary">{reg.full_name}</p>
+                            <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-xs">
+                              <span className="text-text-muted">User:</span><span className="text-text-primary">{reg.username}</span>
+                              <span className="text-text-muted">PAN:</span><span className="text-text-primary font-mono">{reg.pan_card_id}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {/* Desktop table */}
+                      <div className="hidden sm:block overflow-x-auto">
+                        <table className="data-table">
+                          <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th className="hidden sm:table-cell">Username</th>
+                              <th className="hidden md:table-cell">Email</th>
+                              <th className="hidden lg:table-cell">PAN Card</th>
+                              <th>Full Name</th>
+                              <th className="hidden sm:table-cell">Date</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                          </thead>
+                          <tbody className="divide-y divide-border">
+                            {r.registrations.map(reg => (
+                              <tr key={reg.id} className="hover:bg-surface-hover transition-colors">
+                                <td className="text-sm font-medium text-text-primary">{reg.name}</td>
+                                <td className="text-sm text-text-secondary hidden sm:table-cell">{reg.username}</td>
+                                <td className="text-sm text-text-secondary hidden md:table-cell">{reg.email}</td>
+                                <td className="text-sm font-mono text-text-secondary hidden lg:table-cell">{reg.pan_card_id}</td>
+                                <td className="text-sm text-text-secondary">{reg.full_name}</td>
+                                <td className="text-sm text-text-muted hidden sm:table-cell">{new Date(reg.registered_at).toLocaleDateString()}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
                   ) : (
                     <div className="px-6 py-6 text-center text-sm text-text-muted">No signups for this code yet.</div>
                   )}

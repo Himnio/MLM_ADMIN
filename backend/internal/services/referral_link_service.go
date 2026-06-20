@@ -22,6 +22,7 @@ type ReferralLinkService interface {
 	GetRegistrations(code string) ([]*models.ReferralRegistration, error)
 	GetReferralCodes(adminID *uuid.UUID, isSuperAdmin bool) ([]*models.ReferralCode, error)
 	SearchReferralCodesByCreator(username string) ([]*models.ReferralCode, error)
+	DeleteReferralCode(code string) error
 }
 
 type ReferralRegistrationInput struct {
@@ -188,4 +189,15 @@ func (s *referralLinkService) GetReferralCodes(adminID *uuid.UUID, isSuperAdmin 
 
 func (s *referralLinkService) SearchReferralCodesByCreator(username string) ([]*models.ReferralCode, error) {
 	return s.repo.SearchReferralCodesByCreator(username)
+}
+
+func (s *referralLinkService) DeleteReferralCode(code string) error {
+	rc, err := s.repo.GetReferralCodeByCode(code)
+	if err != nil {
+		return err
+	}
+	if rc == nil {
+		return fmt.Errorf("referral code not found")
+	}
+	return s.repo.DeleteReferralCode(code)
 }

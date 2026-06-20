@@ -103,50 +103,77 @@ export default function MembersView() {
       </div>
 
       <div className="stat-card p-0 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th className="hidden sm:table-cell">Phone</th>
-                <th>Status</th>
-                <th className="hidden md:table-cell">Joined</th>
-                <th className="text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr><td colSpan={7} className="text-center py-16"><div className="skeleton mx-auto" /></td></tr>
-              ) : members.length === 0 ? (
-                <tr><td colSpan={7}><div className="empty-state"><Users size={40} /><p>No members found</p></div></td></tr>
-              ) : members.map(m => (
-                <tr key={m.id} className="cursor-pointer hover:bg-surface-hover transition-colors" onClick={() => viewDetail(m)}>
-                  <td className="font-mono text-sm">{m.member_code}</td>
-                  <td className="font-medium text-text-primary">{m.full_name}</td>
-                  <td className="text-sm text-text-secondary">{m.email}</td>
-                  <td className="text-sm text-text-secondary hidden sm:table-cell">{m.phone || '-'}</td>
-                  <td>{statusBadge(m.status)}</td>
-                  <td className="text-sm text-text-muted hidden md:table-cell">{new Date(m.joined_at).toLocaleDateString()}</td>
-                  <td>
-                    <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
-                      <button onClick={() => setShowEdit(m)} className="p-1.5 hover:bg-surface-hover rounded-lg text-text-muted hover:text-primary transition-colors"><Edit2 size={16} /></button>
-                      <button onClick={() => handleDelete(m.id)} className="p-1.5 hover:bg-red-50 rounded-lg text-text-muted hover:text-red-600 transition-colors"><Trash2 size={16} /></button>
+        {loading ? (
+          <div className="py-16 flex justify-center"><div className="skeleton" /></div>
+        ) : members.length === 0 ? (
+          <div className="py-16"><div className="empty-state"><Users size={40} /><p>No members found</p></div></div>
+        ) : (
+          <>
+            {/* Mobile cards */}
+            <div className="sm:hidden divide-y divide-border">
+              {members.map(m => (
+                <div key={m.id} className="p-4 space-y-2 cursor-pointer hover:bg-surface-hover transition-colors" onClick={() => viewDetail(m)}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-text-primary truncate">{m.full_name}</p>
+                      <p className="text-xs text-text-secondary font-mono mt-0.5">{m.member_code}</p>
                     </div>
-                  </td>
-                </tr>
+                    {statusBadge(m.status)}
+                  </div>
+                  <p className="text-xs text-text-muted truncate">{m.email}</p>
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-xs text-text-muted">{m.phone || '—'}</span>
+                    <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                      <button onClick={() => setShowEdit(m)} className="p-1.5 hover:bg-surface-hover rounded-lg text-text-muted hover:text-primary transition-colors"><Edit2 size={14} /></button>
+                      <button onClick={() => handleDelete(m.id)} className="p-1.5 hover:bg-red-50 rounded-lg text-text-muted hover:text-red-600 transition-colors"><Trash2 size={14} /></button>
+                    </div>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </div>
+            {/* Desktop table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th className="hidden md:table-cell">Phone</th>
+                    <th>Status</th>
+                    <th className="hidden lg:table-cell">Joined</th>
+                    <th className="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {members.map(m => (
+                    <tr key={m.id} className="cursor-pointer hover:bg-surface-hover transition-colors" onClick={() => viewDetail(m)}>
+                      <td className="font-mono text-sm">{m.member_code}</td>
+                      <td className="font-medium text-text-primary">{m.full_name}</td>
+                      <td className="text-sm text-text-secondary truncate max-w-[200px]">{m.email}</td>
+                      <td className="text-sm text-text-secondary hidden md:table-cell">{m.phone || '-'}</td>
+                      <td>{statusBadge(m.status)}</td>
+                      <td className="text-sm text-text-muted hidden lg:table-cell">{new Date(m.joined_at).toLocaleDateString()}</td>
+                      <td>
+                        <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
+                          <button onClick={() => setShowEdit(m)} className="p-1.5 hover:bg-surface-hover rounded-lg text-text-muted hover:text-primary transition-colors"><Edit2 size={16} /></button>
+                          <button onClick={() => handleDelete(m.id)} className="p-1.5 hover:bg-red-50 rounded-lg text-text-muted hover:text-red-600 transition-colors"><Trash2 size={16} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
         {meta && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-border">
-            <p className="text-sm text-text-muted">Showing {((meta.page - 1) * meta.limit) + 1}-{Math.min(meta.page * meta.limit, meta.total)} of {meta.total}</p>
+          <div className="flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-4 border-t border-border gap-3">
+            <p className="text-xs sm:text-sm text-text-muted">Showing {((meta.page - 1) * meta.limit) + 1}-{Math.min(meta.page * meta.limit, meta.total)} of {meta.total}</p>
             <div className="flex items-center gap-2">
-              <button disabled={!meta.has_prev} onClick={() => setPage(p => p - 1)} className="btn-icon" aria-label="Previous"><ChevronLeft size={16} /></button>
+              <button disabled={!meta.has_prev} onClick={() => setPage(p => p - 1)} className="btn-icon border border-border" aria-label="Previous"><ChevronLeft size={16} /></button>
               <span className="text-sm font-medium px-2 text-text-primary">{meta.page} / {meta.total_pages}</span>
-              <button disabled={!meta.has_next} onClick={() => setPage(p => p + 1)} className="btn-icon" aria-label="Next"><ChevronRight size={16} /></button>
+              <button disabled={!meta.has_next} onClick={() => setPage(p => p + 1)} className="btn-icon border border-border" aria-label="Next"><ChevronRight size={16} /></button>
             </div>
           </div>
         )}

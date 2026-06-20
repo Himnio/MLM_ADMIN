@@ -301,6 +301,7 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 				referralLinkAdmin.GET("/referral-codes", referralLinkHandler.ListReferralCodes)
 				referralLinkAdmin.GET("/referral-codes/search", referralLinkHandler.SearchByCreator)
 				referralLinkAdmin.GET("/referral/:code/registrations", referralLinkHandler.GetRegistrations)
+				referralLinkAdmin.DELETE("/referral/:code", referralLinkHandler.DeleteReferralCode)
 			}
 		}
 	}

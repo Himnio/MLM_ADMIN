@@ -61,36 +61,60 @@ export default function ReferralsView() {
             <p className="text-xs text-text-muted">MLM commission rate structure by level</p>
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Level</th>
-                <th>Income Amount</th>
-                <th>Seat Capacity</th>
-                <th>Commission %</th>
-                <th>Active</th>
-                <th className="text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {commissionConfig.length === 0 ? (
-                <tr><td colSpan={6}><div className="empty-state"><Settings size={36} /><p>No config found</p></div></td></tr>
-              ) : commissionConfig.map(c => (
-                <tr key={c.level}>
-                  <td className="font-bold text-text-primary">Level {c.level}</td>
-                  <td className="text-sm text-text-secondary">{formatCurrency(c.income_amount)}</td>
-                  <td className="text-sm text-text-secondary">{c.seat_capacity} seats</td>
-                  <td className="text-sm font-medium text-primary">{c.commission_percentage}%</td>
-                  <td><span className={c.is_active ? 'badge-success' : 'badge-default'}>{c.is_active ? 'Active' : 'Inactive'}</span></td>
-                  <td className="text-right">
-                    <button onClick={() => setShowConfigEdit(c)} className="text-sm text-primary hover:text-primary-dark font-medium transition-colors">Edit</button>
-                  </td>
-                </tr>
+        {commissionConfig.length === 0 ? (
+          <div className="empty-state"><Settings size={36} /><p>No config found</p></div>
+        ) : (
+          <>
+            {/* Mobile cards */}
+            <div className="sm:hidden space-y-2">
+              {commissionConfig.map(c => (
+                <div key={c.level} className="border border-border rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-text-primary text-sm">Level {c.level}</span>
+                    <span className={c.is_active ? 'badge-success' : 'badge-default'}>{c.is_active ? 'Active' : 'Inactive'}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-y-1.5 text-xs">
+                    <span className="text-text-muted">Income:</span><span className="text-text-primary">{formatCurrency(c.income_amount)}</span>
+                    <span className="text-text-muted">Seats:</span><span className="text-text-primary">{c.seat_capacity}</span>
+                    <span className="text-text-muted">Commission:</span><span className="font-semibold text-primary">{c.commission_percentage}%</span>
+                  </div>
+                  <div className="mt-2 pt-2 border-t border-border">
+                    <button onClick={() => setShowConfigEdit(c)} className="text-xs text-primary hover:text-primary-dark font-medium transition-colors w-full text-center py-1">Edit Configuration</button>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </div>
+            {/* Desktop table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Level</th>
+                    <th>Income Amount</th>
+                    <th>Seat Capacity</th>
+                    <th>Commission %</th>
+                    <th>Active</th>
+                    <th className="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {commissionConfig.map(c => (
+                    <tr key={c.level}>
+                      <td className="font-bold text-text-primary">Level {c.level}</td>
+                      <td className="text-sm text-text-secondary">{formatCurrency(c.income_amount)}</td>
+                      <td className="text-sm text-text-secondary">{c.seat_capacity} seats</td>
+                      <td className="text-sm font-medium text-primary">{c.commission_percentage}%</td>
+                      <td><span className={c.is_active ? 'badge-success' : 'badge-default'}>{c.is_active ? 'Active' : 'Inactive'}</span></td>
+                      <td className="text-right">
+                        <button onClick={() => setShowConfigEdit(c)} className="text-sm text-primary hover:text-primary-dark font-medium transition-colors">Edit</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="stat-card">
