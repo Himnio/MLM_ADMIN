@@ -35,6 +35,16 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     envVars:
+      # --- FIX: Render defaults to routing/health-checking on port 10000
+      # unless you tell it otherwise. Your app listens on 8080, so without
+      # this, every request (including the health check) silently fails
+      # to reach the container. Both keys are set so it works whether your
+      # Go code reads PORT or APP_PORT. ---
+      - key: PORT
+        value: 8080
+      - key: APP_PORT
+        value: 8080
+
       - key: APP_ENV
         value: production
       - key: APP_NAME
@@ -62,9 +72,11 @@ services:
           type: keyvalue
           name: mlm-redis
           property: connectionString
+      # --- VERIFY: must exactly match your frontend's real onrender.com
+      # URL (check the dashboard — Render appends a random suffix if the
+      # name "mlm-frontend" was already taken globally). ---
       - key: FRONTEND_URL
         value: https://mlm-frontend.onrender.com
-      # CORS: Update this in Render dashboard if your service names differ
       - key: CORS_ALLOWED_ORIGINS
         value: https://mlm-frontend.onrender.com
     healthCheckPath: /api/v1/health
@@ -80,7 +92,9 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      # Update this in Render dashboard if your backend service name differs
+      # --- VERIFY: must exactly match your backend's real onrender.com
+      # URL (same caveat as above — check the dashboard). Must include
+      # /api/v1 since that's your router's base path. ---
       - key: NEXT_PUBLIC_API_URL
         value: https://mlm-backend.onrender.com/api/v1
     healthCheckPath: /
