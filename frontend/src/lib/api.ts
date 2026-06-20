@@ -2,6 +2,7 @@ const API_TIMEOUT = 45000;
 
 function getApiBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+  if (typeof window !== 'undefined') return '/api/v1';
   return 'http://localhost:8080/api/v1';
 }
 const API_BASE = getApiBaseUrl();

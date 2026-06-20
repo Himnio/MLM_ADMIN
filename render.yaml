@@ -1,12 +1,13 @@
 # ============================================================
 # Render Blueprint - MLM Admin Deployment
 # ============================================================
-# IMPORTANT after first deploy:
-#   1. Go to Render Dashboard → mlm-frontend → Environment
-#      Set  NEXT_PUBLIC_API_URL = https://<your-backend-name>.onrender.com/api/v1
-#   2. Go to Render Dashboard → mlm-backend → Environment
-#      Set  FRONTEND_URL = https://<your-frontend-name>.onrender.com
-#   3. Redeploy both services
+# API proxying: the frontend Next.js server proxies /api/v1/*
+# to http://mlm-backend:8080 via BACKEND_URL (internal DNS).
+# No CORS issues, no need to guess external URLs.
+#
+# Optional after deploy:
+#   mlm-backend → Environment → FRONTEND_URL
+#   (needed for redirects/password-reset links)
 # ============================================================
 
 databases:
@@ -32,6 +33,10 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     envVars:
+      - key: PORT
+        value: "8080"
+      - key: APP_PORT
+        value: "8080"
       - key: APP_ENV
         value: production
       - key: APP_NAME
@@ -78,5 +83,8 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      # Points to the backend's internal Render hostname — no random suffix needed
+      - key: BACKEND_URL
+        value: "http://mlm-backend:8080"
     healthCheckPath: /
     autoDeploy: true
