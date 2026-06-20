@@ -5,40 +5,194 @@
 @layer base {
   :root {
     --sidebar-width: 260px;
+    --sidebar-collapsed-width: 0px;
+    --header-height: 64px;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-gray-50 text-gray-900;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    @apply bg-surface text-text-primary antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  ::selection {
+    @apply bg-primary/20 text-primary-dark;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
   }
 }
 
 @layer components {
+  /* Sidebar */
   .sidebar-link {
-    @apply flex items-center gap-3 px-5 py-3 text-gray-300 hover:bg-white/10 hover:text-white transition-all cursor-pointer;
+    @apply flex items-center gap-3 px-4 py-2.5 mx-2 rounded-lg text-sm font-medium
+           text-gray-400 hover:text-white hover:bg-sidebar-hover
+           transition-all duration-200 cursor-pointer relative;
   }
   .sidebar-link.active {
-    @apply bg-white/10 text-white border-r-2 border-primary;
+    @apply text-white bg-primary/10;
   }
+  .sidebar-link.active::before {
+    content: '';
+    @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-full;
+  }
+  .sidebar-link svg {
+    @apply w-5 h-5 flex-shrink-0;
+  }
+
+  /* Cards */
   .stat-card {
-    @apply bg-white rounded-xl p-5 shadow-sm border border-gray-100;
+    @apply bg-white rounded-xl p-5 shadow-card border border-border
+           hover:shadow-card-hover transition-all duration-200;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg
+           text-sm font-medium transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .btn-primary {
-    @apply bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg font-medium transition-all disabled:opacity-50;
+    @apply btn bg-primary text-white hover:bg-primary-dark
+           focus:ring-primary/40 active:scale-[0.98];
   }
+  .btn-secondary {
+    @apply btn bg-white text-text-primary border border-border
+           hover:bg-surface hover:border-gray-300
+           focus:ring-gray-200;
+  }
+  .btn-danger {
+    @apply btn bg-red-500 text-white hover:bg-red-600
+           focus:ring-red-300 active:scale-[0.98];
+  }
+  .btn-success {
+    @apply btn bg-emerald-500 text-white hover:bg-emerald-600
+           focus:ring-emerald-300 active:scale-[0.98];
+  }
+  .btn-ghost {
+    @apply btn text-text-secondary hover:bg-surface hover:text-text-primary;
+  }
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+  .btn-icon {
+    @apply p-2 rounded-lg;
+  }
+
+  /* Tables */
   .data-table {
-    @apply w-full bg-white rounded-xl shadow-sm overflow-hidden;
+    @apply w-full;
   }
   .data-table th {
-    @apply px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50;
+    @apply px-4 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wider
+           bg-gray-50/80 border-b border-border;
   }
   .data-table td {
-    @apply px-4 py-3 border-t border-gray-100;
+    @apply px-4 py-3 text-sm border-b border-border/60;
   }
+  .data-table tbody tr {
+    @apply hover:bg-surface-hover transition-colors duration-150;
+  }
+
+  /* Inputs */
+  .input {
+    @apply w-full px-4 py-2.5 rounded-lg border border-border
+           bg-white text-text-primary text-sm
+           placeholder:text-text-muted
+           focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+           transition-all duration-200;
+  }
+  .input-error {
+    @apply border-red-300 focus:ring-red-200 focus:border-red-400;
+  }
+  .select {
+    @apply input appearance-none cursor-pointer;
+  }
+
+  /* Badges */
   .badge {
-    @apply px-2.5 py-1 rounded-full text-xs font-medium;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
   }
-  .badge-active { @apply bg-emerald-100 text-emerald-700; }
-  .badge-inactive { @apply bg-red-100 text-red-700; }
-  .badge-pending { @apply bg-amber-100 text-amber-700; }
-  .badge-suspended { @apply bg-gray-100 text-gray-600; }
+  .badge-active, .badge-success { @apply bg-emerald-50 text-emerald-700 border border-emerald-200; }
+  .badge-inactive, .badge-error { @apply bg-red-50 text-red-700 border border-red-200; }
+  .badge-pending, .badge-warning { @apply bg-amber-50 text-amber-700 border border-amber-200; }
+  .badge-suspended { @apply bg-gray-100 text-gray-600 border border-gray-200; }
+  .badge-info { @apply bg-blue-50 text-blue-700 border border-blue-200; }
+  .badge-primary { @apply bg-indigo-50 text-indigo-700 border border-indigo-200; }
+
+  /* Modal */
+  .modal-overlay {
+    @apply fixed inset-0 z-50 flex items-center justify-center
+           bg-black/50 backdrop-blur-sm animate-fade-in;
+  }
+  .modal-content {
+    @apply bg-white rounded-2xl shadow-modal w-full max-w-lg mx-4
+           animate-scale-in max-h-[90vh] overflow-y-auto;
+  }
+
+  /* Skeleton loading */
+  .skeleton {
+    @apply bg-gray-200 rounded animate-pulse;
+  }
+
+  /* Mobile sidebar overlay */
+  .sidebar-overlay {
+    @apply fixed inset-0 z-40 bg-black/50 backdrop-blur-sm
+           lg:hidden animate-fade-in;
+  }
+
+  /* Page transitions */
+  .page-enter {
+    @apply animate-fade-in;
+  }
+
+  /* Empty state */
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-16 text-center;
+  }
+  .empty-state svg {
+    @apply w-16 h-16 text-gray-300 mb-4;
+  }
+  .empty-state h3 {
+    @apply text-lg font-semibold text-text-primary mb-1;
+  }
+  .empty-state p {
+    @apply text-sm text-text-muted max-w-sm;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
