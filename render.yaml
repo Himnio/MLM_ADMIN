@@ -1,9 +1,10 @@
 # ============================================================
 # Render Blueprint - MLM Admin Deployment
 # ============================================================
-# API proxying: the frontend Next.js server proxies /api/v1/*
-# to http://mlm-backend:8080 via BACKEND_URL (internal DNS).
-# No CORS issues, no need to guess external URLs.
+# Frontend proxies /api/v1/* to the backend via internal DNS.
+# BACKEND_HOST and BACKEND_PORT are auto-resolved by Render
+# via fromService — no hardcoded URLs or random suffixes.
+# No CORS issues, no Dashboard env vars needed for API access.
 #
 # Optional after deploy:
 #   mlm-backend → Environment → FRONTEND_URL
@@ -33,10 +34,6 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     envVars:
-      - key: PORT
-        value: "8080"
-      - key: APP_PORT
-        value: "8080"
       - key: APP_ENV
         value: production
       - key: APP_NAME
@@ -83,8 +80,16 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      # Points to the backend's internal Render hostname — no random suffix needed
-      - key: BACKEND_URL
-        value: "http://mlm-backend:8080"
+      # Auto-resolved internal backend host and port — no hardcoded values
+      - key: BACKEND_HOST
+        fromService:
+          type: web
+          name: mlm-backend
+          property: host
+      - key: BACKEND_PORT
+        fromService:
+          type: web
+          name: mlm-backend
+          property: port
     healthCheckPath: /
     autoDeploy: true
