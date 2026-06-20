@@ -1,22 +1,13 @@
 # ============================================================
 # Render Blueprint - MLM Admin Deployment
 # ============================================================
-# Steps:
-#   1. Push this repo to GitHub
-#   2. In Render dashboard: New -> Blueprint -> Connect your repo
-#   3. Render auto-detects this file and provisions all services
-#   4. After first deploy, update env vars in dashboard if needed
-#      (see notes below)
-# ============================================================
 
-# PostgreSQL (defined separately from services)
 databases:
   - name: mlm-postgres
     plan: free
     databaseName: mlm_admin
     user: mlm_admin
 
-# Web services, Key Value (Redis), workers, etc.
 services:
   # -------------------- Redis (Render Key Value) --------------------
   - type: keyvalue
@@ -35,16 +26,10 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     envVars:
-      # --- FIX: Render defaults to routing/health-checking on port 10000
-      # unless you tell it otherwise. Your app listens on 8080, so without
-      # this, every request (including the health check) silently fails
-      # to reach the container. Both keys are set so it works whether your
-      # Go code reads PORT or APP_PORT. ---
       - key: PORT
         value: 8080
       - key: APP_PORT
         value: 8080
-
       - key: APP_ENV
         value: production
       - key: APP_NAME
@@ -72,13 +57,11 @@ services:
           type: keyvalue
           name: mlm-redis
           property: connectionString
-      # --- VERIFY: must exactly match your frontend's real onrender.com
-      # URL (check the dashboard — Render appends a random suffix if the
-      # name "mlm-frontend" was already taken globally). ---
+      # --- FIXED: real frontend hostname (Render added -ukjv suffix) ---
       - key: FRONTEND_URL
-        value: https://mlm-frontend.onrender.com
+        value: https://mlm-frontend-ukjv.onrender.com
       - key: CORS_ALLOWED_ORIGINS
-        value: https://mlm-frontend.onrender.com
+        value: https://mlm-frontend-ukjv.onrender.com
     healthCheckPath: /api/v1/health
     autoDeploy: true
 
@@ -92,10 +75,8 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      # --- VERIFY: must exactly match your backend's real onrender.com
-      # URL (same caveat as above — check the dashboard). Must include
-      # /api/v1 since that's your router's base path. ---
+      # --- FIXED: real backend hostname (Render added -qho1 suffix) ---
       - key: NEXT_PUBLIC_API_URL
-        value: https://mlm-backend.onrender.com/api/v1
+        value: https://mlm-backend-qho1.onrender.com/api/v1
     healthCheckPath: /
     autoDeploy: true
