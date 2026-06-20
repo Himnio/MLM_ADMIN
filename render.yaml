@@ -1,6 +1,13 @@
 # ============================================================
 # Render Blueprint - MLM Admin Deployment
 # ============================================================
+# IMPORTANT after first deploy:
+#   1. Go to Render Dashboard → mlm-frontend → Environment
+#      Set  NEXT_PUBLIC_API_URL = https://<your-backend-name>.onrender.com/api/v1
+#   2. Go to Render Dashboard → mlm-backend → Environment
+#      Set  FRONTEND_URL = https://<your-frontend-name>.onrender.com
+#   3. Redeploy both services
+# ============================================================
 
 databases:
   - name: mlm-postgres
@@ -9,7 +16,6 @@ databases:
     user: mlm_admin
 
 services:
-  # -------------------- Redis (Render Key Value) --------------------
   - type: keyvalue
     name: mlm-redis
     plan: free
@@ -26,10 +32,6 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     envVars:
-      - key: PORT
-        value: 8080
-      - key: APP_PORT
-        value: 8080
       - key: APP_ENV
         value: production
       - key: APP_NAME
@@ -57,11 +59,12 @@ services:
           type: keyvalue
           name: mlm-redis
           property: connectionString
-      # --- FIXED: real frontend hostname (Render added -ukjv suffix) ---
+      # Update this in Dashboard after deploy: FRONTEND_URL = https://mlm-frontend-XXXX.onrender.com
       - key: FRONTEND_URL
-        value: https://mlm-frontend-ukjv.onrender.com
+        value: http://localhost:3000
+      # Allow any frontend URL (JWT protects the API)
       - key: CORS_ALLOWED_ORIGINS
-        value: https://mlm-frontend-ukjv.onrender.com
+        value: "*"
     healthCheckPath: /api/v1/health
     autoDeploy: true
 
@@ -75,8 +78,5 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      # --- FIXED: real backend hostname (Render added -qho1 suffix) ---
-      - key: NEXT_PUBLIC_API_URL
-        value: https://mlm-backend-qho1.onrender.com/api/v1
     healthCheckPath: /
     autoDeploy: true

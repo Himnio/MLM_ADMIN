@@ -40,7 +40,7 @@ USER nextjs
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD wget --quiet --tries=1 --spider http://localhost:3000 || exit 1
+    CMD wget --quiet --tries=1 --spider "http://localhost:${PORT:-3000}" || exit 1
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "server.js"]

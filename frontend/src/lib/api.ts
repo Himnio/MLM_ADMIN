@@ -1,12 +1,7 @@
 const API_TIMEOUT = 45000;
 
 function getApiBaseUrl(): string {
-  const buildUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (buildUrl) return buildUrl;
-  if (typeof window !== 'undefined') {
-    const host = window.location.hostname;
-    if (host.endsWith('.onrender.com')) return `https://${host.replace('frontend', 'backend')}/api/v1`;
-  }
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
   return 'http://localhost:8080/api/v1';
 }
 const API_BASE = getApiBaseUrl();
