@@ -25,6 +25,7 @@ type MemberUserRepository interface {
 	ToggleActive(id uuid.UUID) error
 	UpdatePassword(id uuid.UUID, passwordHash string) error
 	SetPasswordChanged(id uuid.UUID) error
+	ClearReferralCode(code string) error
 }
 
 type memberUserRepository struct {
@@ -91,6 +92,10 @@ func (r *memberUserRepository) GetByReferralCode(code string) ([]*models.MemberU
 	var users []*models.MemberUser
 	err := r.db.DB.Where("referral_code = ?", code).Order("created_at DESC").Find(&users).Error
 	return users, err
+}
+
+func (r *memberUserRepository) ClearReferralCode(code string) error {
+	return r.db.DB.Model(&models.MemberUser{}).Where("referral_code = ?", code).Update("referral_code", gorm.Expr("NULL")).Error
 }
 
 func (r *memberUserRepository) GetByEmail(email string) (*models.MemberUser, error) {

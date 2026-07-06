@@ -303,5 +303,11 @@ func (s *referralLinkService) DeleteReferralCode(code string) error {
 	if rc == nil {
 		return fmt.Errorf("referral code not found")
 	}
+
+	// Clear references in member_users before deleting the code
+	if err := s.memberRepo.ClearReferralCode(code); err != nil {
+		return fmt.Errorf("failed to clear referral code references: %w", err)
+	}
+
 	return s.repo.DeleteReferralCode(code)
 }
