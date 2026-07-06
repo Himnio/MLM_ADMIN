@@ -49,9 +49,9 @@ services:
       - key: DB_SSL_MODE
         value: require
       - key: JWT_ACCESS_EXPIRY
-        value: 15m
+        value: 168h
       - key: JWT_REFRESH_EXPIRY
-        value: 7d
+        value: 720h
       - key: JWT_SECRET
         generateValue: true
       - key: DATABASE_URL

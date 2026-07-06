@@ -164,7 +164,7 @@ func Load() (*Config, error) {
 		},
 		JWT: JWTConfig{
 			Secret:        getEnvOrPanic("JWT_SECRET"),
-			AccessExpiry:  getEnvDuration("JWT_ACCESS_EXPIRY", 15*time.Minute),
+			AccessExpiry:  getEnvDuration("JWT_ACCESS_EXPIRY", 24*time.Hour),
 			RefreshExpiry: getEnvDuration("JWT_REFRESH_EXPIRY", 7*24*time.Hour),
 			Issuer:        getEnv("JWT_ISSUER", "mlm-admin-api"),
 		},
