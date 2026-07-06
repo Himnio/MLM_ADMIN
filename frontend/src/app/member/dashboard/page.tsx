@@ -85,8 +85,8 @@ export default function MemberDashboardPage() {
       } else {
         setChangeError(data.message || 'Failed to change password');
       }
-    } catch {
-      setChangeError('Network error');
+    } catch (e) {
+      setChangeError(e instanceof TypeError ? 'Network error — backend unreachable' : 'Failed to change password');
     }
     setChanging(false);
   };

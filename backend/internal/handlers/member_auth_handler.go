@@ -115,7 +115,17 @@ func (h *MemberAuthHandler) ChangePassword(c *gin.Context) {
 	}
 
 	if err := h.service.ChangePassword(userID, req.OldPassword, req.NewPassword); err != nil {
-		utils.BadRequestResponse(c, "Failed to change password", err.Error())
+		errMsg := err.Error()
+		// Client-side errors (wrong password, weak password, user not found)
+		if errMsg == "current password is incorrect" || errMsg == "new password must be at least 6 characters" || errMsg == "user not found" {
+			utils.BadRequestResponse(c, "Failed to change password", errMsg)
+			return
+		}
+		// Server-side errors (DB failure, bcrypt failure)
+		h.logger.Error(err, "Change password failed", map[string]interface{}{
+			"user_id": userID.String(),
+		})
+		utils.InternalServerErrorResponse(c, "Failed to change password. Please try again.", "")
 		return
 	}
 

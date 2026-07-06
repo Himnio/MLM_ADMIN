@@ -5,31 +5,36 @@ const BACKEND_PORT = process.env.BACKEND_PORT || '8080';
 const BACKEND_URL = `http://${BACKEND_HOST}:${BACKEND_PORT}`;
 
 async function handler(request: NextRequest) {
-  const url = new URL(request.nextUrl.pathname + request.nextUrl.search, BACKEND_URL);
-
-  const headers = new Headers(request.headers);
-  headers.delete('host');
-
-  let body: string | undefined;
-  if (request.method !== 'GET' && request.method !== 'HEAD') {
-    try {
-      body = await request.clone().text();
-    } catch {
-      body = '';
-    }
-  }
-
   try {
+    const url = new URL(request.nextUrl.pathname + request.nextUrl.search, BACKEND_URL);
+
+    const headers = new Headers(request.headers);
+    headers.delete('host');
+    headers.delete('transfer-encoding');
+    headers.delete('content-encoding');
+
+    let body: string | undefined;
+    if (request.method !== 'GET' && request.method !== 'HEAD') {
+      try {
+        body = await request.clone().text();
+      } catch {
+        body = '';
+      }
+    }
+
     const backendRes = await fetch(url.toString(), {
       method: request.method,
       headers,
-      body,
+      body: body || undefined,
     });
 
-    const resHeaders = new Headers(backendRes.headers);
-    resHeaders.delete('content-encoding');
+    const text = await backendRes.text();
 
-    return new NextResponse(backendRes.body, {
+    const resHeaders: Record<string, string> = {
+      'content-type': backendRes.headers.get('content-type') || 'application/json',
+    };
+
+    return new NextResponse(text, {
       status: backendRes.status,
       statusText: backendRes.statusText,
       headers: resHeaders,
