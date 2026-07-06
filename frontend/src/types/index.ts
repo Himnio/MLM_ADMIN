@@ -292,12 +292,48 @@ export interface ReferralCodeItem {
 
 export interface ReferralRegistrationItem {
   id: string;
-  name: string;
+  name?: string;
   username: string;
   email: string;
   pan_card_id: string;
-  full_name: string;
-  registered_at: string;
+  full_name?: string;
+  registered_at?: string;
+  // new member_user fields
+  member_id?: string;
+  first_name?: string;
+  last_name?: string;
+  mobile?: string;
+  gender?: string;
+  dob?: string;
+  address?: string;
+  aadhaar_card?: string;
+  bank_account?: string;
+  bank_ifsc?: string;
+  bank_branch?: string;
+  referral_code?: string;
+  is_active?: boolean;
+  created_at?: string;
+}
+
+export interface MemberUserPublic {
+  id: string;
+  member_id: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  mobile: string;
+  gender: string;
+  dob: string;
+  address: string;
+  email: string;
+  pan_card_id: string;
+  aadhaar_card: string;
+  bank_account: string;
+  bank_ifsc: string;
+  bank_branch: string;
+  referral_code: string;
+  is_active: boolean;
+  created_at: string;
 }
 
 export interface CreateCodeResponse {

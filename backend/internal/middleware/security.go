@@ -13,7 +13,7 @@ func SecureHeaders() gin.HandlerFunc {
 			"font-src 'self' data:; " +
 			"img-src 'self' data:; " +
 			"script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-			"connect-src 'self' http://localhost:8080;"
+			"connect-src 'self';"
 		c.Writer.Header().Set("Content-Security-Policy", csp)
 
 		// Prevent MIME type sniffing

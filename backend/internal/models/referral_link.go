@@ -12,6 +12,7 @@ type ReferralCode struct {
 	ReferralCode      string     `gorm:"column:referral_code;type:varchar(50);uniqueIndex;not null" json:"referral_code"`
 	CreatedByUsername string     `gorm:"column:created_by_username;type:varchar(100);not null" json:"created_by_username"`
 	AdminID           *uuid.UUID `gorm:"column:admin_id;type:uuid;index" json:"admin_id"`
+	MemberUserID      *uuid.UUID `gorm:"column:member_user_id;type:uuid;index" json:"member_user_id,omitempty"`
 	CreatedAt         time.Time  `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
 	IsActive          bool       `gorm:"column:is_active;default:true" json:"is_active"`
 }

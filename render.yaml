@@ -63,8 +63,9 @@ services:
           type: keyvalue
           name: mlm-redis
           property: connectionString
-      - key: FRONTEND_URL
-        value: http://localhost:3000
+      # FRONTEND_URL: Set this manually in Render Dashboard to your frontend URL
+      # (e.g. https://mlm-frontend.onrender.com) for backend-generated links.
+      # The frontend now constructs referral links client-side, so this is optional.
       - key: CORS_ALLOWED_ORIGINS
         value: "*"
     healthCheckPath: /api/v1/health

@@ -10,18 +10,20 @@ import (
 
 // Member represents an MLM member in the system
 type Member struct {
-	ID         uuid.UUID      `gorm:"type:uuid;primary_key" json:"id"`
-	SponsorID  *uuid.UUID     `gorm:"type:uuid;index" json:"sponsor_id,omitempty"`
-	Sponsor    *Member        `gorm:"foreignKey:SponsorID" json:"sponsor,omitempty"`
-	MemberCode string         `gorm:"type:varchar(50);uniqueIndex;not null" json:"member_code"`
-	FullName   string         `gorm:"type:varchar(255);not null" json:"full_name"`
-	Email      string         `gorm:"type:varchar(255);index" json:"email,omitempty"`
-	Phone      string         `gorm:"type:varchar(20)" json:"phone,omitempty"`
-	Status     string         `gorm:"type:varchar(20);not null;default:'active'" json:"status"`
-	JoinedAt   time.Time      `gorm:"not null" json:"joined_at"`
-	CreatedAt  time.Time      `json:"created_at"`
-	UpdatedAt  time.Time      `json:"updated_at"`
-	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
+	ID           uuid.UUID      `gorm:"type:uuid;primary_key" json:"id"`
+	SponsorID    *uuid.UUID     `gorm:"type:uuid;index" json:"sponsor_id,omitempty"`
+	Sponsor      *Member        `gorm:"foreignKey:SponsorID" json:"sponsor,omitempty"`
+	MemberUserID *uuid.UUID     `gorm:"type:uuid;index" json:"member_user_id,omitempty"`
+	MemberUser   *MemberUser    `gorm:"foreignKey:MemberUserID" json:"member_user,omitempty"`
+	MemberCode   string         `gorm:"type:varchar(50);uniqueIndex;not null" json:"member_code"`
+	FullName     string         `gorm:"type:varchar(255);not null" json:"full_name"`
+	Email        string         `gorm:"type:varchar(255);index" json:"email,omitempty"`
+	Phone        string         `gorm:"type:varchar(20)" json:"phone,omitempty"`
+	Status       string         `gorm:"type:varchar(20);not null;default:'active'" json:"status"`
+	JoinedAt     time.Time      `gorm:"not null" json:"joined_at"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
+	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships
 	Downlines []Member   `gorm:"foreignKey:SponsorID" json:"downlines,omitempty"`

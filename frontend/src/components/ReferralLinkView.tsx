@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { api } from '@/lib/api';
-import type { ReferralCodeItem, ReferralRegistrationItem } from '@/types';
+import type { ReferralCodeItem, ReferralRegistrationItem, MemberUserPublic } from '@/types';
 import { Plus, Link, Copy, Users, ExternalLink, X, Search, Check, Loader2, Trash2, AlertTriangle } from 'lucide-react';
 
 export default function ReferralLinkView() {
@@ -11,7 +11,7 @@ export default function ReferralLinkView() {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [codeName, setCodeName] = useState('');
-  const [newCode, setNewCode] = useState<{ referral_code: string; referral_link: string } | null>(null);
+  const [newCode, setNewCode] = useState<{ referral_code: string } | null>(null);
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const [registrations, setRegistrations] = useState<ReferralRegistrationItem[]>([]);
   const [regLoading, setRegLoading] = useState(false);
@@ -50,7 +50,6 @@ export default function ReferralLinkView() {
     if (res.success && res.data) {
       setNewCode({
         referral_code: res.data.referral_code,
-        referral_link: res.data.referral_link,
       });
       setCodeName('');
       fetchCodes();
@@ -160,8 +159,8 @@ export default function ReferralLinkView() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
                 <span className="text-text-muted font-medium">Link:</span>
                 <div className="flex items-center gap-2 min-w-0">
-                  <a href={newCode.referral_link} target="_blank" className="text-primary hover:text-primary-dark underline truncate text-xs sm:text-sm" rel="noreferrer">{newCode.referral_link}</a>
-                  <button onClick={() => copyToClipboard(newCode.referral_link, true)} className="text-primary hover:text-primary-dark text-xs font-medium transition-colors flex items-center gap-1 flex-shrink-0"><Copy size={12} /> Copy</button>
+                  <a href={getReferralLink(newCode.referral_code)} target="_blank" className="text-primary hover:text-primary-dark underline truncate text-xs sm:text-sm" rel="noreferrer">{getReferralLink(newCode.referral_code)}</a>
+                  <button onClick={() => copyToClipboard(getReferralLink(newCode.referral_code), true)} className="text-primary hover:text-primary-dark text-xs font-medium transition-colors flex items-center gap-1 flex-shrink-0"><Copy size={12} /> Copy</button>
                 </div>
               </div>
             </div>
@@ -352,20 +351,26 @@ export default function ReferralLinkView() {
                 <>
                   {/* Mobile registration cards */}
                   <div className="sm:hidden space-y-3">
-                    {registrations.map(r => (
-                      <div key={r.id} className="border border-border rounded-xl p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <p className="text-sm font-semibold text-text-primary">{r.name}</p>
-                          <span className="text-xs text-text-muted">{new Date(r.registered_at).toLocaleDateString()}</span>
+                    {registrations.map(r => {
+                      const name = r.first_name ? `${r.first_name} ${r.last_name || ''}`.trim() : r.name || r.full_name || '—';
+                      const date = r.created_at || r.registered_at;
+                      return (
+                        <div key={r.id} className="border border-border rounded-xl p-4 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-semibold text-text-primary truncate">{name}</p>
+                            {date && <span className="text-xs text-text-muted flex-shrink-0 ml-2">{new Date(date).toLocaleDateString()}</span>}
+                          </div>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                            {r.mobile && <><span className="text-text-muted">Mobile:</span><span className="text-text-primary">{r.mobile}</span></>}
+                            {r.email && <><span className="text-text-muted">Email:</span><span className="text-text-primary truncate">{r.email}</span></>}
+                            {r.pan_card_id && <><span className="text-text-muted">PAN:</span><span className="text-text-primary font-mono">{r.pan_card_id}</span></>}
+                            {r.aadhaar_card && <><span className="text-text-muted">Aadhaar:</span><span className="text-text-primary">{r.aadhaar_card}</span></>}
+                            {r.dob && <><span className="text-text-muted">DOB:</span><span className="text-text-primary">{r.dob}</span></>}
+                            {r.gender && <><span className="text-text-muted">Gender:</span><span className="text-text-primary capitalize">{r.gender}</span></>}
+                          </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                          <span className="text-text-muted">Username:</span><span className="text-text-primary">{r.username}</span>
-                          <span className="text-text-muted">Email:</span><span className="text-text-primary truncate">{r.email}</span>
-                          <span className="text-text-muted">PAN:</span><span className="text-text-primary font-mono">{r.pan_card_id}</span>
-                          <span className="text-text-muted">Full Name:</span><span className="text-text-primary">{r.full_name}</span>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   {/* Desktop registration table */}
@@ -374,24 +379,28 @@ export default function ReferralLinkView() {
                       <thead>
                         <tr>
                           <th>Name</th>
-                          <th className="hidden sm:table-cell">Username</th>
+                          <th>Mobile</th>
                           <th className="hidden md:table-cell">Email</th>
-                          <th className="hidden lg:table-cell">PAN Card</th>
-                          <th>Full Name</th>
-                          <th className="hidden sm:table-cell">Date</th>
+                          <th className="hidden lg:table-cell">PAN</th>
+                          <th className="hidden lg:table-cell">Aadhaar</th>
+                          <th className="hidden md:table-cell">Date</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
-                        {registrations.map(r => (
-                          <tr key={r.id} className="hover:bg-surface-hover transition-colors">
-                            <td className="text-sm font-medium text-text-primary">{r.name}</td>
-                            <td className="text-sm text-text-secondary hidden sm:table-cell">{r.username}</td>
-                            <td className="text-sm text-text-secondary hidden md:table-cell">{r.email}</td>
-                            <td className="text-sm font-mono text-text-secondary hidden lg:table-cell">{r.pan_card_id}</td>
-                            <td className="text-sm text-text-secondary">{r.full_name}</td>
-                            <td className="text-sm text-text-muted hidden sm:table-cell">{new Date(r.registered_at).toLocaleDateString()}</td>
-                          </tr>
-                        ))}
+                        {registrations.map(r => {
+                          const name = r.first_name ? `${r.first_name} ${r.last_name || ''}`.trim() : r.name || r.full_name || '—';
+                          const date = r.created_at || r.registered_at;
+                          return (
+                            <tr key={r.id} className="hover:bg-surface-hover transition-colors">
+                              <td className="text-sm font-medium text-text-primary">{name}</td>
+                              <td className="text-sm text-text-secondary">{r.mobile || '—'}</td>
+                              <td className="text-sm text-text-secondary hidden md:table-cell truncate max-w-[200px]">{r.email || '—'}</td>
+                              <td className="text-sm font-mono text-text-secondary hidden lg:table-cell">{r.pan_card_id || '—'}</td>
+                              <td className="text-sm text-text-secondary hidden lg:table-cell">{r.aadhaar_card || '—'}</td>
+                              <td className="text-sm text-text-muted hidden md:table-cell">{date ? new Date(date).toLocaleDateString() : '—'}</td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>

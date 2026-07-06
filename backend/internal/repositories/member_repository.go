@@ -16,6 +16,7 @@ type MemberRepository interface {
 	GetByID(id uuid.UUID) (*models.Member, error)
 	GetByMemberCode(code string) (*models.Member, error)
 	GetByEmail(email string) (*models.Member, error)
+	GetByMemberUserID(memberUserID uuid.UUID) (*models.Member, error)
 	Update(member *models.Member) error
 	Delete(id uuid.UUID) error
 	List(filter *models.MemberFilter, page, limit int) ([]*models.Member, int64, error)
@@ -71,6 +72,19 @@ func (r *memberRepository) GetByMemberCode(code string) (*models.Member, error) 
 func (r *memberRepository) GetByEmail(email string) (*models.Member, error) {
 	var member models.Member
 	err := r.db.DB.Where("email = ?", email).First(&member).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &member, nil
+}
+
+// GetByMemberUserID retrieves a member by their linked member_user ID
+func (r *memberRepository) GetByMemberUserID(memberUserID uuid.UUID) (*models.Member, error) {
+	var member models.Member
+	err := r.db.DB.Where("member_user_id = ?", memberUserID).First(&member).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil

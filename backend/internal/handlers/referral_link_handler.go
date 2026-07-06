@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"mlm-admin-backend/internal/config"
+	"mlm-admin-backend/internal/models"
 	"mlm-admin-backend/internal/services"
 	"mlm-admin-backend/internal/utils"
 
@@ -98,11 +99,18 @@ func (h *ReferralLinkHandler) ValidateReferralCode(c *gin.Context) {
 }
 
 type registerRequest struct {
-	Name     string `json:"name"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	PanCardID string `json:"pan_card_id"`
-	FullName string `json:"full_name"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	Mobile      string `json:"mobile"`
+	Gender      string `json:"gender"`
+	DOB         string `json:"dob"`
+	Address     string `json:"address"`
+	Email       string `json:"email"`
+	PanCardID   string `json:"pan_card_id"`
+	AadhaarCard string `json:"aadhaar_card"`
+	BankAccount string `json:"bank_account"`
+	BankIFSC    string `json:"bank_ifsc"`
+	BankBranch  string `json:"bank_branch"`
 }
 
 func (h *ReferralLinkHandler) RegisterWithReferral(c *gin.Context) {
@@ -130,24 +138,32 @@ func (h *ReferralLinkHandler) RegisterWithReferral(c *gin.Context) {
 		return
 	}
 
-	input := &services.ReferralRegistrationInput{
-		Name:     req.Name,
-		Username: req.Username,
-		Email:    req.Email,
-		PanCardID: req.PanCardID,
-		FullName: req.FullName,
+	input := &services.MemberRegistrationInput{
+		FirstName:   req.FirstName,
+		LastName:    req.LastName,
+		Mobile:      req.Mobile,
+		Gender:      req.Gender,
+		DOB:         req.DOB,
+		Address:     req.Address,
+		Email:       req.Email,
+		PanCardID:   req.PanCardID,
+		AadhaarCard: req.AadhaarCard,
+		BankAccount: req.BankAccount,
+		BankIFSC:    req.BankIFSC,
+		BankBranch:  req.BankBranch,
 	}
 
-	reg, err := h.service.RegisterWithReferral(code, input)
+	result, err := h.service.RegisterWithReferral(code, input)
 	if err != nil {
 		errMsg := err.Error()
 		switch {
 		case strings.Contains(errMsg, "is required"),
-		     strings.Contains(errMsg, "invalid email"),
-		     strings.Contains(errMsg, "invalid PAN"):
+			strings.Contains(errMsg, "invalid email"),
+			strings.Contains(errMsg, "invalid PAN"),
+			strings.Contains(errMsg, "invalid Aadhaar"),
+			strings.Contains(errMsg, "gender must be"),
+			strings.Contains(errMsg, "already registered"):
 			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": errMsg})
-		case strings.Contains(errMsg, "already registered"):
-			c.JSON(http.StatusConflict, gin.H{"success": false, "message": errMsg})
 		default:
 			h.logger.Error(err, "Registration failed", nil)
 			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Registration failed"})
@@ -156,9 +172,11 @@ func (h *ReferralLinkHandler) RegisterWithReferral(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"success":          true,
-		"registration_id":  reg.ID.String(),
-		"message":          "Registration successful",
+		"success":   true,
+		"message":   result.Message,
+		"member_id": result.MemberID,
+		"username":  result.Username,
+		"password":  result.Password,
 	})
 }
 
@@ -181,34 +199,16 @@ func (h *ReferralLinkHandler) GetRegistrations(c *gin.Context) {
 		return
 	}
 
-	regs, err := h.service.GetRegistrations(code)
+	users, err := h.service.GetRegistrations(code)
 	if err != nil {
 		h.logger.Error(err, "Failed to get registrations", nil)
 		utils.InternalServerErrorResponse(c, "Failed to get registrations", "")
 		return
 	}
 
-	type regItem struct {
-		ID           string `json:"id"`
-		Name         string `json:"name"`
-		Username     string `json:"username"`
-		Email        string `json:"email"`
-		PanCardID    string `json:"pan_card_id"`
-		FullName     string `json:"full_name"`
-		RegisteredAt string `json:"registered_at"`
-	}
-
-	items := make([]regItem, 0, len(regs))
-	for _, reg := range regs {
-		items = append(items, regItem{
-			ID:           reg.ID.String(),
-			Name:         reg.Name,
-			Username:     reg.Username,
-			Email:        reg.Email,
-			PanCardID:    reg.PanCardID,
-			FullName:     reg.FullName,
-			RegisteredAt: reg.RegisteredAt.Format("2006-01-02T15:04:05Z"),
-		})
+	items := make([]*models.MemberUserPublic, 0, len(users))
+	for _, u := range users {
+		items = append(items, models.ToMemberUserPublic(u))
 	}
 
 	utils.SuccessResponse(c, http.StatusOK, "Registrations retrieved", gin.H{
@@ -267,6 +267,54 @@ func (h *ReferralLinkHandler) ListReferralCodes(c *gin.Context) {
 	})
 }
 
+func (h *ReferralLinkHandler) SearchByCreator(c *gin.Context) {
+	username := c.Query("username")
+	if username == "" {
+		utils.BadRequestResponse(c, "username query parameter is required", "")
+		return
+	}
+
+	codes, err := h.service.SearchReferralCodesByCreator(username)
+	if err != nil {
+		h.logger.Error(err, "Failed to search referral codes", nil)
+		utils.InternalServerErrorResponse(c, "Failed to search", "")
+		return
+	}
+
+	type codeResult struct {
+		ReferralCode       string                    `json:"referral_code"`
+		CreatedByUsername  string                    `json:"created_by_username"`
+		CreatedAt          string                    `json:"created_at"`
+		Registrations      []*models.MemberUserPublic `json:"registrations"`
+		TotalRegistrations int                       `json:"total_registrations"`
+	}
+
+	results := make([]codeResult, 0, len(codes))
+	totalAll := 0
+	for _, rc := range codes {
+		users, _ := h.service.GetRegistrations(rc.ReferralCode)
+		items := make([]*models.MemberUserPublic, 0, len(users))
+		for _, u := range users {
+			items = append(items, models.ToMemberUserPublic(u))
+		}
+		totalAll += len(users)
+		results = append(results, codeResult{
+			ReferralCode:       rc.ReferralCode,
+			CreatedByUsername:  rc.CreatedByUsername,
+			CreatedAt:          rc.CreatedAt.Format("2006-01-02T15:04:05Z"),
+			Registrations:      items,
+			TotalRegistrations: len(users),
+		})
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Search results", gin.H{
+		"created_by_username": username,
+		"total_codes":         len(results),
+		"total_registrations": totalAll,
+		"results":             results,
+	})
+}
+
 func (h *ReferralLinkHandler) DeleteReferralCode(c *gin.Context) {
 	code := c.Param("code")
 	if code == "" {
@@ -285,72 +333,4 @@ func (h *ReferralLinkHandler) DeleteReferralCode(c *gin.Context) {
 	}
 
 	utils.SuccessResponse(c, http.StatusOK, "Referral code deleted successfully", nil)
-}
-
-func (h *ReferralLinkHandler) SearchByCreator(c *gin.Context) {
-	username := c.Query("username")
-	if username == "" {
-		utils.BadRequestResponse(c, "username query parameter is required", "")
-		return
-	}
-
-	codes, err := h.service.SearchReferralCodesByCreator(username)
-	if err != nil {
-		h.logger.Error(err, "Failed to search referral codes", nil)
-		utils.InternalServerErrorResponse(c, "Failed to search", "")
-		return
-	}
-
-	type regItem struct {
-		ID           string `json:"id"`
-		ReferralCode string `json:"referral_code"`
-		Name         string `json:"name"`
-		Username     string `json:"username"`
-		Email        string `json:"email"`
-		PanCardID    string `json:"pan_card_id"`
-		FullName     string `json:"full_name"`
-		RegisteredAt string `json:"registered_at"`
-	}
-
-	type codeResult struct {
-		ReferralCode      string    `json:"referral_code"`
-		CreatedByUsername string    `json:"created_by_username"`
-		CreatedAt         string    `json:"created_at"`
-		Registrations     []regItem `json:"registrations"`
-		TotalRegistrations int      `json:"total_registrations"`
-	}
-
-	results := make([]codeResult, 0, len(codes))
-	totalAll := 0
-	for _, rc := range codes {
-		regs, _ := h.service.GetRegistrations(rc.ReferralCode)
-		items := make([]regItem, 0, len(regs))
-		for _, reg := range regs {
-			items = append(items, regItem{
-				ID:           reg.ID.String(),
-				ReferralCode: reg.ReferralCode,
-				Name:         reg.Name,
-				Username:     reg.Username,
-				Email:        reg.Email,
-				PanCardID:    reg.PanCardID,
-				FullName:     reg.FullName,
-				RegisteredAt: reg.RegisteredAt.Format("2006-01-02T15:04:05Z"),
-			})
-		}
-		totalAll += len(regs)
-		results = append(results, codeResult{
-			ReferralCode:       rc.ReferralCode,
-			CreatedByUsername:  rc.CreatedByUsername,
-			CreatedAt:          rc.CreatedAt.Format("2006-01-02T15:04:05Z"),
-			Registrations:      items,
-			TotalRegistrations: len(regs),
-		})
-	}
-
-	utils.SuccessResponse(c, http.StatusOK, "Search results", gin.H{
-		"created_by_username": username,
-		"total_codes":         len(results),
-		"total_registrations": totalAll,
-		"results":             results,
-	})
 }

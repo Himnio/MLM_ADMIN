@@ -159,6 +159,7 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 	referralRepo := repositories.NewReferralRepository(db)
 	incomeRepo := repositories.NewIncomeRepository(db)
 	commissionRepo := repositories.NewCommissionRepository(db)
+	memberUserRepo := repositories.NewMemberUserRepository(db)
 
 	// Initialize JWT manager
 	jwtMgr := auth.NewJWTManager(&cfg.JWT)
@@ -172,10 +173,20 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 		logger.Fatal(err, "Failed to initialize income service", nil)
 	}
 
+	// Initialize member auth service
+	memberAuthService := services.NewMemberAuthService(memberUserRepo, jwtMgr, cfg, logger)
+
 	// Initialize referral link system
 	referralLinkRepo := repositories.NewReferralLinkRepository(db)
-	referralLinkService := services.NewReferralLinkService(referralLinkRepo, cfg, logger)
+	referralLinkService := services.NewReferralLinkService(referralLinkRepo, memberUserRepo, memberRepo, memberAuthService, cfg, logger)
 	referralLinkHandler := handlers.NewReferralLinkHandler(referralLinkService, cfg, logger)
+
+	// Initialize member auth handler
+	memberAuthHandler := handlers.NewMemberAuthHandler(memberAuthService, cfg, logger)
+
+	// Initialize distributor service and handler
+	distributorService := services.NewDistributorService(memberUserRepo, memberRepo, referralLinkRepo, cfg, logger)
+	distributorHandler := handlers.NewDistributorHandler(distributorService, cfg, logger)
 
 	// Initialize dashboard service
 	dashboardService := services.NewDashboardService(db.DB, memberRepo, incomeRepo, referralRepo, cfg, logger)
@@ -208,6 +219,9 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 		// Public referral link routes (no auth required)
 		v1.GET("/referral-link/:code/validate", referralLinkHandler.ValidateReferralCode)
 		v1.POST("/referral-link/:code/register", referralLinkHandler.RegisterWithReferral)
+
+		// Public member auth routes (no auth required)
+		v1.POST("/member/auth/login", memberAuthHandler.Login)
 
 		// Auth routes (public)
 		authRoutes := v1.Group("/auth")
@@ -302,7 +316,21 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 				referralLinkAdmin.GET("/referral-codes/search", referralLinkHandler.SearchByCreator)
 				referralLinkAdmin.GET("/referral/:code/registrations", referralLinkHandler.GetRegistrations)
 				referralLinkAdmin.DELETE("/referral/:code", referralLinkHandler.DeleteReferralCode)
+				referralLinkAdmin.GET("/distributors", distributorHandler.ListDistributors)
+				referralLinkAdmin.POST("/distributors/:id/toggle-active", distributorHandler.ToggleActive)
+				referralLinkAdmin.GET("/distributor-tree/:id", distributorHandler.GetDistributorTree)
 			}
+		}
+
+		// Member protected routes
+		memberProtected := v1.Group("/member")
+		memberProtected.Use(middleware.MemberAuth(&cfg.JWT))
+		{
+			memberProtected.GET("/profile", memberAuthHandler.GetProfile)
+			memberProtected.GET("/dashboard", distributorHandler.GetDashboard)
+			memberProtected.GET("/downline", distributorHandler.GetDownline)
+			memberProtected.GET("/referral-info", distributorHandler.GetReferralInfo)
+			memberProtected.GET("/tree", distributorHandler.GetOwnTree)
 		}
 	}
 

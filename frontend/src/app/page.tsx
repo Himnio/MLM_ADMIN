@@ -13,10 +13,11 @@ import IncomeView from '@/components/IncomeView';
 import ReportsView from '@/components/ReportsView';
 import LoginPage from '@/components/LoginPage';
 import AdminLayout from '@/components/AdminLayout';
+import AdminDistributorView from '@/components/AdminDistributorView';
 
 const sectionTitles: Record<SectionKey, string> = {
   dashboard: 'Dashboard',
-  members: 'Members Management',
+  members: 'Distributors Management',
   'referral-link': 'Referral Links',
   'referral-search': 'Referral Search',
   referrals: 'MLM Tree',
@@ -56,7 +57,7 @@ export default function Home() {
   const renderSection = () => {
     switch (activeSection) {
       case 'dashboard': return <DashboardView />;
-      case 'members': return <MembersView />;
+      case 'members': return <AdminDistributorView />;
       case 'referral-link': return <ReferralLinkView />;
       case 'referral-search': return <ReferralSearchView />;
       case 'referrals': return <ReferralsView />;

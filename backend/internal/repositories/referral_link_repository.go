@@ -16,6 +16,7 @@ type ReferralLinkRepository interface {
 	GetReferralCodesByAdminID(adminID uuid.UUID) ([]*models.ReferralCode, error)
 	GetAllReferralCodes() ([]*models.ReferralCode, error)
 	SearchReferralCodesByCreator(username string) ([]*models.ReferralCode, error)
+	GetReferralCodeByMemberUserID(memberUserID uuid.UUID) (*models.ReferralCode, error)
 	CreateRegistration(reg *models.ReferralRegistration) error
 	GetRegistrationsByReferralCode(code string) ([]*models.ReferralRegistration, error)
 	CheckUsernameExists(username string) (bool, error)
@@ -57,6 +58,18 @@ func (r *referralLinkRepository) GetAllReferralCodes() ([]*models.ReferralCode, 
 	var codes []*models.ReferralCode
 	err := r.db.DB.Order("created_at DESC").Find(&codes).Error
 	return codes, err
+}
+
+func (r *referralLinkRepository) GetReferralCodeByMemberUserID(memberUserID uuid.UUID) (*models.ReferralCode, error) {
+	var rc models.ReferralCode
+	err := r.db.DB.Where("member_user_id = ?", memberUserID).First(&rc).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &rc, nil
 }
 
 func (r *referralLinkRepository) SearchReferralCodesByCreator(username string) ([]*models.ReferralCode, error) {

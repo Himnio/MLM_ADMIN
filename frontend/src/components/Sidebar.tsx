@@ -24,7 +24,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { key: 'members', label: 'Members', icon: Users },
+  { key: 'members', label: 'Distributors', icon: Users },
   { key: 'referral-link', label: 'Referral Links', icon: Link2 },
   { key: 'referral-search', label: 'Referral Search', icon: Search },
   { key: 'referrals', label: 'MLM Tree', icon: GitBranch },
