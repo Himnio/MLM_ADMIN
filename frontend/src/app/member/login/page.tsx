@@ -16,11 +16,17 @@ function LoginForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
-
-  const hasPrefilled = searchParams.has('login_id') || searchParams.has('password');
+  const [mounted, setMounted] = useState(false);
+  const [hasPrefilled, setHasPrefilled] = useState(false);
 
   useEffect(() => {
-    if (hasPrefilled) return;
+    setMounted(true);
+    const params = new URLSearchParams(window.location.search);
+    setHasPrefilled(params.has('login_id') || params.has('password'));
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || hasPrefilled) return;
     const token = localStorage.getItem('member_token');
     if (token) {
       fetch(`${API_BASE}/member/profile`, {
@@ -29,7 +35,7 @@ function LoginForm() {
         if (r.ok) router.push('/member/dashboard');
       }).catch(() => {});
     }
-  }, [router, hasPrefilled]);
+  }, [router, mounted, hasPrefilled]);
 
   useEffect(() => {
     const lid = searchParams.get('login_id');
