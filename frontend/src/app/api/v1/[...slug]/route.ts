@@ -9,19 +9,23 @@ async function proxy(request: NextRequest) {
 
   const headers = new Headers(request.headers);
   headers.delete('host');
+  headers.delete('content-length');
 
-  const init: RequestInit = {
-    method: request.method,
-    headers,
-  };
-
+  let body: string | undefined;
   if (request.method !== 'GET' && request.method !== 'HEAD') {
-    (init as any).duplex = 'half';
-    init.body = await request.text();
+    try {
+      body = await request.text();
+    } catch (e) {
+      body = '';
+    }
   }
 
   try {
-    const backendRes = await fetch(url.toString(), init);
+    const backendRes = await fetch(url.toString(), {
+      method: request.method,
+      headers,
+      body,
+    });
 
     const resHeaders = new Headers(backendRes.headers);
     resHeaders.delete('content-encoding');
@@ -31,9 +35,13 @@ async function proxy(request: NextRequest) {
       statusText: backendRes.statusText,
       headers: resHeaders,
     });
-  } catch {
+  } catch (e) {
     return NextResponse.json(
-      { success: false, message: 'Backend unreachable.' },
+      {
+        success: false,
+        message: 'Backend unreachable.',
+        error: e instanceof Error ? e.message : String(e),
+      },
       { status: 502 },
     );
   }
