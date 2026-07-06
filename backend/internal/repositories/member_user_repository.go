@@ -25,6 +25,7 @@ type MemberUserRepository interface {
 	ToggleActive(id uuid.UUID) error
 	UpdatePassword(id uuid.UUID, passwordHash string) error
 	SetPasswordChanged(id uuid.UUID) error
+	SetPasswordMustChange(id uuid.UUID) error
 	ClearReferralCode(code string) error
 	DeleteByID(id uuid.UUID) error
 }
@@ -156,4 +157,8 @@ func (r *memberUserRepository) UpdatePassword(id uuid.UUID, passwordHash string)
 
 func (r *memberUserRepository) SetPasswordChanged(id uuid.UUID) error {
 	return r.db.DB.Model(&models.MemberUser{}).Where("id = ?", id).Update("must_change_password", false).Error
+}
+
+func (r *memberUserRepository) SetPasswordMustChange(id uuid.UUID) error {
+	return r.db.DB.Model(&models.MemberUser{}).Where("id = ?", id).Update("must_change_password", true).Error
 }

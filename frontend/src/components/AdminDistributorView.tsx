@@ -48,6 +48,10 @@ export default function AdminDistributorView() {
   const [confirmToggle, setConfirmToggle] = useState<Distributor | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Distributor | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetPasswordValue, setResetPasswordValue] = useState('');
+  const [resetError, setResetError] = useState('');
+  const [resetting, setResetting] = useState(false);
 
   const fetchDistributors = useCallback(async () => {
     setLoading(true);
@@ -74,6 +78,23 @@ export default function AdminDistributorView() {
       }
     }
     setDeleting(false);
+  };
+
+  const handleResetPassword = async () => {
+    if (!selected || resetPasswordValue.length < 6) {
+      setResetError('Password must be at least 6 characters');
+      return;
+    }
+    setResetError('');
+    setResetting(true);
+    const res = await api.post(`/admin/distributors/${selected.id}/reset-password`, { new_password: resetPasswordValue });
+    if (res.success) {
+      setShowResetPassword(false);
+      setResetPasswordValue('');
+    } else {
+      setResetError(res.message || 'Failed to reset password');
+    }
+    setResetting(false);
   };
 
   const viewDetail = async (d: Distributor) => {
@@ -124,7 +145,7 @@ export default function AdminDistributorView() {
       <div className="p-1.5 rounded-lg bg-surface text-text-muted flex-shrink-0">{icon}</div>
       <div className="min-w-0 flex-1">
         <p className="text-xs text-text-muted">{label}</p>
-        <p className="text-sm font-medium text-text-primary truncate">{value || 'ÔÇö'}</p>
+        <p className="text-sm font-medium text-text-primary truncate">{value || 'ï¿½ï¿½ï¿½'}</p>
       </div>
     </div>
   );
@@ -253,7 +274,7 @@ export default function AdminDistributorView() {
                   </div>
                   <div className="flex items-center gap-2">
                     {d.is_active ? <span className="badge-success">Payout On</span> : <span className="badge-default">Payout Off</span>}
-                    <span className="text-xs text-text-muted">{d.mobile || 'ÔÇö'}</span>
+                    <span className="text-xs text-text-muted">{d.mobile || 'ï¿½ï¿½ï¿½'}</span>
                   </div>
                 </div>
               ))}
@@ -279,7 +300,7 @@ export default function AdminDistributorView() {
                       <td className="font-mono text-sm text-text-secondary">{d.member_id}</td>
                       <td className="text-sm text-text-muted">@{d.username}</td>
                       <td className="text-sm text-text-secondary">{d.mobile}</td>
-                      <td className="text-sm text-text-muted truncate max-w-[150px]">{d.email || 'ÔÇö'}</td>
+                      <td className="text-sm text-text-muted truncate max-w-[150px]">{d.email || 'ï¿½ï¿½ï¿½'}</td>
                       <td>{d.is_active ? <span className="badge-success">Payout On</span> : <span className="badge-default">Payout Off</span>}</td>
                       <td>
                         <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
@@ -332,7 +353,7 @@ export default function AdminDistributorView() {
                 )}
                 <button onClick={() => { setSelected(null); setDetailTree(null); }}
                   className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors text-text-muted">
-                  Ô£ò
+                  Ô£ï¿½
                 </button>
               </div>
             </div>
@@ -370,6 +391,15 @@ export default function AdminDistributorView() {
                 {fieldRow(<Shield size={15} />, 'Username', `@${selected.username}`)}
                 {fieldRow(<Shield size={15} />, 'Referral Code Used', selected.referral_code)}
                 {fieldRow(<Shield size={15} />, 'Registered', new Date(selected.created_at).toLocaleDateString())}
+                {isSuperAdmin && (
+                  <div className="pt-3 mt-3 border-t border-border">
+                    <button onClick={() => { setShowResetPassword(true); setResetPasswordValue(''); setResetError(''); }}
+                      className="w-full py-2.5 rounded-xl font-medium text-sm text-white bg-red-500 hover:bg-red-600 transition-all">
+                      Reset Password
+                    </button>
+                    <p className="text-[10px] text-text-muted mt-1">Sets a new password. User will be prompted to change on next login.</p>
+                  </div>
+                )}
               </div>
 
               {/* Tree view */}
@@ -389,6 +419,35 @@ export default function AdminDistributorView() {
                 ) : (
                   <p className="text-xs text-text-muted py-2">Select a distributor to view their tree.</p>
                 )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showResetPassword && (
+        <div className="modal-overlay" onClick={() => { setShowResetPassword(false); setResetPasswordValue(''); setResetError(''); }}>
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-modal animate-scale-in p-6" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-text-primary mb-1">Reset Password</h3>
+            <p className="text-sm text-text-muted mb-4">
+              Set a new password for <strong>{selected?.first_name} {selected?.last_name}</strong>. The distributor will be prompted to change it on next login.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">New Password</label>
+                <input type="text" value={resetPasswordValue} onChange={e => setResetPasswordValue(e.target.value)}
+                  className="input" placeholder="Min 6 characters" autoFocus />
+              </div>
+              {resetError && (
+                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">{resetError}</div>
+              )}
+              <div className="flex gap-3">
+                <button onClick={() => { setShowResetPassword(false); setResetPasswordValue(''); setResetError(''); }}
+                  className="flex-1 btn-ghost py-2.5">Cancel</button>
+                <button onClick={handleResetPassword} disabled={resetting}
+                  className="flex-1 py-2.5 rounded-xl font-medium text-white bg-red-500 hover:bg-red-600 disabled:opacity-50 transition-all">
+                  {resetting ? 'Resetting...' : 'Reset Password'}
+                </button>
               </div>
             </div>
           </div>
@@ -429,7 +488,7 @@ export default function AdminDistributorView() {
             <h3 className="text-lg font-semibold text-text-primary text-center mb-2">Delete Distributor?</h3>
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
               <p className="text-sm text-amber-800 font-medium text-center">
-                ÔÜá This action cannot be undone!
+                ï¿½ï¿½ï¿½ This action cannot be undone!
               </p>
             </div>
             <p className="text-sm text-text-muted text-center mb-6">

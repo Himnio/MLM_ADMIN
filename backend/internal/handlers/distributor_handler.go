@@ -218,6 +218,41 @@ func (h *DistributorHandler) GetDistributorTree(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Tree retrieved", tree)
 }
 
+// Admin: reset distributor password (no old password required)
+func (h *DistributorHandler) AdminResetPassword(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		utils.BadRequestResponse(c, "Invalid distributor ID", "")
+		return
+	}
+
+	var req struct {
+		NewPassword string `json:"new_password"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.BadRequestResponse(c, "Invalid request", err.Error())
+		return
+	}
+
+	if len(req.NewPassword) < 6 {
+		utils.BadRequestResponse(c, "Password must be at least 6 characters", "")
+		return
+	}
+
+	if err := h.service.AdminResetPassword(id, req.NewPassword); err != nil {
+		if err.Error() == "distributor not found" {
+			utils.NotFoundResponse(c, "Distributor not found", "")
+			return
+		}
+		h.logger.Error(err, "Failed to reset distributor password", nil)
+		utils.InternalServerErrorResponse(c, "Failed to reset password", "")
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Password reset successfully. Distributor will be prompted to change on next login.", nil)
+}
+
 // Distributor: get their own tree
 func (h *DistributorHandler) GetOwnTree(c *gin.Context) {
 	userIDStr := c.GetString("member_user_id")

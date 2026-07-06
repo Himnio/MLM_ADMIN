@@ -9,6 +9,7 @@ import (
 	"mlm-admin-backend/internal/utils"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type DistributorService interface {
@@ -20,6 +21,7 @@ type DistributorService interface {
 	GetDistributorTree(memberUserID uuid.UUID) (*models.DistributorTreeResponse, error)
 	DeleteDistributor(memberUserID uuid.UUID) error
 	GetDownlineByMemberUserID(memberUserID uuid.UUID) ([]*models.DistributorDownlinePublic, error)
+	AdminResetPassword(memberUserID uuid.UUID, newPassword string) error
 }
 
 type distributorService struct {
@@ -258,4 +260,28 @@ func (s *distributorService) GetDistributorTree(memberUserID uuid.UUID) (*models
 		Distributor: distributor,
 		Downlines:   downlines,
 	}, nil
+}
+
+func (s *distributorService) AdminResetPassword(memberUserID uuid.UUID, newPassword string) error {
+	user, err := s.memberUserRepo.GetByID(memberUserID)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return fmt.Errorf("distributor not found")
+	}
+
+	if len(newPassword) < 6 {
+		return fmt.Errorf("new password must be at least 6 characters")
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	if err := s.memberUserRepo.UpdatePassword(memberUserID, string(hash)); err != nil {
+		return err
+	}
+	return s.memberUserRepo.SetPasswordMustChange(memberUserID)
 }
