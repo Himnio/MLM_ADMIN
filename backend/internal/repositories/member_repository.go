@@ -27,6 +27,7 @@ type MemberRepository interface {
 	GetActiveMemberCount() (int64, error)
 	CheckCircularReference(sponsorID, memberID uuid.UUID) (bool, error)
 	HardDeleteByMemberUserID(memberUserID uuid.UUID) error
+	GetImmediateDownline(sponsorID uuid.UUID) ([]*models.Member, error)
 }
 
 type memberRepository struct {
@@ -227,6 +228,12 @@ func (r *memberRepository) GetUpline(memberID uuid.UUID, maxLevel int) ([]*model
 }
 
 // GetDownlineCount returns the total downline count for a member
+func (r *memberRepository) GetImmediateDownline(sponsorID uuid.UUID) ([]*models.Member, error) {
+	var members []*models.Member
+	err := r.db.DB.Where("sponsor_id = ?", sponsorID).Preload("Sponsor").Order("created_at DESC").Find(&members).Error
+	return members, err
+}
+
 func (r *memberRepository) GetDownlineCount(memberID uuid.UUID) (int, error) {
 	var count int64
 	err := r.db.DB.Model(&models.Member{}).

@@ -16,7 +16,7 @@ import (
 )
 
 type ReferralLinkService interface {
-	CreateReferralCode(createdByUsername string, adminID *uuid.UUID) (*models.ReferralCode, string, error)
+	CreateReferralCode(createdByUsername string, adminID *uuid.UUID, distInput *CreateDistributorInput) (*models.ReferralCode, string, error)
 	ValidateReferralCode(code string) (*models.ReferralCode, error)
 	RegisterWithReferral(code string, input *MemberRegistrationInput) (*models.RegistrationResponse, error)
 	GetRegistrations(code string) ([]*models.MemberUser, error)
@@ -24,6 +24,16 @@ type ReferralLinkService interface {
 	SearchReferralCodesByCreator(username string) ([]*models.ReferralCode, error)
 	DeleteReferralCode(code string) error
 	GetReferralCodeByMemberUserID(memberUserID uuid.UUID) (*models.ReferralCode, error)
+}
+
+type CreateDistributorInput struct {
+	FirstName string
+	LastName  string
+	Mobile    string
+	Gender    string
+	DOB       string
+	Address   string
+	Email     string
 }
 
 type MemberRegistrationInput struct {
@@ -92,15 +102,59 @@ func slugify(s string) string {
 	return s
 }
 
-func (s *referralLinkService) CreateReferralCode(createdByUsername string, adminID *uuid.UUID) (*models.ReferralCode, string, error) {
+func (s *referralLinkService) CreateReferralCode(createdByUsername string, adminID *uuid.UUID, distInput *CreateDistributorInput) (*models.ReferralCode, string, error) {
 	slug := slugify(createdByUsername)
 	suffix := randomSuffix(5)
 	referralCode := fmt.Sprintf("%s_%s", slug, suffix)
+
+	var memberUserID *uuid.UUID
+
+	if distInput != nil {
+		// Generate credentials for the new distributor
+		creds, err := s.authSvc.GenerateUniqueCredentials(distInput.FirstName, distInput.LastName)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to generate credentials: %w", err)
+		}
+
+		// Create the member_user record
+		user := &models.MemberUser{
+			MemberID:     creds.MemberID,
+			Username:     creds.Username,
+			PasswordHash: creds.Hash,
+			FirstName:    distInput.FirstName,
+			LastName:     distInput.LastName,
+			Mobile:       distInput.Mobile,
+			Gender:       distInput.Gender,
+			DOB:          distInput.DOB,
+			Address:      distInput.Address,
+			Email:        distInput.Email,
+			ReferralCode: referralCode,
+			IsActive:     false,
+		}
+		if err := s.memberRepo.Create(user); err != nil {
+			return nil, "", fmt.Errorf("failed to create distributor: %w", err)
+		}
+		memberUserID = &user.ID
+
+		// Create a member record (MLM tree node) for this distributor
+		fullName := distInput.FirstName + " " + distInput.LastName
+		member := &models.Member{
+			MemberUserID: &user.ID,
+			FullName:     fullName,
+			Email:        distInput.Email,
+			Phone:        distInput.Mobile,
+			Status:       "inactive",
+		}
+		if err := s.memberTreeRepo.Create(member); err != nil {
+			s.logger.Error(err, "Failed to create member tree node", map[string]interface{}{"user_id": user.ID.String()})
+		}
+	}
 
 	rc := &models.ReferralCode{
 		ReferralCode:      referralCode,
 		CreatedByUsername: createdByUsername,
 		AdminID:           adminID,
+		MemberUserID:      memberUserID,
 		IsActive:          true,
 	}
 

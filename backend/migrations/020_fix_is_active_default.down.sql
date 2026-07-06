@@ -1,0 +1,1 @@
+ALTER TABLE member_users ALTER COLUMN is_active SET DEFAULT TRUE;

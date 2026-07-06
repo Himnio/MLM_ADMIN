@@ -24,7 +24,7 @@ type MemberUser struct {
 	BankIFSC      string    `gorm:"column:bank_ifsc;type:varchar(20)" json:"bank_ifsc,omitempty"`
 	BankBranch    string    `gorm:"column:bank_branch;type:varchar(100)" json:"bank_branch,omitempty"`
 	ReferralCode       string    `gorm:"column:referral_code;type:varchar(50);not null" json:"referral_code"`
-	IsActive           bool      `gorm:"column:is_active;default:true" json:"is_active"`
+	IsActive           bool      `gorm:"column:is_active;default:false" json:"is_active"`
 	MustChangePassword bool      `gorm:"column:must_change_password;default:true" json:"must_change_password"`
 	CreatedAt          time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt          time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`

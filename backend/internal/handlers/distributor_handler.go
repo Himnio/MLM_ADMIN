@@ -155,6 +155,28 @@ func (h *DistributorHandler) ToggleActive(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Status toggled", nil)
 }
 
+// Admin: get immediate downline for a distributor by ID (for lazy tree loading)
+func (h *DistributorHandler) GetDownlineByID(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		utils.BadRequestResponse(c, "Invalid distributor ID", "")
+		return
+	}
+
+	downlines, err := h.service.GetDownlineByMemberUserID(id)
+	if err != nil {
+		h.logger.Error(err, "Failed to get downline", nil)
+		utils.InternalServerErrorResponse(c, "Failed to get downline", "")
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Downline retrieved", gin.H{
+		"downlines": downlines,
+		"total":     len(downlines),
+	})
+}
+
 // Admin: delete distributor completely
 func (h *DistributorHandler) DeleteDistributor(c *gin.Context) {
 	idStr := c.Param("id")

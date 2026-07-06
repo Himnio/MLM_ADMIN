@@ -21,6 +21,10 @@ export default function ReferralLinkView() {
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [showDistForm, setShowDistForm] = useState(false);
+  const [distForm, setDistForm] = useState({
+    first_name: '', last_name: '', mobile: '', gender: 'male', dob: '', address: '', email: '',
+  });
 
   const getReferralLink = (code: string) => {
     if (typeof window !== 'undefined') {
@@ -44,14 +48,26 @@ export default function ReferralLinkView() {
     setCreating(true);
     setError('');
     setNewCode(null);
-    const res: any = await api.post('/admin/referral', {
+    const body: any = {
       created_by_username: codeName || undefined,
-    });
+    };
+    if (showDistForm && distForm.first_name && distForm.last_name) {
+      body.first_name = distForm.first_name;
+      body.last_name = distForm.last_name;
+      body.mobile = distForm.mobile;
+      body.gender = distForm.gender;
+      body.dob = distForm.dob;
+      body.address = distForm.address;
+      body.email = distForm.email;
+    }
+    const res: any = await api.post('/admin/referral', body);
     if (res.success && res.data) {
       setNewCode({
         referral_code: res.data.referral_code,
       });
       setCodeName('');
+      setShowDistForm(false);
+      setDistForm({ first_name: '', last_name: '', mobile: '', gender: 'male', dob: '', address: '', email: '' });
       fetchCodes();
     } else {
       setError(res.error || res.message || 'Failed to create code');
@@ -142,6 +158,54 @@ export default function ReferralLinkView() {
             ) : 'Create Code'}
           </button>
         </div>
+        <div className="mt-3">
+          <label className="flex items-center gap-2 cursor-pointer" onClick={() => setShowDistForm(!showDistForm)}>
+            <input type="checkbox" checked={showDistForm} onChange={() => setShowDistForm(!showDistForm)} className="rounded border-border text-primary focus:ring-primary" />
+            <span className="text-sm text-text-secondary font-medium">Also create a distributor account</span>
+          </label>
+        </div>
+        {showDistForm && (
+          <div className="mt-3 p-4 bg-surface rounded-xl border border-border space-y-3">
+            <p className="text-xs text-text-muted font-medium">Distributor Details (required fields marked *)</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1">First Name *</label>
+                <input value={distForm.first_name} onChange={e => setDistForm(p => ({ ...p, first_name: e.target.value }))} placeholder="John" className="input text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1">Last Name *</label>
+                <input value={distForm.last_name} onChange={e => setDistForm(p => ({ ...p, last_name: e.target.value }))} placeholder="Doe" className="input text-sm" />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1">Mobile *</label>
+                <input value={distForm.mobile} onChange={e => setDistForm(p => ({ ...p, mobile: e.target.value }))} placeholder="+91 9876543210" className="input text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1">Gender *</label>
+                <select value={distForm.gender} onChange={e => setDistForm(p => ({ ...p, gender: e.target.value }))} className="input text-sm">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1">Date of Birth *</label>
+                <input value={distForm.dob} onChange={e => setDistForm(p => ({ ...p, dob: e.target.value }))} type="date" className="input text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1">Email</label>
+                <input value={distForm.email} onChange={e => setDistForm(p => ({ ...p, email: e.target.value }))} type="email" placeholder="john@example.com" className="input text-sm" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-text-secondary mb-1">Address *</label>
+              <textarea value={distForm.address} onChange={e => setDistForm(p => ({ ...p, address: e.target.value }))} rows={2} placeholder="Full address" className="input text-sm resize-none" />
+            </div>
+          </div>
+        )}
         {error && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>}
         {newCode && (
           <div className="mt-4 p-3 sm:p-4 bg-emerald-50 border border-emerald-200 rounded-xl">

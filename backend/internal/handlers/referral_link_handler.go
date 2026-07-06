@@ -33,6 +33,13 @@ func NewReferralLinkHandler(
 
 type createCodeRequest struct {
 	CreatedByUsername string `json:"created_by_username"`
+	FirstName         string `json:"first_name"`
+	LastName          string `json:"last_name"`
+	Mobile            string `json:"mobile"`
+	Gender            string `json:"gender"`
+	DOB               string `json:"dob"`
+	Address           string `json:"address"`
+	Email             string `json:"email"`
 }
 
 func (h *ReferralLinkHandler) CreateReferralCode(c *gin.Context) {
@@ -59,17 +66,36 @@ func (h *ReferralLinkHandler) CreateReferralCode(c *gin.Context) {
 		}
 	}
 
-	rc, link, err := h.service.CreateReferralCode(username, adminUUID)
+	// Build optional distributor input
+	var distInput *services.CreateDistributorInput
+	if strings.TrimSpace(req.FirstName) != "" {
+		distInput = &services.CreateDistributorInput{
+			FirstName: strings.TrimSpace(req.FirstName),
+			LastName:  strings.TrimSpace(req.LastName),
+			Mobile:    strings.TrimSpace(req.Mobile),
+			Gender:    strings.TrimSpace(req.Gender),
+			DOB:       strings.TrimSpace(req.DOB),
+			Address:   strings.TrimSpace(req.Address),
+			Email:     strings.TrimSpace(strings.ToLower(req.Email)),
+		}
+	}
+
+	rc, link, err := h.service.CreateReferralCode(username, adminUUID, distInput)
 	if err != nil {
 		h.logger.Error(err, "Failed to create referral code", nil)
 		utils.InternalServerErrorResponse(c, "Failed to create referral code", err.Error())
 		return
 	}
 
-	utils.SuccessResponse(c, http.StatusOK, "Referral code created", gin.H{
+	resp := gin.H{
 		"referral_code": rc.ReferralCode,
 		"referral_link": link,
-	})
+	}
+	if distInput != nil && rc.MemberUserID != nil {
+		resp["member_user_id"] = rc.MemberUserID.String()
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Referral code created", resp)
 }
 
 func (h *ReferralLinkHandler) ValidateReferralCode(c *gin.Context) {

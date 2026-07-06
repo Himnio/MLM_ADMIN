@@ -129,21 +129,88 @@ export default function AdminDistributorView() {
     </div>
   );
 
-  const renderTreeNode = (node: any, isRoot = false) => (
-    <div key={node.id} className="select-none">
-      <div className={`flex items-center gap-2 p-2 rounded-lg border text-sm
-        ${isRoot ? 'bg-primary/5 border-primary/20' : 'bg-white border-border'}
-      `}>
-        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
-          {node.first_name?.charAt(0)}{node.last_name?.charAt(0)}
+  interface TreeNode {
+    id: string;
+    first_name: string;
+    last_name: string;
+    member_id: string;
+    is_active: boolean;
+    downline_count: number;
+  }
+
+  function TreeBranch({ node, depth }: { node: TreeNode; depth: number }) {
+    const [expanded, setExpanded] = useState(false);
+    const [children, setChildren] = useState<TreeNode[] | null>(null);
+    const [loading, setLoading] = useState(false);
+
+    const toggle = async () => {
+      if (expanded) { setExpanded(false); return; }
+      if (children === null) {
+        setLoading(true);
+        const res = await api.get<{ downlines: TreeNode[] }>(`/admin/distributors/${node.id}/downline`);
+        if (res.success && res.data) {
+          setChildren(res.data.downlines || []);
+        } else {
+          setChildren([]);
+        }
+        setLoading(false);
+      }
+      setExpanded(true);
+    };
+
+    const hasChildren = node.downline_count > 0;
+
+    return (
+      <div className="select-none">
+        <div
+          onClick={hasChildren ? toggle : undefined}
+          className={`flex items-center gap-2 p-2 rounded-lg border text-sm cursor-default transition-all
+            ${depth === 0 ? 'bg-primary/5 border-primary/20' : 'bg-white border-border hover:bg-surface-hover'}
+          `}
+          style={{ marginLeft: depth * 16 }}
+        >
+          <button
+            onClick={(e) => { e.stopPropagation(); if (hasChildren) toggle(); }}
+            className={`w-5 h-5 flex items-center justify-center rounded transition-colors
+              ${hasChildren ? 'text-text-muted hover:bg-surface-hover' : 'text-transparent cursor-default'}
+            `}
+          >
+            {loading ? (
+              <Loader2 size={12} className="animate-spin" />
+            ) : hasChildren ? (
+              <ChevronRight size={14} className={`transition-transform ${expanded ? 'rotate-90' : ''}`} />
+            ) : null}
+          </button>
+          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
+            {node.first_name?.charAt(0)}{node.last_name?.charAt(0)}
+          </div>
+          <span className="flex-1 truncate font-medium text-text-primary min-w-0">
+            {node.first_name} {node.last_name}
+          </span>
+          {hasChildren && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium flex-shrink-0">
+              {node.downline_count}
+            </span>
+          )}
+          <span className={`text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0 ${node.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
+            {node.is_active ? 'Active' : 'Inactive'}
+          </span>
         </div>
-        <span className="flex-1 truncate font-medium text-text-primary">{node.first_name} {node.last_name}</span>
-        <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${node.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
-          {node.is_active ? 'Active' : 'Inactive'}
-        </span>
+        {expanded && children && children.length > 0 && (
+          <div className="space-y-1 mt-1">
+            {children.map((child) => (
+              <TreeBranch key={child.id} node={child} depth={depth + 1} />
+            ))}
+          </div>
+        )}
+        {expanded && children && children.length === 0 && (
+          <p className="text-xs text-text-muted py-1" style={{ marginLeft: (depth + 1) * 16 + 24 }}>
+            No sub-distributors
+          </p>
+        )}
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -310,22 +377,17 @@ export default function AdminDistributorView() {
                 <h3 className="text-sm font-semibold text-text-primary mb-2 flex items-center gap-2">
                   <Users size={15} /> Distributor Tree
                 </h3>
-                {detailLoading ? (
-                  <div className="flex justify-center py-4"><Loader2 size={20} className="animate-spin text-primary" /></div>
-                ) : detailTree ? (
-                  <div className="space-y-1">
-                    {renderTreeNode(detailTree.distributor, true)}
-                    {detailTree.downlines && detailTree.downlines.length > 0 && (
-                      <div className="ml-4 pl-3 border-l-2 border-border space-y-1">
-                        {detailTree.downlines.map((d: any) => renderTreeNode(d, false))}
-                      </div>
-                    )}
-                    {(!detailTree.downlines || detailTree.downlines.length === 0) && (
-                      <p className="text-xs text-text-muted py-2">No downline members</p>
-                    )}
+                <p className="text-xs text-text-muted mb-3">
+                  Click on a distributor to expand and view their sub-distributors.
+                </p>
+                {detailTree && detailTree.distributor ? (
+                  <div className="bg-surface rounded-xl p-3 space-y-1">
+                    <TreeBranch node={detailTree.distributor} depth={0} />
                   </div>
+                ) : detailLoading ? (
+                  <div className="flex justify-center py-4"><Loader2 size={20} className="animate-spin text-primary" /></div>
                 ) : (
-                  <p className="text-xs text-text-muted py-2">Loading tree...</p>
+                  <p className="text-xs text-text-muted py-2">Select a distributor to view their tree.</p>
                 )}
               </div>
             </div>

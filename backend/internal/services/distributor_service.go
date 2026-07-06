@@ -19,6 +19,7 @@ type DistributorService interface {
 	ToggleActive(memberUserID uuid.UUID) error
 	GetDistributorTree(memberUserID uuid.UUID) (*models.DistributorTreeResponse, error)
 	DeleteDistributor(memberUserID uuid.UUID) error
+	GetDownlineByMemberUserID(memberUserID uuid.UUID) ([]*models.DistributorDownlinePublic, error)
 }
 
 type distributorService struct {
@@ -169,6 +170,39 @@ func (s *distributorService) GetAllDistributors(page, limit int) ([]*models.Memb
 
 func (s *distributorService) ToggleActive(memberUserID uuid.UUID) error {
 	return s.memberUserRepo.ToggleActive(memberUserID)
+}
+
+func (s *distributorService) GetDownlineByMemberUserID(memberUserID uuid.UUID) ([]*models.DistributorDownlinePublic, error) {
+	member, err := s.memberTreeRepo.GetByMemberUserID(memberUserID)
+	if err != nil {
+		return nil, err
+	}
+	if member == nil {
+		return []*models.DistributorDownlinePublic{}, nil
+	}
+
+	downlineMembers, err := s.memberTreeRepo.GetImmediateDownline(member.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*models.DistributorDownlinePublic, 0, len(downlineMembers))
+	for _, dm := range downlineMembers {
+		if dm.MemberUserID == nil {
+			continue
+		}
+		mu, err := s.memberUserRepo.GetByID(*dm.MemberUserID)
+		if err != nil || mu == nil {
+			continue
+		}
+		sponsorName := ""
+		if dm.Sponsor != nil {
+			sponsorName = dm.Sponsor.FullName
+		}
+		dc, _ := s.memberTreeRepo.GetDownlineCount(dm.ID)
+		result = append(result, models.ToDistributorDownlinePublic(mu, 1, dm.SponsorID.String(), sponsorName, dc))
+	}
+	return result, nil
 }
 
 func (s *distributorService) DeleteDistributor(memberUserID uuid.UUID) error {
