@@ -61,6 +61,12 @@ export default function DistributorLayout({
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
+  useEffect(() => {
+    if (showPasswordModal) {
+      setOldPassword(sessionStorage.getItem('member_password') || '');
+    }
+  }, [showPasswordModal]);
+
   const handleChangePassword = async () => {
     setChangeError('');
     if (newPassword.length < 6) {

@@ -31,7 +31,7 @@ export default function DistributorDashboardView() {
   if (!data) return null;
 
   const stats = [
-    { label: 'Status', value: data.is_active ? 'Active' : 'Inactive', icon: Shield, color: data.is_active ? 'from-emerald-500 to-green-500' : 'from-gray-400 to-gray-500' },
+    { label: 'Payout Status', value: data.is_active ? 'On' : 'Off', icon: Shield, color: data.is_active ? 'from-emerald-500 to-green-500' : 'from-gray-400 to-gray-500' },
     { label: 'Downline Members', value: data.downline_count, icon: Users, color: 'from-blue-500 to-indigo-500' },
     { label: 'Referral Used', value: data.referral_used, icon: Link2, color: 'from-purple-500 to-pink-500' },
     { label: 'Member ID', value: data.member_id, icon: UserCheck, color: 'from-amber-500 to-orange-500' },

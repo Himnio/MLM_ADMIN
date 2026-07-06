@@ -92,9 +92,9 @@ export default function DistributorDownlineView() {
             </div>
             <div className="flex items-center gap-2 mt-2">
               {d.is_active ? (
-                <span className="badge-success">Active</span>
+                <span className="badge-success">Payout On</span>
               ) : (
-                <span className="badge-default">Inactive</span>
+                <span className="badge-default">Payout Off</span>
               )}
               <span className="text-xs text-text-muted">{d.downline_count} downline</span>
             </div>
@@ -111,7 +111,7 @@ export default function DistributorDownlineView() {
               <th>Member ID</th>
               <th>Mobile</th>
               <th>Email</th>
-              <th>Status</th>
+              <th>Payout</th>
               <th>Downline</th>
               <th className="text-right">Actions</th>
             </tr>
@@ -123,7 +123,7 @@ export default function DistributorDownlineView() {
                 <td className="font-mono text-sm text-text-secondary">{d.member_id}</td>
                 <td className="text-sm text-text-secondary">{d.mobile}</td>
                 <td className="text-sm text-text-muted truncate max-w-[150px]">{d.email || '—'}</td>
-                <td>{d.is_active ? <span className="badge-success">Active</span> : <span className="badge-default">Inactive</span>}</td>
+                <td>{d.is_active ? <span className="badge-success">Payout On</span> : <span className="badge-default">Payout Off</span>}</td>
                 <td className="text-sm text-text-secondary">{d.downline_count}</td>
                 <td>
                   <button onClick={(e) => { e.stopPropagation(); setSelected(d); }} className="btn-icon border border-border">
@@ -150,7 +150,7 @@ export default function DistributorDownlineView() {
               <div className="flex items-center gap-3 mb-4">
                 <Shield size={16} className={selected.is_active ? 'text-emerald-500' : 'text-gray-400'} />
                 <span className={selected.is_active ? 'badge-success' : 'badge-default'}>
-                  {selected.is_active ? 'Active' : 'Inactive'}
+                  {selected.is_active ? 'Payout On' : 'Payout Off'}
                 </span>
               </div>
 

@@ -44,7 +44,7 @@ func (h *MemberAuthHandler) Login(c *gin.Context) {
 
 	tokenPair, user, err := h.service.Login(req.LoginID, req.Password)
 	if err != nil {
-		if err.Error() == "invalid credentials" || err.Error() == "account is inactive" {
+		if err.Error() == "invalid credentials" {
 			utils.UnauthorizedResponse(c, err.Error(), "")
 			return
 		}

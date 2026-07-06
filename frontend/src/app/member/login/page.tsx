@@ -68,6 +68,7 @@ function LoginForm() {
       if (data.success) {
         localStorage.setItem('member_token', data.access_token);
         localStorage.setItem('member_user', JSON.stringify(data.user));
+        sessionStorage.setItem('member_password', password);
         router.push('/member/dashboard');
       } else {
         setError(data.message || 'Invalid credentials');

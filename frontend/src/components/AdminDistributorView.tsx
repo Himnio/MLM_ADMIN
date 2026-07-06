@@ -193,7 +193,7 @@ export default function AdminDistributorView() {
             </span>
           )}
           <span className={`text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0 ${node.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
-            {node.is_active ? 'Active' : 'Inactive'}
+            {node.is_active ? 'Payout On' : 'Payout Off'}
           </span>
         </div>
         {expanded && children && children.length > 0 && (
@@ -252,7 +252,7 @@ export default function AdminDistributorView() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {d.is_active ? <span className="badge-success">Active</span> : <span className="badge-default">Inactive</span>}
+                    {d.is_active ? <span className="badge-success">Payout On</span> : <span className="badge-default">Payout Off</span>}
                     <span className="text-xs text-text-muted">{d.mobile || '—'}</span>
                   </div>
                 </div>
@@ -268,7 +268,7 @@ export default function AdminDistributorView() {
                     <th>Username</th>
                     <th>Mobile</th>
                     <th>Email</th>
-                    <th>Status</th>
+                    <th>Payout</th>
                     <th className="text-right">Actions</th>
                   </tr>
                 </thead>
@@ -280,12 +280,12 @@ export default function AdminDistributorView() {
                       <td className="text-sm text-text-muted">@{d.username}</td>
                       <td className="text-sm text-text-secondary">{d.mobile}</td>
                       <td className="text-sm text-text-muted truncate max-w-[150px]">{d.email || '—'}</td>
-                      <td>{d.is_active ? <span className="badge-success">Active</span> : <span className="badge-default">Inactive</span>}</td>
+                      <td>{d.is_active ? <span className="badge-success">Payout On</span> : <span className="badge-default">Payout Off</span>}</td>
                       <td>
                         <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
                           <button onClick={() => confirmToggleActive(d)} disabled={togglingId === d.id}
                             className={`btn-icon border border-border ${d.is_active ? 'text-emerald-500' : 'text-gray-400'}`}
-                            title={d.is_active ? 'Deactivate' : 'Activate'}
+                            title={d.is_active ? 'Disable Payout' : 'Enable Payout'}
                           >
                             {togglingId === d.id ? <Loader2 size={14} className="animate-spin" /> : d.is_active ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
                           </button>
@@ -319,7 +319,7 @@ export default function AdminDistributorView() {
                       : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}
                   `}
                 >
-                  {togglingId === selected.id ? '...' : selected.is_active ? 'Active - Click to deactivate' : 'Inactive - Click to activate'}
+                    {togglingId === selected.id ? '...' : selected.is_active ? 'Payout On - Click to disable' : 'Payout Off - Click to enable'}
                 </button>
               </div>
               <div className="flex items-center gap-2">
@@ -399,10 +399,10 @@ export default function AdminDistributorView() {
         <div className="modal-overlay" onClick={() => setConfirmToggle(null)}>
           <div className="bg-white rounded-2xl w-full max-w-sm shadow-modal animate-scale-in p-6" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-text-primary mb-2">
-              {confirmToggle.is_active ? 'Deactivate Distributor' : 'Activate Distributor'}
+              {confirmToggle.is_active ? 'Disable Payout' : 'Enable Payout'}
             </h3>
             <p className="text-sm text-text-muted mb-6">
-              Are you sure you want to {confirmToggle.is_active ? 'deactivate' : 'activate'} <strong>{confirmToggle.first_name} {confirmToggle.last_name}</strong> ({confirmToggle.member_id})?
+              Are you sure you want to {confirmToggle.is_active ? 'disable payout for' : 'enable payout for'} <strong>{confirmToggle.first_name} {confirmToggle.last_name}</strong> ({confirmToggle.member_id})?
             </p>
             <div className="flex gap-3">
               <button onClick={() => setConfirmToggle(null)} className="flex-1 btn-ghost py-2.5">Cancel</button>
@@ -413,7 +413,7 @@ export default function AdminDistributorView() {
                     : 'bg-emerald-500 hover:bg-emerald-600'
                 }`}
               >
-                {confirmToggle.is_active ? 'Deactivate' : 'Activate'}
+                {confirmToggle.is_active ? 'Disable Payout' : 'Enable Payout'}
               </button>
             </div>
           </div>

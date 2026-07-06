@@ -77,9 +77,9 @@ export default function DistributorTreeView() {
           </div>
           <div className="flex items-center gap-2">
             {node.is_active ? (
-              <span className="badge-success text-[10px]">Active</span>
+              <span className="badge-success text-[10px]">Payout On</span>
             ) : (
-              <span className="badge-default text-[10px]">Inactive</span>
+              <span className="badge-default text-[10px]">Payout Off</span>
             )}
             {hasChildren && (
               <span className="text-xs text-text-muted bg-surface px-2 py-0.5 rounded-full">

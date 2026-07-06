@@ -47,6 +47,7 @@ export default function MemberDashboardPage() {
         if (u.must_change_password) {
           setMustChangePassword(true);
           setShowPasswordModal(true);
+          setOldPassword(sessionStorage.getItem('member_password') || '');
         }
       } catch {}
     }
@@ -100,6 +101,7 @@ export default function MemberDashboardPage() {
   const handleLogout = () => {
     localStorage.removeItem('member_token');
     localStorage.removeItem('member_user');
+    sessionStorage.removeItem('member_password');
     router.push('/member/login');
   };
 

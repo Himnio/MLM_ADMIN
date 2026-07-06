@@ -58,9 +58,6 @@ func (s *memberAuthService) Login(loginID, password string) (*auth.TokenPair, *m
 	if user == nil {
 		return nil, nil, fmt.Errorf("invalid credentials")
 	}
-	if !user.IsActive {
-		return nil, nil, fmt.Errorf("account is inactive")
-	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
 		return nil, nil, fmt.Errorf("invalid credentials")
