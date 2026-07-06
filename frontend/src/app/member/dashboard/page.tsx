@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { X } from 'lucide-react';
 import DistributorLayout, { type DistributorSection } from '@/components/DistributorLayout';
 import DistributorDashboardView from '@/components/DistributorDashboardView';
 import DistributorDownlineView from '@/components/DistributorDownlineView';
@@ -75,7 +76,6 @@ export default function MemberDashboardPage() {
       if (data.success) {
         setShowPasswordModal(false);
         setMustChangePassword(false);
-        sessionStorage.setItem('member_password', newPassword);
         const stored = localStorage.getItem('member_user');
         if (stored) {
           const u = JSON.parse(stored);
@@ -85,10 +85,23 @@ export default function MemberDashboardPage() {
       } else {
         setChangeError(data.message || 'Failed to change password');
       }
-    } catch (e) {
-      setChangeError(e instanceof TypeError ? 'Network error — backend unreachable' : 'Failed to change password');
+    } catch {
+      setChangeError('Network error');
     }
     setChanging(false);
+  };
+
+  const handleSkipPassword = () => {
+    setShowPasswordModal(false);
+    setMustChangePassword(false);
+    const stored = localStorage.getItem('member_user');
+    if (stored) {
+      try {
+        const u = JSON.parse(stored);
+        u.must_change_password = false;
+        localStorage.setItem('member_user', JSON.stringify(u));
+      } catch {}
+    }
   };
 
   if (!mounted || !authenticated) {
@@ -131,12 +144,18 @@ export default function MemberDashboardPage() {
       {showPasswordModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-md shadow-modal animate-scale-in p-6">
-            <h2 className="text-lg font-semibold text-text-primary mb-1">
-              {mustChangePassword ? 'Set Your Password' : 'Change Password'}
-            </h2>
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-lg font-semibold text-text-primary">
+                {mustChangePassword ? 'Set Your Password' : 'Change Password'}
+              </h2>
+              <button onClick={handleSkipPassword}
+                className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors text-text-muted hover:text-text-primary">
+                <X size={18} />
+              </button>
+            </div>
             <p className="text-sm text-text-muted mb-5">
               {mustChangePassword
-                ? 'You must set a new password before continuing. This is required for first-time login.'
+                ? 'We recommend setting a new password for security. You can skip this and change it later.'
                 : 'Enter your current and new password.'}
             </p>
             <div className="space-y-4">
@@ -158,10 +177,14 @@ export default function MemberDashboardPage() {
               {changeError && (
                 <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">{changeError}</div>
               )}
-              <button onClick={handleChangePassword} disabled={changing}
-                className="btn-primary w-full py-2.5">
-                {changing ? 'Changing...' : mustChangePassword ? 'Set Password & Continue' : 'Change Password'}
-              </button>
+              <div className="flex gap-3">
+                <button onClick={handleSkipPassword}
+                  className="flex-1 btn-ghost py-2.5">Skip for now</button>
+                <button onClick={handleChangePassword} disabled={changing}
+                  className="flex-1 btn-primary py-2.5">
+                  {changing ? 'Changing...' : mustChangePassword ? 'Set Password' : 'Change Password'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import {
   LayoutDashboard, Users, Link2, GitBranch, LogOut,
-  ChevronLeft, ChevronRight, X, Menu, Bell, User, KeyRound,
+  ChevronLeft, ChevronRight, Menu, Bell, User, KeyRound, X,
 } from 'lucide-react';
 
 const API_BASE = '/api/v1';
@@ -88,15 +88,14 @@ export default function DistributorLayout({
       const data = await res.json();
       if (data.success) {
         setShowPasswordModal(false);
-        sessionStorage.setItem('member_password', newPassword);
         setOldPassword('');
         setNewPassword('');
         setConfirmPassword('');
       } else {
         setChangeError(data.message || 'Failed to change password');
       }
-    } catch (e) {
-      setChangeError(e instanceof TypeError ? 'Network error — backend unreachable' : 'Failed to change password');
+    } catch {
+      setChangeError('Network error');
     }
     setChanging(false);
   };
@@ -272,7 +271,13 @@ export default function DistributorLayout({
       {showPasswordModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-md shadow-modal animate-scale-in p-6">
-            <h2 className="text-lg font-semibold text-text-primary mb-1">Change Password</h2>
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-lg font-semibold text-text-primary">Change Password</h2>
+              <button onClick={() => setShowPasswordModal(false)}
+                className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors text-text-muted hover:text-text-primary">
+                <X size={18} />
+              </button>
+            </div>
             <p className="text-sm text-text-muted mb-5">Update your distributor account password.</p>
             <div className="space-y-4">
               <div>
