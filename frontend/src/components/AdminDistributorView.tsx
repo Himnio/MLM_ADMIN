@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/authStore';
 import {
   Search, Users, ChevronRight, ChevronDown, Loader2, Shield,
   User, Mail, Phone, Calendar, MapPin, CreditCard, Building2,
-  ToggleLeft, ToggleRight, Trash2, Eye, EyeOff,
+  ToggleLeft, ToggleRight, Trash2, Eye,
 } from 'lucide-react';
 
 interface Distributor {
