@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { LogIn, User, Lock, Loader2, ArrowLeft, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { LogIn, User, Lock, Loader2, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
@@ -139,11 +139,6 @@ function LoginForm() {
           </form>
         </div>
 
-        <p className="text-center mt-6">
-          <Link href="/" className="text-sm text-primary hover:text-primary-dark transition-colors inline-flex items-center gap-1">
-            <ArrowLeft size={14} /> Admin Login
-          </Link>
-        </p>
       </div>
     </div>
   );
