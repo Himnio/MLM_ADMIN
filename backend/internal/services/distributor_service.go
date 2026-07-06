@@ -18,6 +18,7 @@ type DistributorService interface {
 	GetAllDistributors(page, limit int) ([]*models.MemberUserPublic, int64, error)
 	ToggleActive(memberUserID uuid.UUID) error
 	GetDistributorTree(memberUserID uuid.UUID) (*models.DistributorTreeResponse, error)
+	DeleteDistributor(memberUserID uuid.UUID) error
 }
 
 type distributorService struct {
@@ -168,6 +169,29 @@ func (s *distributorService) GetAllDistributors(page, limit int) ([]*models.Memb
 
 func (s *distributorService) ToggleActive(memberUserID uuid.UUID) error {
 	return s.memberUserRepo.ToggleActive(memberUserID)
+}
+
+func (s *distributorService) DeleteDistributor(memberUserID uuid.UUID) error {
+	user, err := s.memberUserRepo.GetByID(memberUserID)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return fmt.Errorf("distributor not found")
+	}
+
+	// Hard delete the member tree record (cascades to incomes, referrals, etc.)
+	if err := s.memberTreeRepo.HardDeleteByMemberUserID(memberUserID); err != nil {
+		s.logger.Error(err, "Failed to delete member tree record", map[string]interface{}{"member_user_id": memberUserID.String()})
+	}
+
+	// Delete referral codes owned by this distributor
+	if err := s.referralLinkRepo.DeleteByMemberUserID(memberUserID); err != nil {
+		s.logger.Error(err, "Failed to delete distributor referral codes", map[string]interface{}{"member_user_id": memberUserID.String()})
+	}
+
+	// Delete the member_user record
+	return s.memberUserRepo.DeleteByID(memberUserID)
 }
 
 func (s *distributorService) GetDistributorTree(memberUserID uuid.UUID) (*models.DistributorTreeResponse, error) {

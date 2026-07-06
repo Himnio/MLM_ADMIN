@@ -155,6 +155,28 @@ func (h *DistributorHandler) ToggleActive(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Status toggled", nil)
 }
 
+// Admin: delete distributor completely
+func (h *DistributorHandler) DeleteDistributor(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		utils.BadRequestResponse(c, "Invalid distributor ID", "")
+		return
+	}
+
+	if err := h.service.DeleteDistributor(id); err != nil {
+		if err.Error() == "distributor not found" {
+			utils.NotFoundResponse(c, "Distributor not found", "")
+			return
+		}
+		h.logger.Error(err, "Failed to delete distributor", nil)
+		utils.InternalServerErrorResponse(c, "Failed to delete distributor", "")
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Distributor deleted successfully", nil)
+}
+
 // Admin: get distributor tree (full data)
 func (h *DistributorHandler) GetDistributorTree(c *gin.Context) {
 	idStr := c.Param("id")

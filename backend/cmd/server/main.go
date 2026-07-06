@@ -318,6 +318,7 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 				referralLinkAdmin.DELETE("/referral/:code", referralLinkHandler.DeleteReferralCode)
 				referralLinkAdmin.GET("/distributors", distributorHandler.ListDistributors)
 				referralLinkAdmin.POST("/distributors/:id/toggle-active", distributorHandler.ToggleActive)
+				referralLinkAdmin.DELETE("/distributors/:id", middleware.RequireRole("super_admin"), distributorHandler.DeleteDistributor)
 				referralLinkAdmin.GET("/distributor-tree/:id", distributorHandler.GetDistributorTree)
 			}
 		}

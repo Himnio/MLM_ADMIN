@@ -26,6 +26,7 @@ type MemberUserRepository interface {
 	UpdatePassword(id uuid.UUID, passwordHash string) error
 	SetPasswordChanged(id uuid.UUID) error
 	ClearReferralCode(code string) error
+	DeleteByID(id uuid.UUID) error
 }
 
 type memberUserRepository struct {
@@ -96,6 +97,10 @@ func (r *memberUserRepository) GetByReferralCode(code string) ([]*models.MemberU
 
 func (r *memberUserRepository) ClearReferralCode(code string) error {
 	return r.db.DB.Model(&models.MemberUser{}).Where("referral_code = ?", code).Update("referral_code", gorm.Expr("NULL")).Error
+}
+
+func (r *memberUserRepository) DeleteByID(id uuid.UUID) error {
+	return r.db.DB.Where("id = ?", id).Delete(&models.MemberUser{}).Error
 }
 
 func (r *memberUserRepository) GetByEmail(email string) (*models.MemberUser, error) {

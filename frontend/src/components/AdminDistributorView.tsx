@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
+import { useAuthStore } from '@/stores/authStore';
 import {
   Search, Users, ChevronRight, ChevronDown, Loader2, Shield,
-  User, Mail, Phone, Calendar, MapPin, CreditCard, Building2, ToggleLeft, ToggleRight,
+  User, Mail, Phone, Calendar, MapPin, CreditCard, Building2, ToggleLeft, ToggleRight, Trash2,
 } from 'lucide-react';
 
 interface Distributor {
@@ -34,6 +35,9 @@ interface TreeNode {
 }
 
 export default function AdminDistributorView() {
+  const { admin } = useAuthStore();
+  const isSuperAdmin = admin?.role === 'super_admin';
+
   const [distributors, setDistributors] = useState<Distributor[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -42,6 +46,8 @@ export default function AdminDistributorView() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [confirmToggle, setConfirmToggle] = useState<Distributor | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Distributor | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchDistributors = useCallback(async () => {
     setLoading(true);
@@ -53,6 +59,22 @@ export default function AdminDistributorView() {
   }, []);
 
   useEffect(() => { fetchDistributors(); }, [fetchDistributors]);
+
+  const executeDelete = async () => {
+    if (!confirmDelete) return;
+    const id = confirmDelete.id;
+    setDeleting(true);
+    setConfirmDelete(null);
+    const res = await api.del(`/admin/distributors/${id}`);
+    if (res.success) {
+      setDistributors(prev => prev.filter(d => d.id !== id));
+      if (selected?.id === id) {
+        setSelected(null);
+        setDetailTree(null);
+      }
+    }
+    setDeleting(false);
+  };
 
   const viewDetail = async (d: Distributor) => {
     setSelected(d);
@@ -233,10 +255,19 @@ export default function AdminDistributorView() {
                   {togglingId === selected.id ? '...' : selected.is_active ? 'Active - Click to deactivate' : 'Inactive - Click to activate'}
                 </button>
               </div>
-              <button onClick={() => { setSelected(null); setDetailTree(null); }}
-                className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors text-text-muted">
-                ✕
-              </button>
+              <div className="flex items-center gap-2">
+                {isSuperAdmin && (
+                  <button onClick={() => setConfirmDelete(selected)}
+                    className="p-1.5 hover:bg-red-50 rounded-lg transition-colors text-red-400 hover:text-red-600"
+                    title="Delete distributor">
+                    <Trash2 size={16} />
+                  </button>
+                )}
+                <button onClick={() => { setSelected(null); setDetailTree(null); }}
+                  className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors text-text-muted">
+                  ✕
+                </button>
+              </div>
             </div>
             <div className="p-6 space-y-6">
               <div>
@@ -321,6 +352,34 @@ export default function AdminDistributorView() {
                 }`}
               >
                 {confirmToggle.is_active ? 'Deactivate' : 'Activate'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmDelete && (
+        <div className="modal-overlay" onClick={() => !deleting && setConfirmDelete(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-modal animate-scale-in p-6" onClick={e => e.stopPropagation()}>
+            <div className="mx-auto w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
+              <Trash2 size={28} className="text-red-500" />
+            </div>
+            <h3 className="text-lg font-semibold text-text-primary text-center mb-2">Delete Distributor?</h3>
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+              <p className="text-sm text-amber-800 font-medium text-center">
+                ⚠ This action cannot be undone!
+              </p>
+            </div>
+            <p className="text-sm text-text-muted text-center mb-6">
+              Are you sure you want to permanently delete <strong>{confirmDelete.first_name} {confirmDelete.last_name}</strong> ({confirmDelete.member_id})? This will remove the distributor, their referral codes, and all associated data from the system completely.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmDelete(null)} disabled={deleting}
+                className="flex-1 btn-ghost py-2.5">Cancel</button>
+              <button onClick={executeDelete} disabled={deleting}
+                className="flex-1 py-2.5 rounded-xl font-medium text-white bg-red-500 hover:bg-red-600 disabled:opacity-50 transition-all"
+              >
+                {deleting ? 'Deleting...' : 'Yes, Delete'}
               </button>
             </div>
           </div>

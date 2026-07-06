@@ -22,6 +22,7 @@ type ReferralLinkRepository interface {
 	CheckUsernameExists(username string) (bool, error)
 	CheckEmailExists(email string) (bool, error)
 	DeleteReferralCode(code string) error
+	DeleteByMemberUserID(memberUserID uuid.UUID) error
 }
 
 type referralLinkRepository struct {
@@ -102,4 +103,8 @@ func (r *referralLinkRepository) CheckEmailExists(email string) (bool, error) {
 
 func (r *referralLinkRepository) DeleteReferralCode(code string) error {
 	return r.db.DB.Where("referral_code = ?", code).Delete(&models.ReferralCode{}).Error
+}
+
+func (r *referralLinkRepository) DeleteByMemberUserID(memberUserID uuid.UUID) error {
+	return r.db.DB.Where("member_user_id = ?", memberUserID).Delete(&models.ReferralCode{}).Error
 }

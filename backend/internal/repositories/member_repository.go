@@ -26,6 +26,7 @@ type MemberRepository interface {
 	GetTotalReferrals() (int64, error)
 	GetActiveMemberCount() (int64, error)
 	CheckCircularReference(sponsorID, memberID uuid.UUID) (bool, error)
+	HardDeleteByMemberUserID(memberUserID uuid.UUID) error
 }
 
 type memberRepository struct {
@@ -102,6 +103,11 @@ func (r *memberRepository) Update(member *models.Member) error {
 // Delete soft deletes a member
 func (r *memberRepository) Delete(id uuid.UUID) error {
 	return r.db.DB.Delete(&models.Member{}, id).Error
+}
+
+// HardDeleteByMemberUserID permanently deletes a member by member_user_id
+func (r *memberRepository) HardDeleteByMemberUserID(memberUserID uuid.UUID) error {
+	return r.db.DB.Unscoped().Where("member_user_id = ?", memberUserID).Delete(&models.Member{}).Error
 }
 
 // List retrieves members with pagination and filtering
