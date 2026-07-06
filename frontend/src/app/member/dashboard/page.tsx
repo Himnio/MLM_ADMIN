@@ -91,7 +91,16 @@ export default function MemberDashboardPage() {
     setChanging(false);
   };
 
-  const handleSkipPassword = () => {
+  const handleSkipPassword = async () => {
+    const token = localStorage.getItem('member_token');
+    if (token) {
+      try {
+        await fetch(`${API_BASE}/member/skip-password-change`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch {}
+    }
     setShowPasswordModal(false);
     setMustChangePassword(false);
     const stored = localStorage.getItem('member_user');
@@ -142,10 +151,10 @@ export default function MemberDashboardPage() {
       </DistributorLayout>
 
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-modal animate-scale-in p-6">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-modal animate-scale-in p-5 sm:p-6 mx-auto">
             <div className="flex items-center justify-between mb-1">
-              <h2 className="text-lg font-semibold text-text-primary">
+              <h2 className="text-base sm:text-lg font-semibold text-text-primary">
                 {mustChangePassword ? 'Set Your Password' : 'Change Password'}
               </h2>
               <button onClick={handleSkipPassword}

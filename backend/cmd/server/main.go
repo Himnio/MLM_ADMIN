@@ -331,6 +331,7 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 		{
 			memberProtected.GET("/profile", memberAuthHandler.GetProfile)
 			memberProtected.POST("/change-password", memberAuthHandler.ChangePassword)
+			memberProtected.POST("/skip-password-change", memberAuthHandler.SkipPasswordChange)
 			memberProtected.GET("/dashboard", distributorHandler.GetDashboard)
 			memberProtected.GET("/downline", distributorHandler.GetDownline)
 			memberProtected.GET("/referral-info", distributorHandler.GetReferralInfo)

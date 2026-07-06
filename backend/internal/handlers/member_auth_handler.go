@@ -131,3 +131,27 @@ func (h *MemberAuthHandler) ChangePassword(c *gin.Context) {
 
 	utils.SuccessResponse(c, http.StatusOK, "Password changed successfully", nil)
 }
+
+func (h *MemberAuthHandler) SkipPasswordChange(c *gin.Context) {
+	userIDStr := c.GetString("member_user_id")
+	if userIDStr == "" {
+		utils.UnauthorizedResponse(c, "Not authenticated", "")
+		return
+	}
+
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		utils.UnauthorizedResponse(c, "Invalid user ID", "")
+		return
+	}
+
+	if err := h.service.SkipPasswordChange(userID); err != nil {
+		h.logger.Error(err, "Failed to skip password change", map[string]interface{}{
+			"user_id": userID.String(),
+		})
+		utils.InternalServerErrorResponse(c, "Failed to skip password change", "")
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Password change skipped", nil)
+}

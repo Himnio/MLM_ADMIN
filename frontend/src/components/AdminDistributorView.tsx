@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
 import {
   Search, Users, ChevronRight, ChevronDown, Loader2, Shield,
-  User, Mail, Phone, Calendar, MapPin, CreditCard, Building2, ToggleLeft, ToggleRight, Trash2,
+  User, Mail, Phone, Calendar, MapPin, CreditCard, Building2, ToggleLeft, ToggleRight, Trash2, X,
 } from 'lucide-react';
 
 interface Distributor {
@@ -145,7 +145,7 @@ export default function AdminDistributorView() {
       <div className="p-1.5 rounded-lg bg-surface text-text-muted flex-shrink-0">{icon}</div>
       <div className="min-w-0 flex-1">
         <p className="text-xs text-text-muted">{label}</p>
-        <p className="text-sm font-medium text-text-primary truncate">{value || '���'}</p>
+        <p className="text-sm font-medium text-text-primary truncate">{value || '-'}</p>
       </div>
     </div>
   );
@@ -240,7 +240,7 @@ export default function AdminDistributorView() {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <input type="text" placeholder="Search distributors..." value={search}
             onChange={e => setSearch(e.target.value)}
-            className="input pl-10"
+            className="input pl-10 h-12 sm:h-auto"
           />
         </div>
         <p className="text-sm text-text-muted">{distributors.length} total</p>
@@ -258,23 +258,23 @@ export default function AdminDistributorView() {
             {/* Mobile cards */}
             <div className="sm:hidden divide-y divide-border">
               {filtered.map(d => (
-                <div key={d.id} className="p-4 space-y-2 cursor-pointer hover:bg-surface-hover" onClick={() => viewDetail(d)}>
-                  <div className="flex items-start justify-between gap-2">
+                <div key={d.id} className="p-4 sm:p-5 space-y-3 cursor-pointer hover:bg-surface-hover active:bg-surface-hover" onClick={() => viewDetail(d)}>
+                  <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-text-primary truncate">{d.first_name} {d.last_name}</p>
+                      <p className="font-medium text-text-primary truncate text-[15px]">{d.first_name} {d.last_name}</p>
                       <p className="text-xs text-text-secondary font-mono mt-0.5">{d.member_id}</p>
                     </div>
                     <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                       <button onClick={() => confirmToggleActive(d)} disabled={togglingId === d.id}
-                        className={`p-1.5 rounded-lg transition-colors ${d.is_active ? 'text-emerald-500 hover:bg-emerald-50' : 'text-gray-400 hover:bg-gray-100'}`}
+                        className={`p-2.5 rounded-xl transition-colors ${d.is_active ? 'text-emerald-500 hover:bg-emerald-50' : 'text-gray-400 hover:bg-gray-100'}`}
                       >
-                        {togglingId === d.id ? <Loader2 size={16} className="animate-spin" /> : d.is_active ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
+                        {togglingId === d.id ? <Loader2 size={18} className="animate-spin" /> : d.is_active ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
                       </button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     {d.is_active ? <span className="badge-success">Payout On</span> : <span className="badge-default">Payout Off</span>}
-                    <span className="text-xs text-text-muted">{d.mobile || '���'}</span>
+                    <span className="text-xs text-text-muted">{d.mobile || '-'}</span>
                   </div>
                 </div>
               ))}
@@ -300,7 +300,7 @@ export default function AdminDistributorView() {
                       <td className="font-mono text-sm text-text-secondary">{d.member_id}</td>
                       <td className="text-sm text-text-muted">@{d.username}</td>
                       <td className="text-sm text-text-secondary">{d.mobile}</td>
-                      <td className="text-sm text-text-muted truncate max-w-[150px]">{d.email || '���'}</td>
+                      <td className="text-sm text-text-muted truncate max-w-[150px]">{d.email || '-'}</td>
                       <td>{d.is_active ? <span className="badge-success">Payout On</span> : <span className="badge-default">Payout Off</span>}</td>
                       <td>
                         <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
@@ -327,10 +327,10 @@ export default function AdminDistributorView() {
       {/* Detail modal */}
       {selected && (
         <div className="modal-overlay" onClick={() => { setSelected(null); setDetailTree(null); }}>
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-modal" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6 border-b border-border sticky top-0 bg-white z-10">
+          <div className="bg-white rounded-2xl w-[calc(100%-2rem)] sm:w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-modal mx-4 sm:mx-0" onClick={e => e.stopPropagation()}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 border-b border-border sticky top-0 bg-white z-10 gap-3">
               <div className="flex items-center gap-3">
-                <h2 className="text-lg font-semibold text-text-primary">{selected.first_name} {selected.last_name}</h2>
+                <h2 className="text-base sm:text-lg font-semibold text-text-primary">{selected.first_name} {selected.last_name}</h2>
                 <button
                   onClick={() => confirmToggleActive(selected)}
                   disabled={togglingId === selected.id}
@@ -353,7 +353,7 @@ export default function AdminDistributorView() {
                 )}
                 <button onClick={() => { setSelected(null); setDetailTree(null); }}
                   className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors text-text-muted">
-                  ԣ�
+                  <X size={16} />
                 </button>
               </div>
             </div>
@@ -427,7 +427,7 @@ export default function AdminDistributorView() {
 
       {showResetPassword && (
         <div className="modal-overlay" onClick={() => { setShowResetPassword(false); setResetPasswordValue(''); setResetError(''); }}>
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-modal animate-scale-in p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl w-[calc(100%-2rem)] sm:w-full max-w-sm shadow-modal animate-scale-in p-6 mx-4 sm:mx-0" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-text-primary mb-1">Reset Password</h3>
             <p className="text-sm text-text-muted mb-4">
               Set a new password for <strong>{selected?.first_name} {selected?.last_name}</strong>. The distributor will be prompted to change it on next login.
@@ -456,7 +456,7 @@ export default function AdminDistributorView() {
 
       {confirmToggle && (
         <div className="modal-overlay" onClick={() => setConfirmToggle(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-modal animate-scale-in p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl w-[calc(100%-2rem)] sm:w-full max-w-sm shadow-modal animate-scale-in p-6 mx-4 sm:mx-0" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-text-primary mb-2">
               {confirmToggle.is_active ? 'Disable Payout' : 'Enable Payout'}
             </h3>
@@ -481,14 +481,14 @@ export default function AdminDistributorView() {
 
       {confirmDelete && (
         <div className="modal-overlay" onClick={() => !deleting && setConfirmDelete(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-modal animate-scale-in p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl w-[calc(100%-2rem)] sm:w-full max-w-sm shadow-modal animate-scale-in p-4 sm:p-6 mx-4 sm:mx-0" onClick={e => e.stopPropagation()}>
             <div className="mx-auto w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
               <Trash2 size={28} className="text-red-500" />
             </div>
             <h3 className="text-lg font-semibold text-text-primary text-center mb-2">Delete Distributor?</h3>
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
               <p className="text-sm text-amber-800 font-medium text-center">
-                ��� This action cannot be undone!
+                This action cannot be undone!
               </p>
             </div>
             <p className="text-sm text-text-muted text-center mb-6">

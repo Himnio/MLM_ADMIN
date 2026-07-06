@@ -66,7 +66,7 @@ function RegisterForm() {
     navigator.clipboard.writeText(val);
   };
 
-  const inputClass = "input";
+  const inputClass = "input h-12 sm:h-auto";
   const labelClass = "block text-sm font-medium text-text-secondary mb-1.5";
 
   if (step === 'loading') {

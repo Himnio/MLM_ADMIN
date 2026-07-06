@@ -103,7 +103,7 @@ function LoginForm() {
               <div className="relative">
                 <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
                 <input type="text" value={loginID} onChange={e => setLoginID(e.target.value)}
-                  placeholder="MEM7XK2P or john_doe_abcd" className="input pl-10" autoFocus />
+                  placeholder="MEM7XK2P or john_doe_abcd" className="input pl-10 h-12 sm:h-auto" autoFocus />
               </div>
             </div>
 
@@ -112,10 +112,10 @@ function LoginForm() {
               <div className="relative">
                 <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
                 <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
-                  placeholder="Enter your password" className="input pl-10 pr-10" />
+                  placeholder="Enter your password" className="input pl-10 pr-10 h-12 sm:h-auto" />
                 <button type="button" onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors">
-                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors p-1">
+                  {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>

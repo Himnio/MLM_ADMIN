@@ -21,6 +21,7 @@ type MemberAuthService interface {
 	Login(loginID, password string) (*auth.TokenPair, *models.MemberUser, error)
 	GetProfile(userID uuid.UUID) (*models.MemberUser, error)
 	ChangePassword(userID uuid.UUID, oldPassword, newPassword string) error
+	SkipPasswordChange(userID uuid.UUID) error
 	GetReferralCodeRegistrations(code string) ([]*models.MemberUser, error)
 	GenerateUniqueCredentials(firstName, lastName string) (*GeneratedCredentials, error)
 }
@@ -100,6 +101,10 @@ func (s *memberAuthService) ChangePassword(userID uuid.UUID, oldPassword, newPas
 	if err := s.repo.UpdatePassword(userID, string(hash)); err != nil {
 		return err
 	}
+	return s.repo.SetPasswordChanged(userID)
+}
+
+func (s *memberAuthService) SkipPasswordChange(userID uuid.UUID) error {
 	return s.repo.SetPasswordChanged(userID)
 }
 

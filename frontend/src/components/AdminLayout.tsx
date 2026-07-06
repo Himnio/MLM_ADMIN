@@ -170,10 +170,10 @@ export default function AdminLayout({
       </div>
 
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-modal animate-scale-in p-6">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-modal animate-scale-in p-5 sm:p-6 mx-auto">
             <div className="flex items-center justify-between mb-1">
-              <h2 className="text-lg font-semibold text-text-primary">Change Password</h2>
+              <h2 className="text-base sm:text-lg font-semibold text-text-primary">Change Password</h2>
               <button onClick={() => setShowPasswordModal(false)}
                 className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors text-text-muted hover:text-text-primary">
                 <X size={18} />
