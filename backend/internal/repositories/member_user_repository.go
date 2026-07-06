@@ -23,6 +23,8 @@ type MemberUserRepository interface {
 	GetAll(page, limit int) ([]*models.MemberUser, int64, error)
 	Update(user *models.MemberUser) error
 	ToggleActive(id uuid.UUID) error
+	UpdatePassword(id uuid.UUID, passwordHash string) error
+	SetPasswordChanged(id uuid.UUID) error
 }
 
 type memberUserRepository struct {
@@ -136,4 +138,12 @@ func (r *memberUserRepository) Update(user *models.MemberUser) error {
 
 func (r *memberUserRepository) ToggleActive(id uuid.UUID) error {
 	return r.db.DB.Model(&models.MemberUser{}).Where("id = ?", id).Update("is_active", gorm.Expr("NOT is_active")).Error
+}
+
+func (r *memberUserRepository) UpdatePassword(id uuid.UUID, passwordHash string) error {
+	return r.db.DB.Model(&models.MemberUser{}).Where("id = ?", id).Update("password_hash", passwordHash).Error
+}
+
+func (r *memberUserRepository) SetPasswordChanged(id uuid.UUID) error {
+	return r.db.DB.Model(&models.MemberUser{}).Where("id = ?", id).Update("must_change_password", false).Error
 }

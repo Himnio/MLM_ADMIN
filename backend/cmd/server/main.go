@@ -327,6 +327,7 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 		memberProtected.Use(middleware.MemberAuth(&cfg.JWT))
 		{
 			memberProtected.GET("/profile", memberAuthHandler.GetProfile)
+			memberProtected.POST("/change-password", memberAuthHandler.ChangePassword)
 			memberProtected.GET("/dashboard", distributorHandler.GetDashboard)
 			memberProtected.GET("/downline", distributorHandler.GetDownline)
 			memberProtected.GET("/referral-info", distributorHandler.GetReferralInfo)

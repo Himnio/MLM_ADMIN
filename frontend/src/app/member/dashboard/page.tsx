@@ -8,6 +8,7 @@ import DistributorDownlineView from '@/components/DistributorDownlineView';
 import DistributorReferralView from '@/components/DistributorReferralView';
 import DistributorTreeView from '@/components/DistributorTreeView';
 
+const API_BASE = '/api/v1';
 const sectionTitles: Record<DistributorSection, string> = {
   dashboard: 'Dashboard',
   downline: 'My Downline',
@@ -21,6 +22,13 @@ export default function MemberDashboardPage() {
   const [activeSection, setActiveSection] = useState<DistributorSection>('dashboard');
   const [profileName, setProfileName] = useState('');
   const [mounted, setMounted] = useState(false);
+  const [mustChangePassword, setMustChangePassword] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changeError, setChangeError] = useState('');
+  const [changing, setChanging] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -36,9 +44,50 @@ export default function MemberDashboardPage() {
       try {
         const u = JSON.parse(stored);
         setProfileName(`${u.first_name || ''} ${u.last_name || ''}`.trim());
+        if (u.must_change_password) {
+          setMustChangePassword(true);
+          setShowPasswordModal(true);
+        }
       } catch {}
     }
   }, [router]);
+
+  const handleChangePassword = async () => {
+    setChangeError('');
+    if (newPassword.length < 6) {
+      setChangeError('Password must be at least 6 characters');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setChangeError('Passwords do not match');
+      return;
+    }
+    setChanging(true);
+    try {
+      const token = localStorage.getItem('member_token');
+      const res = await fetch(`${API_BASE}/member/change-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ old_password: oldPassword, new_password: newPassword }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShowPasswordModal(false);
+        setMustChangePassword(false);
+        const stored = localStorage.getItem('member_user');
+        if (stored) {
+          const u = JSON.parse(stored);
+          u.must_change_password = false;
+          localStorage.setItem('member_user', JSON.stringify(u));
+        }
+      } else {
+        setChangeError(data.message || 'Failed to change password');
+      }
+    } catch {
+      setChangeError('Network error');
+    }
+    setChanging(false);
+  };
 
   if (!mounted || !authenticated) {
     return (
@@ -65,14 +114,55 @@ export default function MemberDashboardPage() {
   };
 
   return (
-    <DistributorLayout
-      activeSection={activeSection}
-      onSectionChange={setActiveSection}
-      onLogout={handleLogout}
-      title={sectionTitles[activeSection]}
-      profileName={profileName}
-    >
-      {renderSection()}
-    </DistributorLayout>
+    <>
+      <DistributorLayout
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+        onLogout={handleLogout}
+        title={sectionTitles[activeSection]}
+        profileName={profileName}
+      >
+        {renderSection()}
+      </DistributorLayout>
+
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-modal animate-scale-in p-6">
+            <h2 className="text-lg font-semibold text-text-primary mb-1">
+              {mustChangePassword ? 'Set Your Password' : 'Change Password'}
+            </h2>
+            <p className="text-sm text-text-muted mb-5">
+              {mustChangePassword
+                ? 'You must set a new password before continuing. This is required for first-time login.'
+                : 'Enter your current and new password.'}
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">Current Password</label>
+                <input type="password" value={oldPassword} onChange={e => setOldPassword(e.target.value)}
+                  className="input" placeholder="Enter current password" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">New Password</label>
+                <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)}
+                  className="input" placeholder="Min 6 characters" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">Confirm New Password</label>
+                <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
+                  className="input" placeholder="Re-enter new password" />
+              </div>
+              {changeError && (
+                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">{changeError}</div>
+              )}
+              <button onClick={handleChangePassword} disabled={changing}
+                className="btn-primary w-full py-2.5">
+                {changing ? 'Changing...' : mustChangePassword ? 'Set Password & Continue' : 'Change Password'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

@@ -1,14 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { LogIn, User, Lock, Loader2, ArrowLeft, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
-export default function MemberLoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loginID, setLoginID] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,6 +20,13 @@ export default function MemberLoginPage() {
     const token = localStorage.getItem('member_token');
     if (token) router.push('/member/dashboard');
   }, [router]);
+
+  useEffect(() => {
+    const lid = searchParams.get('login_id');
+    const pwd = searchParams.get('password');
+    if (lid) setLoginID(lid);
+    if (pwd) setPassword(pwd);
+  }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,5 +117,17 @@ export default function MemberLoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function MemberLoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-surface">
+        <Loader2 size={32} className="animate-spin text-primary" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -100,8 +100,10 @@ func (s *memberAuthService) ChangePassword(userID uuid.UUID, oldPassword, newPas
 		return err
 	}
 
-	user.PasswordHash = string(hash)
-	return s.repo.Create(user) // not ideal, we need an update method
+	if err := s.repo.UpdatePassword(userID, string(hash)); err != nil {
+		return err
+	}
+	return s.repo.SetPasswordChanged(userID)
 }
 
 func (s *memberAuthService) GetReferralCodeRegistrations(code string) ([]*models.MemberUser, error) {

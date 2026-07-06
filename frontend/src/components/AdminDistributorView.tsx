@@ -41,6 +41,7 @@ export default function AdminDistributorView() {
   const [detailTree, setDetailTree] = useState<any>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [confirmToggle, setConfirmToggle] = useState<Distributor | null>(null);
 
   const fetchDistributors = useCallback(async () => {
     setLoading(true);
@@ -66,7 +67,12 @@ export default function AdminDistributorView() {
     setDetailLoading(false);
   };
 
-  const toggleActive = async (id: string) => {
+  const confirmToggleActive = (d: Distributor) => {
+    setConfirmToggle(d);
+  };
+
+  const executeToggle = async (id: string) => {
+    setConfirmToggle(null);
     setTogglingId(id);
     const res = await api.post(`/admin/distributors/${id}/toggle-active`);
     if (res.success) {
@@ -149,7 +155,7 @@ export default function AdminDistributorView() {
                       <p className="text-xs text-text-secondary font-mono mt-0.5">{d.member_id}</p>
                     </div>
                     <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                      <button onClick={() => toggleActive(d.id)} disabled={togglingId === d.id}
+                      <button onClick={() => confirmToggleActive(d)} disabled={togglingId === d.id}
                         className={`p-1.5 rounded-lg transition-colors ${d.is_active ? 'text-emerald-500 hover:bg-emerald-50' : 'text-gray-400 hover:bg-gray-100'}`}
                       >
                         {togglingId === d.id ? <Loader2 size={16} className="animate-spin" /> : d.is_active ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
@@ -188,7 +194,7 @@ export default function AdminDistributorView() {
                       <td>{d.is_active ? <span className="badge-success">Active</span> : <span className="badge-default">Inactive</span>}</td>
                       <td>
                         <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
-                          <button onClick={() => toggleActive(d.id)} disabled={togglingId === d.id}
+                          <button onClick={() => confirmToggleActive(d)} disabled={togglingId === d.id}
                             className={`btn-icon border border-border ${d.is_active ? 'text-emerald-500' : 'text-gray-400'}`}
                             title={d.is_active ? 'Deactivate' : 'Activate'}
                           >
@@ -216,7 +222,7 @@ export default function AdminDistributorView() {
               <div className="flex items-center gap-3">
                 <h2 className="text-lg font-semibold text-text-primary">{selected.first_name} {selected.last_name}</h2>
                 <button
-                  onClick={() => toggleActive(selected.id)}
+                  onClick={() => confirmToggleActive(selected)}
                   disabled={togglingId === selected.id}
                   className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors
                     ${selected.is_active
@@ -291,6 +297,31 @@ export default function AdminDistributorView() {
                   <p className="text-xs text-text-muted py-2">Loading tree...</p>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmToggle && (
+        <div className="modal-overlay" onClick={() => setConfirmToggle(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-modal animate-scale-in p-6" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-text-primary mb-2">
+              {confirmToggle.is_active ? 'Deactivate Distributor' : 'Activate Distributor'}
+            </h3>
+            <p className="text-sm text-text-muted mb-6">
+              Are you sure you want to {confirmToggle.is_active ? 'deactivate' : 'activate'} <strong>{confirmToggle.first_name} {confirmToggle.last_name}</strong> ({confirmToggle.member_id})?
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmToggle(null)} className="flex-1 btn-ghost py-2.5">Cancel</button>
+              <button onClick={() => executeToggle(confirmToggle.id)}
+                className={`flex-1 py-2.5 rounded-xl font-medium text-white transition-all ${
+                  confirmToggle.is_active
+                    ? 'bg-red-500 hover:bg-red-600'
+                    : 'bg-emerald-500 hover:bg-emerald-600'
+                }`}
+              >
+                {confirmToggle.is_active ? 'Deactivate' : 'Activate'}
+              </button>
             </div>
           </div>
         </div>

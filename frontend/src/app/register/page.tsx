@@ -141,7 +141,7 @@ function RegisterForm() {
           </div>
 
           <a
-            href="/member/login"
+            href={`/member/login?login_id=${encodeURIComponent(credentials.member_id)}&password=${encodeURIComponent(credentials.password)}`}
             className="btn-primary w-full flex items-center justify-center gap-2"
           >
             Go to Login <ArrowRight size={16} />

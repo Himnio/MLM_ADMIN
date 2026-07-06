@@ -1,0 +1,1 @@
+ALTER TABLE member_users ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT TRUE;

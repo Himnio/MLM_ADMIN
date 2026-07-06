@@ -89,3 +89,35 @@ func (h *MemberAuthHandler) GetProfile(c *gin.Context) {
 
 	utils.SuccessResponse(c, http.StatusOK, "Profile retrieved", models.ToMemberUserPublic(user))
 }
+
+type memberChangePasswordRequest struct {
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
+}
+
+func (h *MemberAuthHandler) ChangePassword(c *gin.Context) {
+	userIDStr := c.GetString("member_user_id")
+	if userIDStr == "" {
+		utils.UnauthorizedResponse(c, "Not authenticated", "")
+		return
+	}
+
+	var req memberChangePasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.BadRequestResponse(c, "Invalid request", err.Error())
+		return
+	}
+
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		utils.UnauthorizedResponse(c, "Invalid user ID", "")
+		return
+	}
+
+	if err := h.service.ChangePassword(userID, req.OldPassword, req.NewPassword); err != nil {
+		utils.BadRequestResponse(c, "Failed to change password", err.Error())
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Password changed successfully", nil)
+}
