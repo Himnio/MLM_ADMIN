@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { LogIn, User, Lock, Loader2, ArrowLeft, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
@@ -10,22 +10,44 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const formRef = useRef<HTMLFormElement>(null);
   const [loginID, setLoginID] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
 
+  const hasPrefilled = searchParams.has('login_id') || searchParams.has('password');
+
   useEffect(() => {
+    if (hasPrefilled) return;
     const token = localStorage.getItem('member_token');
-    if (token) router.push('/member/dashboard');
-  }, [router]);
+    if (token) {
+      fetch(`${API_BASE}/member/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then(r => {
+        if (r.ok) router.push('/member/dashboard');
+      }).catch(() => {});
+    }
+  }, [router, hasPrefilled]);
 
   useEffect(() => {
     const lid = searchParams.get('login_id');
     const pwd = searchParams.get('password');
     if (lid) setLoginID(lid);
     if (pwd) setPassword(pwd);
+  }, [searchParams]);
+
+  // Auto-submit when both fields are pre-filled from registration
+  useEffect(() => {
+    const lid = searchParams.get('login_id');
+    const pwd = searchParams.get('password');
+    if (lid && pwd) {
+      const timer = setTimeout(() => {
+        formRef.current?.requestSubmit();
+      }, 600);
+      return () => clearTimeout(timer);
+    }
   }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -66,7 +88,7 @@ function LoginForm() {
         </div>
 
         <div className="stat-card">
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form ref={formRef} onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-text-secondary mb-1.5">
                 Member ID or Username
