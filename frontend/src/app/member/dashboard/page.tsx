@@ -75,6 +75,7 @@ export default function MemberDashboardPage() {
       if (data.success) {
         setShowPasswordModal(false);
         setMustChangePassword(false);
+        sessionStorage.setItem('member_password', newPassword);
         const stored = localStorage.getItem('member_user');
         if (stored) {
           const u = JSON.parse(stored);

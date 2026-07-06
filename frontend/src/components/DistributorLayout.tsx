@@ -88,6 +88,7 @@ export default function DistributorLayout({
       const data = await res.json();
       if (data.success) {
         setShowPasswordModal(false);
+        sessionStorage.setItem('member_password', newPassword);
         setOldPassword('');
         setNewPassword('');
         setConfirmPassword('');
