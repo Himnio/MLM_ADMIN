@@ -121,7 +121,7 @@ function LoginForm() {
             </div>
 
             {error && (
-              <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-2 animate-slide-down">
+              <div className="p-3 rounded-lg bg-danger-light/20 border border-danger/30 text-danger text-sm flex items-start gap-2 animate-slide-down">
                 <AlertTriangle size={16} className="flex-shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>

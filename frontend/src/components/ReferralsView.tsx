@@ -146,7 +146,7 @@ export default function ReferralsView() {
             )}
 
             {stats && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 bg-indigo-50 rounded-lg">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 bg-primary/5 rounded-lg">
                 <div><p className="text-xs text-text-muted">Total Referrals</p><p className="text-lg font-bold text-primary">{stats.total_referrals}</p></div>
                 <div><p className="text-xs text-text-muted">Direct</p><p className="text-lg font-bold text-text-primary">{stats.direct_referrals}</p></div>
                 <div><p className="text-xs text-text-muted">Indirect</p><p className="text-lg font-bold text-text-primary">{stats.indirect_referrals}</p></div>
@@ -222,12 +222,12 @@ export default function ReferralsView() {
             </div>
 
             {projectionData && (
-              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-                <h4 className="font-semibold text-emerald-800 mb-3">Income Projection</h4>
+              <div className="p-4 bg-success-light/20 border border-success/30 rounded-xl">
+                <h4 className="font-semibold text-success mb-3">Income Projection</h4>
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <p className="text-xs text-text-muted">Actual Total</p>
-                    <p className="text-2xl font-bold text-emerald-600">{formatCurrency(projectionData.total_actual)}</p>
+                    <p className="text-2xl font-bold text-success">{formatCurrency(projectionData.total_actual)}</p>
                   </div>
                   <div>
                     <p className="text-xs text-text-muted">Potential Total</p>
@@ -255,7 +255,7 @@ export default function ReferralsView() {
 
       {showConfigEdit && (
         <div className="modal-overlay" onClick={() => setShowConfigEdit(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-modal" onClick={e => e.stopPropagation()}>
+          <div className="bg-modal rounded-2xl w-full max-w-md shadow-modal border border-border" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-6 border-b border-border">
               <h2 className="text-lg font-semibold text-text-primary">Edit Level {showConfigEdit.level} Commission</h2>
               <button onClick={() => setShowConfigEdit(null)} className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors"><X size={20} /></button>

@@ -88,9 +88,9 @@ export default function ReportsView() {
           </div>
           <div className="space-y-2">
             {alerts.map(a => {
-              const severityClass = a.severity === 'critical' ? 'bg-red-50 border-red-200 text-red-700' :
-                a.severity === 'warning' ? 'bg-amber-50 border-amber-200 text-amber-700' :
-                'bg-blue-50 border-blue-200 text-blue-700';
+              const severityClass = a.severity === 'critical' ? 'bg-danger-light/20 border-danger/30 text-danger' :
+                a.severity === 'warning' ? 'bg-warning-light/20 border-warning/30 text-warning' :
+                'bg-info-light/20 border-info/30 text-info';
               return (
                 <div key={a.id} className={`p-3 rounded-lg text-sm flex items-start gap-3 border ${severityClass}`}>
                   <AlertTriangle size={16} className="flex-shrink-0 mt-0.5" />
@@ -106,7 +106,7 @@ export default function ReportsView() {
       )}
 
       {dashboardMetrics && (
-        <div className="stat-card bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200">
+        <div className="stat-card bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div><p className="text-xs text-text-muted">Total Members</p><p className="text-2xl font-bold text-text-primary mt-1">{dashboardMetrics.total_members}</p></div>
             <div><p className="text-xs text-text-muted">Active Members</p><p className="text-2xl font-bold text-emerald-600 mt-1">{dashboardMetrics.active_members}</p></div>
@@ -126,10 +126,10 @@ export default function ReportsView() {
             {activities.slice(0, 20).map(a => (
               <div key={a.id} className="flex items-start gap-3 p-3 hover:bg-surface-hover rounded-lg border border-border transition-colors">
                 <div className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 ${
-                  a.type === 'income' ? 'bg-emerald-400' :
-                  a.type === 'member' ? 'bg-blue-400' :
-                  a.type === 'referral' ? 'bg-purple-400' :
-                  a.type === 'admin' ? 'bg-orange-400' : 'bg-gray-400'
+                  a.type === 'income' ? 'bg-success' :
+                  a.type === 'member' ? 'bg-info' :
+                  a.type === 'referral' ? 'bg-primary' :
+                  a.type === 'admin' ? 'bg-warning' : 'bg-text-muted'
                 }`} />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-text-primary">{a.action}</p>
@@ -186,13 +186,13 @@ export default function ReportsView() {
 
 function HealthCard({ icon, title, value, color }: { icon: React.ReactNode; title: string; value: string; color: string }) {
   const colors: Record<string, string> = {
-    emerald: 'bg-emerald-50 border-emerald-200 text-emerald-700',
-    red: 'bg-red-50 border-red-200 text-red-700',
-    blue: 'bg-blue-50 border-blue-200 text-blue-700',
-    purple: 'bg-purple-50 border-purple-200 text-purple-700',
+    emerald: 'bg-success-light/20 border-success/30 text-success',
+    red: 'bg-danger-light/20 border-danger/30 text-danger',
+    blue: 'bg-info-light/20 border-info/30 text-info',
+    purple: 'bg-primary/10 border-primary/20 text-primary',
   };
   return (
-    <div className={`rounded-xl border p-5 ${colors[color] || colors.blue}`}>
+    <div className={`stat-card ${colors[color] || colors.blue}`}>
       <div className="flex items-center gap-2 mb-2">
         {icon}
         <p className="text-sm font-medium opacity-80">{title}</p>

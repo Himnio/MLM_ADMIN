@@ -1,10 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import {
-  LayoutDashboard, Users, Link2, GitBranch, LogOut,
-  ChevronLeft, ChevronRight, Menu, Bell, User, KeyRound, X,
-} from 'lucide-react';
+import { Menu, Bell, User, LogOut, KeyRound, Sun, Moon, LayoutDashboard, Users, Link2, GitBranch, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ThemeToggle, useTheme } from './ThemeProvider';
 
 const API_BASE = '/api/v1';
 
@@ -40,6 +38,12 @@ export default function DistributorLayout({
   title,
   profileName,
 }: DistributorLayoutProps) {
+  const { setRole } = useTheme();
+  
+  useEffect(() => {
+    setRole('distributor');
+  }, [setRole]);
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -153,7 +157,7 @@ export default function DistributorLayout({
         </button>
         <button
           onClick={onLogout}
-          className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
+          className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-danger hover:bg-danger-light/20 transition-all duration-200"
           title="Logout"
         >
           <LogOut size={18} />
@@ -165,7 +169,6 @@ export default function DistributorLayout({
 
   return (
     <div className="min-h-screen bg-surface">
-      {/* Desktop sidebar */}
       <aside
         className={`hidden lg:flex flex-col fixed left-0 top-0 h-full z-30
           bg-sidebar shadow-sidebar
@@ -176,7 +179,6 @@ export default function DistributorLayout({
         {sidebarContent}
       </aside>
 
-      {/* Mobile sidebar overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden" onClick={() => setMobileOpen(false)} />
       )}
@@ -192,7 +194,6 @@ export default function DistributorLayout({
         {sidebarContent}
       </aside>
 
-      {/* Main content */}
       <div
         className={`transition-all duration-300 ease-in-out
           lg:ml-[var(--sidebar-width)]
@@ -200,13 +201,14 @@ export default function DistributorLayout({
         `}
       >
         <header
-          className="sticky top-0 z-20 h-16 bg-white/80 backdrop-blur-md border-b border-border
+          className="sticky top-0 z-20 h-16 bg-header backdrop-blur-md border-b border-border
           flex items-center justify-between px-4 sm:px-6"
         >
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileOpen(true)}
               className="lg:hidden p-2 rounded-lg hover:bg-surface-hover text-text-secondary transition-colors"
+              aria-label="Open menu"
             >
               <Menu size={20} />
             </button>
@@ -220,10 +222,11 @@ export default function DistributorLayout({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button className="btn-icon text-text-secondary hover:bg-surface-hover transition-colors relative">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <ThemeToggle />
+            <button className="btn-icon text-text-secondary relative" aria-label="Notifications">
               <Bell size={20} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-danger rounded-full ring-2 ring-header" />
             </button>
             <div className="h-8 w-px bg-border mx-1 hidden sm:block" />
             <div className="relative" ref={profileRef}>
@@ -239,7 +242,7 @@ export default function DistributorLayout({
                 </div>
               </div>
               {profileOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-modal border border-border py-2 animate-scale-in z-50">
+                <div className="absolute right-0 top-full mt-2 w-56 bg-modal rounded-xl shadow-modal border border-border py-2 animate-scale-in z-50">
                   <div className="px-4 py-2 border-b border-border">
                     <p className="text-sm font-medium text-text-primary">{profileName || 'Distributor'}</p>
                     <p className="text-xs text-text-muted">Distributor Account</p>
@@ -255,7 +258,7 @@ export default function DistributorLayout({
             </div>
             <button
               onClick={onLogout}
-              className="btn-icon text-text-secondary hover:bg-red-50 hover:text-red-500 transition-colors"
+              className="btn-icon text-text-secondary hover:bg-danger-light hover:text-danger transition-colors"
               title="Logout"
             >
               <LogOut size={18} />
@@ -263,14 +266,14 @@ export default function DistributorLayout({
           </div>
         </header>
 
-        <main className="p-4 sm:p-6 lg:p-8 animate-fade-in">
+        <main className="p-4 sm:p-6 lg:p-8 animate-fade-in pb-20 lg:pb-8">
           {children}
         </main>
       </div>
 
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-modal animate-scale-in p-5 sm:p-6 mx-auto">
+        <div className="modal-overlay">
+          <div className="modal-content p-5 sm:p-6 mx-auto">
             <div className="flex items-center justify-between mb-1">
               <h2 className="text-base sm:text-lg font-semibold text-text-primary">Change Password</h2>
               <button onClick={() => setShowPasswordModal(false)}
@@ -296,13 +299,13 @@ export default function DistributorLayout({
                   className="input" placeholder="Re-enter new password" />
               </div>
               {changeError && (
-                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">{changeError}</div>
+                <div className="p-3 rounded-lg bg-danger-light/20 border border-danger/30 text-danger text-sm">{changeError}</div>
               )}
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button onClick={() => setShowPasswordModal(false)}
-                  className="flex-1 btn-ghost py-2.5">Cancel</button>
+                  className="flex-1 btn-ghost py-2.5 order-2 sm:order-1">Cancel</button>
                 <button onClick={handleChangePassword} disabled={changing}
-                  className="flex-1 btn-primary py-2.5">
+                  className="flex-1 btn-primary py-2.5 order-1 sm:order-2">
                   {changing ? 'Changing...' : 'Change Password'}
                 </button>
               </div>
@@ -310,6 +313,32 @@ export default function DistributorLayout({
           </div>
         </div>
       )}
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-header backdrop-blur-lg border-t border-border safe-bottom">
+        <div className="flex items-center justify-around h-16 px-2">
+          {navItems.map(item => {
+            const Icon = item.icon;
+            const isActive = activeSection === item.key;
+            return (
+              <button
+                key={item.key}
+                onClick={() => { onSectionChange(item.key); setMobileOpen(false); }}
+                className={`flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl min-w-0 flex-1 transition-all duration-200 ${
+                  isActive
+                    ? 'text-primary'
+                    : 'text-text-muted hover:text-text-secondary'
+                }`}
+              >
+                <div className={`p-1.5 rounded-lg transition-colors ${isActive ? 'bg-primary/10' : ''}`}>
+                  <Icon size={20} />
+                </div>
+                <span className="text-[10px] font-medium leading-tight truncate max-w-full">{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }

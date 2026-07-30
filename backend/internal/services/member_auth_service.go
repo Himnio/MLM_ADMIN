@@ -89,8 +89,22 @@ func (s *memberAuthService) ChangePassword(userID uuid.UUID, oldPassword, newPas
 		return fmt.Errorf("current password is incorrect")
 	}
 
-	if len(newPassword) < 6 {
-		return fmt.Errorf("new password must be at least 6 characters")
+	if len(newPassword) < 8 {
+		return fmt.Errorf("new password must be at least 8 characters")
+	}
+	hasUpper, hasLower, hasDigit := false, false, false
+	for _, ch := range newPassword {
+		switch {
+		case ch >= 'A' && ch <= 'Z':
+			hasUpper = true
+		case ch >= 'a' && ch <= 'z':
+			hasLower = true
+		case ch >= '0' && ch <= '9':
+			hasDigit = true
+		}
+	}
+	if !hasUpper || !hasLower || !hasDigit {
+		return fmt.Errorf("new password must contain at least one uppercase letter, one lowercase letter, and one digit")
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)

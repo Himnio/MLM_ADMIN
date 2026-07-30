@@ -206,17 +206,17 @@ export default function ReferralLinkView() {
             </div>
           </div>
         )}
-        {error && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>}
+        {error && <div className="mt-3 p-3 bg-danger-light/20 border border-danger/30 text-danger text-sm rounded-lg">{error}</div>}
         {newCode && (
-          <div className="mt-4 p-3 sm:p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-            <div className="flex items-center gap-2 text-emerald-700 font-semibold text-sm mb-3">
+          <div className="mt-4 p-3 sm:p-4 bg-success-light/20 border border-success/30 rounded-xl">
+            <div className="flex items-center gap-2 text-success font-semibold text-sm mb-3">
               <Check size={16} /> Code created successfully!
             </div>
             <div className="space-y-2.5 text-sm">
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
                 <span className="text-text-muted font-medium">Code:</span>
                 <div className="flex items-center gap-2">
-                  <code className="bg-white px-2.5 sm:px-3 py-1.5 rounded-lg border border-emerald-200 text-emerald-700 font-mono text-xs sm:text-sm break-all">{newCode.referral_code}</code>
+                  <code className="bg-card px-2.5 sm:px-3 py-1.5 rounded-lg border border-success/30 text-success font-mono text-xs sm:text-sm break-all">{newCode.referral_code}</code>
                   <button onClick={() => copyToClipboard(newCode.referral_code)} className="text-primary hover:text-primary-dark text-xs font-medium transition-colors flex items-center gap-1 flex-shrink-0"><Copy size={12} /> Copy</button>
                 </div>
               </div>
@@ -228,7 +228,7 @@ export default function ReferralLinkView() {
                 </div>
               </div>
             </div>
-            {copied && <div className="mt-2 text-xs text-emerald-600 font-medium">Copied to clipboard!</div>}
+            {copied && <div className="mt-2 text-xs text-success font-medium">Copied to clipboard!</div>}
           </div>
         )}
       </div>
@@ -283,7 +283,7 @@ export default function ReferralLinkView() {
                         <Users size={14} /> View
                       </button>
                       <button onClick={() => setDeleteConfirm(c.referral_code)}
-                        className="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5">
+                        className="px-3 py-2 text-danger hover:bg-danger-light/20 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5">
                         <Trash2 size={14} /> Delete
                       </button>
                     </div>
@@ -332,7 +332,7 @@ export default function ReferralLinkView() {
                               <Users size={14} /> View
                             </button>
                             <button onClick={() => setDeleteConfirm(c.referral_code)}
-                              className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete code">
+                              className="p-1.5 text-danger hover:text-danger hover:bg-danger-light/20 rounded-lg transition-colors" title="Delete code">
                               <Trash2 size={16} />
                             </button>
                           </div>
@@ -350,9 +350,9 @@ export default function ReferralLinkView() {
       {/* Delete Confirmation Dialog */}
       {deleteConfirm && (
         <div className="modal-overlay" onClick={() => !deleting && setDeleteConfirm(null)}>
-          <div className="bg-white rounded-2xl w-[90vw] max-w-md shadow-modal animate-scale-in" onClick={e => e.stopPropagation()}>
+          <div className="bg-modal rounded-2xl w-[90vw] max-w-md shadow-modal animate-scale-in border border-border" onClick={e => e.stopPropagation()}>
             <div className="p-6 text-center space-y-4">
-              <div className="mx-auto w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
+              <div className="mx-auto w-14 h-14 rounded-full bg-danger-light/20 flex items-center justify-center">
                 <AlertTriangle size={28} className="text-red-500" />
               </div>
               <div>
@@ -377,7 +377,7 @@ export default function ReferralLinkView() {
       {selectedCode && typeof window === 'object' && createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4">
           <div className="absolute inset-0 bg-black/60" onClick={closeModal} />
-          <div className="relative bg-white rounded-2xl shadow-modal w-full max-w-4xl max-h-[90vh] sm:max-h-[85vh] flex flex-col">
+          <div className="relative bg-modal rounded-2xl shadow-modal w-full max-w-4xl max-h-[90vh] sm:max-h-[85vh] flex flex-col border border-border">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-border shrink-0 gap-3">
               <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
                 <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0"><Users size={18} className="text-primary" /></div>

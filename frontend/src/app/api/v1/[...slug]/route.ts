@@ -13,11 +13,7 @@ async function proxy(request: NextRequest) {
 
   let body: string | undefined;
   if (request.method !== 'GET' && request.method !== 'HEAD') {
-    try {
-      body = await request.text();
-    } catch (e) {
-      body = '';
-    }
+    try { body = await request.text(); } catch { body = ''; }
   }
 
   try {
@@ -37,11 +33,7 @@ async function proxy(request: NextRequest) {
     });
   } catch (e) {
     return NextResponse.json(
-      {
-        success: false,
-        message: 'Backend unreachable.',
-        error: e instanceof Error ? e.message : String(e),
-      },
+      { success: false, message: 'Backend unreachable.', error: e instanceof Error ? e.message : String(e) },
       { status: 502 },
     );
   }

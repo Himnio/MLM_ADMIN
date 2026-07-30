@@ -73,16 +73,22 @@ func (s *distributorService) GetDashboard(memberUserID uuid.UUID) (map[string]in
 		totalUsed, _ = s.memberUserRepo.CountByReferralCode(referralCode.ReferralCode)
 	}
 
+	referralCodeStr := ""
+	if referralCode != nil {
+		referralCodeStr = referralCode.ReferralCode
+	}
+
 	return map[string]interface{}{
-		"member_id":        user.MemberID,
-		"username":         user.Username,
-		"first_name":       user.FirstName,
-		"last_name":        user.LastName,
-		"mobile":           user.Mobile,
-		"email":            user.Email,
-		"is_active":        user.IsActive,
-		"downline_count":   downlineCount,
-		"referral_used":    totalUsed,
+		"member_id":      user.MemberID,
+		"username":       user.Username,
+		"first_name":     user.FirstName,
+		"last_name":      user.LastName,
+		"mobile":         user.Mobile,
+		"email":          user.Email,
+		"is_active":      user.IsActive,
+		"downline_count": downlineCount,
+		"referral_used":  totalUsed,
+		"referral_code":  referralCodeStr,
 	}, nil
 }
 

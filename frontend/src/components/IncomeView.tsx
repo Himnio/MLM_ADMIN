@@ -125,7 +125,7 @@ export default function IncomeView() {
 
       {showConfigEdit && (
         <div className="modal-overlay" onClick={() => setShowConfigEdit(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-modal" onClick={e => e.stopPropagation()}>
+          <div className="bg-modal rounded-2xl w-full max-w-md shadow-modal border border-border" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-6 border-b border-border">
               <h2 className="text-lg font-semibold text-text-primary">Edit Level {showConfigEdit.level}</h2>
               <button onClick={() => setShowConfigEdit(null)} className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors"><X size={20} /></button>
@@ -210,15 +210,15 @@ function CalculateIncomeModal({ onClose }: { onClose: () => void }) {
 
   if (result) return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-md shadow-modal" onClick={e => e.stopPropagation()}>
+      <div className="bg-modal rounded-2xl w-full max-w-md shadow-modal border border-border" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between p-6 border-b border-border">
           <h2 className="text-lg font-semibold text-text-primary">Calculation Result</h2>
           <button onClick={onClose} className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors"><X size={20} /></button>
         </div>
         <div className="p-6 space-y-4">
-          <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+          <div className="p-4 bg-success-light/20 rounded-xl border border-success/30">
             <p className="text-xs text-text-muted">Total Income</p>
-            <p className="text-2xl font-bold text-emerald-600">₹{result.amount?.toFixed(2) || '0.00'}</p>
+            <p className="text-2xl font-bold text-success">₹{result.amount?.toFixed(2) || '0.00'}</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div><p className="text-xs text-text-muted">Level</p><p className="font-semibold text-text-primary">{result.level}</p></div>
@@ -233,7 +233,7 @@ function CalculateIncomeModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-md shadow-modal" onClick={e => e.stopPropagation()}>
+      <div className="bg-modal rounded-2xl w-full max-w-md shadow-modal border border-border" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between p-6 border-b border-border">
           <h2 className="text-lg font-semibold text-text-primary">Calculate Income</h2>
           <button onClick={onClose} className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors"><X size={20} /></button>

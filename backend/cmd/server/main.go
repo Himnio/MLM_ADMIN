@@ -251,9 +251,9 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 				memberRoutes.GET("/stats", memberHandler.GetMemberStats)
 				memberRoutes.GET("/search", memberHandler.SearchMembers)
 				memberRoutes.GET("/:id", memberHandler.GetMember)
-				memberRoutes.POST("", memberHandler.CreateMember)
-				memberRoutes.PUT("/:id", memberHandler.UpdateMember)
-				memberRoutes.DELETE("/:id", memberHandler.DeleteMember)
+					memberRoutes.POST("", middleware.RequireRole("super_admin"), memberHandler.CreateMember)
+				memberRoutes.PUT("/:id", middleware.RequireRole("super_admin"), memberHandler.UpdateMember)
+				memberRoutes.DELETE("/:id", middleware.RequireRole("super_admin"), memberHandler.DeleteMember)
 
 				// Referral tree endpoints
 				memberRoutes.GET("/:id/downline", memberHandler.GetDownline)
@@ -311,13 +311,13 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 			// Referral link admin routes
 			referralLinkAdmin := protected.Group("/admin")
 			{
-				referralLinkAdmin.POST("/referral", referralLinkHandler.CreateReferralCode)
+				referralLinkAdmin.POST("/referral", middleware.RequireRole("super_admin"), referralLinkHandler.CreateReferralCode)
 				referralLinkAdmin.GET("/referral-codes", referralLinkHandler.ListReferralCodes)
 				referralLinkAdmin.GET("/referral-codes/search", referralLinkHandler.SearchByCreator)
 				referralLinkAdmin.GET("/referral/:code/registrations", referralLinkHandler.GetRegistrations)
-				referralLinkAdmin.DELETE("/referral/:code", referralLinkHandler.DeleteReferralCode)
+				referralLinkAdmin.DELETE("/referral/:code", middleware.RequireRole("super_admin"), referralLinkHandler.DeleteReferralCode)
 				referralLinkAdmin.GET("/distributors", distributorHandler.ListDistributors)
-				referralLinkAdmin.POST("/distributors/:id/toggle-active", distributorHandler.ToggleActive)
+				referralLinkAdmin.POST("/distributors/:id/toggle-active", middleware.RequireRole("super_admin"), distributorHandler.ToggleActive)
 				referralLinkAdmin.DELETE("/distributors/:id", middleware.RequireRole("super_admin"), distributorHandler.DeleteDistributor)
 				referralLinkAdmin.GET("/distributor-tree/:id", distributorHandler.GetDistributorTree)
 				referralLinkAdmin.GET("/distributors/:id/downline", distributorHandler.GetDownlineByID)

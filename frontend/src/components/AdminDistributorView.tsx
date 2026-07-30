@@ -5,8 +5,41 @@ import { api } from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
 import {
   Search, Users, ChevronRight, ChevronDown, Loader2, Shield,
-  User, Mail, Phone, Calendar, MapPin, CreditCard, Building2, ToggleLeft, ToggleRight, Trash2, X,
+  User, Mail, Phone, Calendar, MapPin, CreditCard, Building2, ToggleLeft, ToggleRight, Trash2, X, Share2,
 } from 'lucide-react';
+import { MLMTreeWrapper, TreeNode as MLMTreeNode } from './MLMTree';
+
+interface ApiTreeNode {
+  id: string;
+  member_id: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  is_active: boolean;
+  downline_count: number;
+  downlines?: ApiTreeNode[];
+}
+
+function convertToTreeNode(apiNode: ApiTreeNode, level = 0): MLMTreeNode {
+  const children: MLMTreeNode[] = [];
+  
+  if (apiNode.downlines && apiNode.downlines.length > 0) {
+    apiNode.downlines.forEach(child => {
+      children.push(convertToTreeNode(child, level + 1));
+    });
+  }
+  
+  return {
+    id: apiNode.id,
+    name: `${apiNode.first_name} ${apiNode.last_name}`.trim(),
+    memberId: apiNode.member_id,
+    username: apiNode.username,
+    level,
+    isActive: apiNode.is_active,
+    expanded: apiNode.downline_count > 0 ? false : undefined,
+    children
+  };
+}
 
 interface Distributor {
   id: string;
@@ -186,7 +219,7 @@ export default function AdminDistributorView() {
         <div
           onClick={hasChildren ? toggle : undefined}
           className={`flex items-center gap-2 p-2 rounded-lg border text-sm cursor-default transition-all
-            ${depth === 0 ? 'bg-primary/5 border-primary/20' : 'bg-white border-border hover:bg-surface-hover'}
+            ${depth === 0 ? 'bg-primary/5 border-primary/20' : 'bg-card border-border hover:bg-surface-hover'}
           `}
           style={{ marginLeft: depth * 16 }}
         >
@@ -209,11 +242,11 @@ export default function AdminDistributorView() {
             {node.first_name} {node.last_name}
           </span>
           {hasChildren && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium flex-shrink-0">
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-info-light/20 text-info font-medium flex-shrink-0">
               {node.downline_count}
             </span>
           )}
-          <span className={`text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0 ${node.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0 ${node.is_active ? 'bg-success-light/20 text-success' : 'bg-surface-hover text-text-muted'}`}>
             {node.is_active ? 'Payout On' : 'Payout Off'}
           </span>
         </div>
@@ -266,7 +299,7 @@ export default function AdminDistributorView() {
                     </div>
                     <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                       <button onClick={() => confirmToggleActive(d)} disabled={togglingId === d.id}
-                        className={`p-2.5 rounded-xl transition-colors ${d.is_active ? 'text-emerald-500 hover:bg-emerald-50' : 'text-gray-400 hover:bg-gray-100'}`}
+                        className={`p-2.5 rounded-xl transition-colors ${d.is_active ? 'text-success hover:bg-success-light/20' : 'text-text-muted hover:bg-surface-hover'}`}
                       >
                         {togglingId === d.id ? <Loader2 size={18} className="animate-spin" /> : d.is_active ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
                       </button>
@@ -327,8 +360,8 @@ export default function AdminDistributorView() {
       {/* Detail modal */}
       {selected && (
         <div className="modal-overlay" onClick={() => { setSelected(null); setDetailTree(null); }}>
-          <div className="bg-white rounded-2xl w-[calc(100%-2rem)] sm:w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-modal mx-4 sm:mx-0" onClick={e => e.stopPropagation()}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 border-b border-border sticky top-0 bg-white z-10 gap-3">
+          <div className="bg-modal rounded-2xl w-[calc(100%-2rem)] sm:w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-modal border border-border mx-4 sm:mx-0" onClick={e => e.stopPropagation()}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 border-b border-border sticky top-0 bg-modal z-10 gap-3">
               <div className="flex items-center gap-3">
                 <h2 className="text-base sm:text-lg font-semibold text-text-primary">{selected.first_name} {selected.last_name}</h2>
                 <button
@@ -336,8 +369,8 @@ export default function AdminDistributorView() {
                   disabled={togglingId === selected.id}
                   className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors
                     ${selected.is_active
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                      : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}
+                      ? 'bg-success-light/20 text-success border-success/30 hover:bg-success-light/30'
+                      : 'bg-surface-hover text-text-secondary border-border hover:bg-surface'}
                   `}
                 >
                     {togglingId === selected.id ? '...' : selected.is_active ? 'Payout On - Click to disable' : 'Payout Off - Click to enable'}
@@ -346,7 +379,7 @@ export default function AdminDistributorView() {
               <div className="flex items-center gap-2">
                 {isSuperAdmin && (
                   <button onClick={() => setConfirmDelete(selected)}
-                    className="p-1.5 hover:bg-red-50 rounded-lg transition-colors text-red-400 hover:text-red-600"
+                    className="p-1.5 hover:bg-danger-light/20 rounded-lg transition-colors text-danger hover:text-danger"
                     title="Delete distributor">
                     <Trash2 size={16} />
                   </button>
@@ -391,10 +424,22 @@ export default function AdminDistributorView() {
                 {fieldRow(<Shield size={15} />, 'Username', `@${selected.username}`)}
                 {fieldRow(<Shield size={15} />, 'Referral Code Used', selected.referral_code)}
                 {fieldRow(<Shield size={15} />, 'Registered', new Date(selected.created_at).toLocaleDateString())}
+                {selected.referral_code && (
+                  <button onClick={() => {
+                    const url = `${window.location.origin}/register?ref=${selected.referral_code}`;
+                    if (navigator.share) {
+                      navigator.share({ title: 'Referral Link', text: `Join using referral code: ${selected.referral_code}`, url }).catch(() => {});
+                    } else {
+                      navigator.clipboard.writeText(url);
+                    }
+                  }} className="w-full mt-2 py-2.5 rounded-xl font-medium text-sm bg-primary/10 text-primary hover:bg-primary/20 transition-all flex items-center justify-center gap-2">
+                    <Share2 size={15} /> Share Referral Link
+                  </button>
+                )}
                 {isSuperAdmin && (
                   <div className="pt-3 mt-3 border-t border-border">
                     <button onClick={() => { setShowResetPassword(true); setResetPasswordValue(''); setResetError(''); }}
-                      className="w-full py-2.5 rounded-xl font-medium text-sm text-white bg-red-500 hover:bg-red-600 transition-all">
+                      className="w-full py-2.5 rounded-xl font-medium text-sm text-white bg-danger hover:bg-danger/80 transition-all">
                       Reset Password
                     </button>
                     <p className="text-[10px] text-text-muted mt-1">Sets a new password. User will be prompted to change on next login.</p>
@@ -408,11 +453,14 @@ export default function AdminDistributorView() {
                   <Users size={15} /> Distributor Tree
                 </h3>
                 <p className="text-xs text-text-muted mb-3">
-                  Click on a distributor to expand and view their sub-distributors.
+                  Click on a node to expand/collapse. Drag to pan, wheel to zoom.
                 </p>
                 {detailTree && detailTree.distributor ? (
-                  <div className="bg-surface rounded-xl p-3 space-y-1">
-                    <TreeBranch node={detailTree.distributor} depth={0} />
+                  <div className="h-[400px]">
+                    <MLMTreeWrapper
+                      rootData={convertToTreeNode(detailTree.distributor, detailTree)}
+                      title="Downline Tree"
+                    />
                   </div>
                 ) : detailLoading ? (
                   <div className="flex justify-center py-4"><Loader2 size={20} className="animate-spin text-primary" /></div>
@@ -427,7 +475,7 @@ export default function AdminDistributorView() {
 
       {showResetPassword && (
         <div className="modal-overlay" onClick={() => { setShowResetPassword(false); setResetPasswordValue(''); setResetError(''); }}>
-          <div className="bg-white rounded-2xl w-[calc(100%-2rem)] sm:w-full max-w-sm shadow-modal animate-scale-in p-6 mx-4 sm:mx-0" onClick={e => e.stopPropagation()}>
+          <div className="bg-modal rounded-2xl w-[calc(100%-2rem)] sm:w-full max-w-sm shadow-modal animate-scale-in p-6 border border-border mx-4 sm:mx-0" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-text-primary mb-1">Reset Password</h3>
             <p className="text-sm text-text-muted mb-4">
               Set a new password for <strong>{selected?.first_name} {selected?.last_name}</strong>. The distributor will be prompted to change it on next login.
@@ -439,13 +487,13 @@ export default function AdminDistributorView() {
                   className="input" placeholder="Min 6 characters" autoFocus />
               </div>
               {resetError && (
-                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">{resetError}</div>
+                <div className="p-3 rounded-lg bg-danger-light/20 border border-danger/30 text-danger text-sm">{resetError}</div>
               )}
               <div className="flex gap-3">
                 <button onClick={() => { setShowResetPassword(false); setResetPasswordValue(''); setResetError(''); }}
                   className="flex-1 btn-ghost py-2.5">Cancel</button>
                 <button onClick={handleResetPassword} disabled={resetting}
-                  className="flex-1 py-2.5 rounded-xl font-medium text-white bg-red-500 hover:bg-red-600 disabled:opacity-50 transition-all">
+                  className="flex-1 py-2.5 rounded-xl font-medium text-white bg-danger hover:bg-danger/80 disabled:opacity-50 transition-all">
                   {resetting ? 'Resetting...' : 'Reset Password'}
                 </button>
               </div>
@@ -456,7 +504,7 @@ export default function AdminDistributorView() {
 
       {confirmToggle && (
         <div className="modal-overlay" onClick={() => setConfirmToggle(null)}>
-          <div className="bg-white rounded-2xl w-[calc(100%-2rem)] sm:w-full max-w-sm shadow-modal animate-scale-in p-6 mx-4 sm:mx-0" onClick={e => e.stopPropagation()}>
+          <div className="bg-modal rounded-2xl w-[calc(100%-2rem)] sm:w-full max-w-sm shadow-modal animate-scale-in p-6 border border-border mx-4 sm:mx-0" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-text-primary mb-2">
               {confirmToggle.is_active ? 'Disable Payout' : 'Enable Payout'}
             </h3>
@@ -466,11 +514,11 @@ export default function AdminDistributorView() {
             <div className="flex gap-3">
               <button onClick={() => setConfirmToggle(null)} className="flex-1 btn-ghost py-2.5">Cancel</button>
               <button onClick={() => executeToggle(confirmToggle.id)}
-                className={`flex-1 py-2.5 rounded-xl font-medium text-white transition-all ${
-                  confirmToggle.is_active
-                    ? 'bg-red-500 hover:bg-red-600'
-                    : 'bg-emerald-500 hover:bg-emerald-600'
-                }`}
+                        className={`flex-1 py-2.5 rounded-xl font-medium text-white transition-all ${
+                          confirmToggle.is_active
+                            ? 'bg-danger hover:bg-danger/80'
+                            : 'bg-success hover:bg-success/80'
+                        }`}
               >
                 {confirmToggle.is_active ? 'Disable Payout' : 'Enable Payout'}
               </button>
@@ -481,13 +529,13 @@ export default function AdminDistributorView() {
 
       {confirmDelete && (
         <div className="modal-overlay" onClick={() => !deleting && setConfirmDelete(null)}>
-          <div className="bg-white rounded-2xl w-[calc(100%-2rem)] sm:w-full max-w-sm shadow-modal animate-scale-in p-4 sm:p-6 mx-4 sm:mx-0" onClick={e => e.stopPropagation()}>
-            <div className="mx-auto w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
-              <Trash2 size={28} className="text-red-500" />
+          <div className="bg-modal rounded-2xl w-[calc(100%-2rem)] sm:w-full max-w-sm shadow-modal animate-scale-in p-4 sm:p-6 border border-border mx-4 sm:mx-0" onClick={e => e.stopPropagation()}>
+            <div className="mx-auto w-14 h-14 rounded-full bg-danger-light/20 flex items-center justify-center mb-4">
+              <Trash2 size={28} className="text-danger" />
             </div>
             <h3 className="text-lg font-semibold text-text-primary text-center mb-2">Delete Distributor?</h3>
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
-              <p className="text-sm text-amber-800 font-medium text-center">
+            <div className="bg-warning-light/20 border border-warning/30 rounded-xl p-4 mb-4">
+              <p className="text-sm text-warning font-medium text-center">
                 This action cannot be undone!
               </p>
             </div>
@@ -498,7 +546,7 @@ export default function AdminDistributorView() {
               <button onClick={() => setConfirmDelete(null)} disabled={deleting}
                 className="flex-1 btn-ghost py-2.5">Cancel</button>
               <button onClick={executeDelete} disabled={deleting}
-                className="flex-1 py-2.5 rounded-xl font-medium text-white bg-red-500 hover:bg-red-600 disabled:opacity-50 transition-all"
+                className="flex-1 py-2.5 rounded-xl font-medium text-white bg-danger hover:bg-danger/80 disabled:opacity-50 transition-all"
               >
                 {deleting ? 'Deleting...' : 'Yes, Delete'}
               </button>

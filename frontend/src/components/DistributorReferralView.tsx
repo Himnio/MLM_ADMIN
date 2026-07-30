@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Link2, Copy, CheckCircle, Users, ExternalLink, Loader2 } from 'lucide-react';
+import { Link2, Copy, CheckCircle, Users, ExternalLink, Share2, Loader2 } from 'lucide-react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
@@ -10,6 +10,7 @@ export default function DistributorReferralView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [shared, setShared] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('member_token');
@@ -41,6 +42,26 @@ export default function DistributorReferralView() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const shareLink = async () => {
+    if (!info?.referral_code) return;
+    const url = getReferralLink(info.referral_code);
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Join my network',
+          text: `Join my MLM network using my referral link: ${info.referral_code}`,
+          url: url,
+        });
+        setShared(true);
+        setTimeout(() => setShared(false), 3000);
+      } catch {}
+    } else {
+      navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   if (loading) return <div className="flex justify-center py-16"><Loader2 size={32} className="animate-spin text-primary" /></div>;
   if (error) return <div className="py-16 text-center text-red-500">{error}</div>;
 
@@ -48,7 +69,7 @@ export default function DistributorReferralView() {
 
   return (
     <div className="space-y-6 animate-fade-in max-w-2xl">
-      <div className="stat-card bg-gradient-to-br from-purple-500 to-pink-600 text-white border-0">
+      <div className="stat-card bg-gradient-to-br from-primary-dark via-primary to-purple-600 text-white border-0">
         <div className="flex items-center gap-3 mb-2">
           <Link2 size={20} />
           <h2 className="text-lg font-semibold">Your Referral Link</h2>
@@ -90,9 +111,9 @@ export default function DistributorReferralView() {
                 readOnly
                 className="input flex-1 font-mono text-sm"
               />
-              <button onClick={copyLink} className="btn-primary whitespace-nowrap flex items-center gap-2">
-                {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
-                {copied ? 'Copied!' : 'Copy'}
+              <button onClick={shareLink} className="btn-primary whitespace-nowrap flex items-center gap-2">
+                {shared ? <CheckCircle size={16} /> : <Share2 size={16} />}
+                {shared ? 'Shared!' : 'Share'}
               </button>
             </div>
             <p className="text-xs text-text-muted mt-2 flex items-center gap-1">

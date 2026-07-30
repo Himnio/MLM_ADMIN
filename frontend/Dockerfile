@@ -1,12 +1,6 @@
-# Multi-stage build for Next.js frontend (supports Docker & Render)
-
-# Build arg: set at build time (Render passes this via env, docker-compose build --build-arg)
-ARG NEXT_PUBLIC_API_URL
+# Multi-stage build for Next.js frontend (Docker / VPS deployment)
 
 FROM node:18-alpine AS builder
-
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 WORKDIR /app
 

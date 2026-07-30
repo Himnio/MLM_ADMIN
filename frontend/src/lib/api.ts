@@ -1,9 +1,12 @@
 const API_TIMEOUT = 45000;
 
 function getApiBaseUrl(): string {
-  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
-  if (typeof window !== 'undefined') return '/api/v1';
-  return 'http://localhost:8080/api/v1';
+  if (typeof window !== 'undefined') {
+    // Browser: relative URL → same origin → Nginx → Next.js proxy → backend
+    return '/api/v1';
+  }
+  // Server-side (SSR in Docker): reach backend via Docker internal DNS
+  return process.env.INTERNAL_API_URL || `http://${process.env.BACKEND_HOST || 'backend'}:${process.env.BACKEND_PORT || '8080'}/api/v1`;
 }
 const API_BASE = getApiBaseUrl();
 

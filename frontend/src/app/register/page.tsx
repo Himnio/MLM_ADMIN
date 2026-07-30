@@ -84,8 +84,8 @@ function RegisterForm() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface p-4">
         <div className="stat-card max-w-md w-full text-center animate-scale-in">
-          <div className="mx-auto w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-4">
-            <AlertTriangle size={32} className="text-red-500" />
+          <div className="mx-auto w-16 h-16 rounded-full bg-danger-light/20 flex items-center justify-center mb-4">
+            <AlertTriangle size={32} className="text-danger" />
           </div>
           <h1 className="text-xl font-bold text-text-primary mb-2">Invalid Referral Link</h1>
           <p className="text-sm text-text-muted">This referral code is invalid or has expired.</p>
@@ -99,8 +99,8 @@ function RegisterForm() {
       <div className="min-h-screen flex items-center justify-center bg-surface p-4 py-8">
         <div className="stat-card max-w-lg w-full animate-scale-in">
           <div className="text-center mb-6">
-            <div className="mx-auto w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mb-4">
-              <CheckCircle size={32} className="text-emerald-500" />
+            <div className="mx-auto w-16 h-16 rounded-full bg-success-light/20 flex items-center justify-center mb-4">
+              <CheckCircle size={32} className="text-success" />
             </div>
             <h1 className="text-xl font-bold text-text-primary">Registration Successful!</h1>
             <p className="text-sm text-text-muted mt-1">Save your credentials below. You'll need them to log in.</p>
@@ -113,21 +113,21 @@ function RegisterForm() {
                 <div>
                   <p className="text-xs text-text-muted mb-0.5">Member ID</p>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 bg-white px-3 py-2 rounded-lg border border-border font-mono text-sm font-bold text-text-primary">{credentials.member_id}</code>
+                    <code className="flex-1 px-3 py-2 rounded-lg border border-border font-mono text-sm font-bold text-text-primary" style={{ backgroundColor: 'var(--bg-card)' }}>{credentials.member_id}</code>
                     <button onClick={() => copyField(credentials.member_id)} className="btn-icon border border-border"><Copy size={14} /></button>
                   </div>
                 </div>
                 <div>
                   <p className="text-xs text-text-muted mb-0.5">Username</p>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 bg-white px-3 py-2 rounded-lg border border-border font-mono text-sm text-text-primary">{credentials.username}</code>
+                    <code className="flex-1 px-3 py-2 rounded-lg border border-border font-mono text-sm text-text-primary" style={{ backgroundColor: 'var(--bg-card)' }}>{credentials.username}</code>
                     <button onClick={() => copyField(credentials.username)} className="btn-icon border border-border"><Copy size={14} /></button>
                   </div>
                 </div>
                 <div>
                   <p className="text-xs text-text-muted mb-0.5">Password</p>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 bg-white px-3 py-2 rounded-lg border border-border font-mono text-sm text-text-primary">
+                    <code className="flex-1 px-3 py-2 rounded-lg border border-border font-mono text-sm text-text-primary" style={{ backgroundColor: 'var(--bg-card)' }}>
                       {showPass ? credentials.password : '•'.repeat(credentials.password.length)}
                     </code>
                     <button onClick={() => setShowPass(!showPass)} className="btn-icon border border-border">
@@ -167,7 +167,7 @@ function RegisterForm() {
           </div>
 
           {error && (
-            <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-2">
+            <div className="mb-4 p-3 rounded-lg bg-danger-light/20 border border-danger/30 text-danger text-sm flex items-start gap-2">
               <AlertTriangle size={16} className="flex-shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
@@ -248,29 +248,29 @@ function RegisterForm() {
                   </div>
                 </div>
                 <div>
-                  <label className={labelClass}>PAN Card <span className="text-text-muted">(optional)</span></label>
+                  <label className={labelClass}>PAN Card *</label>
                   <div className="relative">
                     <CreditCard size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
-                    <input name="pan_card_id" value={form.pan_card_id} onChange={handleChange}
+                    <input name="pan_card_id" value={form.pan_card_id} onChange={handleChange} required
                       placeholder="ABCDE1234F" className={`${inputClass} pl-10 uppercase`} maxLength={10} />
                   </div>
                 </div>
               </div>
 
               <div className="mt-4">
-                <label className={labelClass}>Aadhaar Card <span className="text-text-muted">(optional)</span></label>
-                <div className="relative">
-                  <Shield size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
-                  <input name="aadhaar_card" value={form.aadhaar_card} onChange={handleChange}
-                    placeholder="1234 5678 9012" className={`${inputClass} pl-10`} maxLength={12} />
-                </div>
+                <label className={labelClass}>Aadhaar Card *</label>
+                  <div className="relative">
+                    <Shield size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
+                    <input name="aadhaar_card" value={form.aadhaar_card} onChange={handleChange} required
+                      placeholder="1234 5678 9012" className={`${inputClass} pl-10`} maxLength={12} />
+                  </div>
               </div>
             </div>
 
             {/* Bank Details */}
             <div className="border-t border-border pt-6">
               <h3 className="text-base font-semibold text-text-primary mb-3 flex items-center gap-2">
-                <Building2 size={16} /> Bank Details <span className="text-xs text-text-muted font-normal">(optional)</span>
+                <Building2 size={16} /> Bank Details
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -285,9 +285,9 @@ function RegisterForm() {
                 </div>
               </div>
               <div className="mt-4">
-                <label className={labelClass}>Branch Name</label>
-                <input name="bank_branch" value={form.bank_branch} onChange={handleChange}
-                  placeholder="Enter branch name" className={inputClass} />
+                  <label className={labelClass}>Branch Name *</label>
+                  <input name="bank_branch" value={form.bank_branch} onChange={handleChange} required
+                    placeholder="Enter branch name" className={inputClass} />
               </div>
             </div>
 

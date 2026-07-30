@@ -139,7 +139,7 @@ export default function DistributorDownlineView() {
       {/* Detail modal */}
       {selected && (
         <div className="modal-overlay" onClick={() => setSelected(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto shadow-modal" onClick={e => e.stopPropagation()}>
+          <div className="bg-modal rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto shadow-modal border border-border" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-6 border-b border-border">
               <h2 className="text-lg font-semibold text-text-primary">{selected.first_name} {selected.last_name}</h2>
               <button onClick={() => setSelected(null)} className="p-1.5 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text-primary">

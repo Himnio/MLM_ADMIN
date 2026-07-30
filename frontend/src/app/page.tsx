@@ -37,10 +37,16 @@ export default function Home() {
       typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (token) {
       api.setTokens(token, localStorage.getItem('refreshToken') || '');
-      setAuthenticated(true);
-      fetchProfile();
+      fetchProfile().then(() => setAuthenticated(true)).catch(() => {
+        api.clearTokens();
+        setAuthenticated(false);
+      });
     }
   }, [fetchProfile]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [activeSection]);
 
   if (!mounted) {
     return (

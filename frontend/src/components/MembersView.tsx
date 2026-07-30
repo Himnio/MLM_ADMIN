@@ -125,7 +125,7 @@ export default function MembersView() {
                     <span className="text-xs text-text-muted">{m.phone || '—'}</span>
                     <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                       <button onClick={() => setShowEdit(m)} className="p-1.5 hover:bg-surface-hover rounded-lg text-text-muted hover:text-primary transition-colors"><Edit2 size={14} /></button>
-                      <button onClick={() => handleDelete(m.id)} className="p-1.5 hover:bg-red-50 rounded-lg text-text-muted hover:text-red-600 transition-colors"><Trash2 size={14} /></button>
+                      <button onClick={() => handleDelete(m.id)} className="p-1.5 hover:bg-danger-light/20 rounded-lg text-text-muted hover:text-danger transition-colors"><Trash2 size={14} /></button>
                     </div>
                   </div>
                 </div>
@@ -157,7 +157,7 @@ export default function MembersView() {
                       <td>
                         <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
                           <button onClick={() => setShowEdit(m)} className="p-1.5 hover:bg-surface-hover rounded-lg text-text-muted hover:text-primary transition-colors"><Edit2 size={16} /></button>
-                          <button onClick={() => handleDelete(m.id)} className="p-1.5 hover:bg-red-50 rounded-lg text-text-muted hover:text-red-600 transition-colors"><Trash2 size={16} /></button>
+                          <button onClick={() => handleDelete(m.id)} className="p-1.5 hover:bg-danger-light/20 rounded-lg text-text-muted hover:text-danger transition-colors"><Trash2 size={16} /></button>
                         </div>
                       </td>
                     </tr>
@@ -184,7 +184,7 @@ export default function MembersView() {
 
       {showDetail && (
         <div className="modal-overlay" onClick={() => setShowDetail(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-modal" onClick={e => e.stopPropagation()}>
+          <div className="bg-modal rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-modal border border-border" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-6 border-b border-border">
               <h2 className="text-lg font-semibold text-text-primary">{showDetail.full_name}</h2>
               <button onClick={() => setShowDetail(null)} className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors"><X size={20} /></button>
@@ -261,7 +261,7 @@ function MemberFormModal({ title, member, onClose, onSubmit }: {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-md shadow-modal" onClick={e => e.stopPropagation()}>
+        <div className="bg-modal rounded-2xl w-full max-w-md shadow-modal border border-border" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between p-6 border-b border-border">
           <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
           <button onClick={onClose} className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors"><X size={20} /></button>

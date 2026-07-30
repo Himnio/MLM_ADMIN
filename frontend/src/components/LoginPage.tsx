@@ -9,8 +9,8 @@ interface LoginPageProps {
 }
 
 export default function LoginPage({ onLogin }: LoginPageProps) {
-  const [email, setEmail] = useState('admin@example.com');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -121,7 +121,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             </div>
 
             {error && (
-              <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm animate-slide-down">
+              <div className="p-3 rounded-lg bg-danger-light/20 border border-danger/30 text-danger text-sm animate-slide-down">
                 {error}
               </div>
             )}

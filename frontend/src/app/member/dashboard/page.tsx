@@ -38,21 +38,42 @@ export default function MemberDashboardPage() {
       router.push('/member/login');
       return;
     }
-    setAuthenticated(true);
 
-    const stored = localStorage.getItem('member_user');
-    if (stored) {
-      try {
-        const u = JSON.parse(stored);
-        setProfileName(`${u.first_name || ''} ${u.last_name || ''}`.trim());
-        if (u.must_change_password) {
-          setMustChangePassword(true);
-          setShowPasswordModal(true);
-          setOldPassword(sessionStorage.getItem('member_password') || '');
-        }
-      } catch {}
-    }
+    fetch(`${API_BASE}/member/profile`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then(r => {
+      if (!r.ok) {
+        localStorage.removeItem('member_token');
+        localStorage.removeItem('member_user');
+        sessionStorage.removeItem('member_password');
+        router.push('/member/login');
+        return;
+      }
+      setAuthenticated(true);
+
+      const stored = localStorage.getItem('member_user');
+      if (stored) {
+        try {
+          const u = JSON.parse(stored);
+          setProfileName(`${u.first_name || ''} ${u.last_name || ''}`.trim());
+          if (u.must_change_password) {
+            setMustChangePassword(true);
+            setShowPasswordModal(true);
+            setOldPassword(sessionStorage.getItem('member_password') || '');
+          }
+        } catch {}
+      }
+    }).catch(() => {
+      localStorage.removeItem('member_token');
+      localStorage.removeItem('member_user');
+      sessionStorage.removeItem('member_password');
+      router.push('/member/login');
+    });
   }, [router]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [activeSection]);
 
   const handleChangePassword = async () => {
     setChangeError('');
@@ -151,8 +172,8 @@ export default function MemberDashboardPage() {
       </DistributorLayout>
 
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-modal animate-scale-in p-5 sm:p-6 mx-auto">
+        <div className="modal-overlay">
+          <div className="modal-content p-5 sm:p-6 mx-auto">
             <div className="flex items-center justify-between mb-1">
               <h2 className="text-base sm:text-lg font-semibold text-text-primary">
                 {mustChangePassword ? 'Set Your Password' : 'Change Password'}
@@ -184,13 +205,13 @@ export default function MemberDashboardPage() {
                   className="input" placeholder="Re-enter new password" />
               </div>
               {changeError && (
-                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">{changeError}</div>
+                <div className="p-3 rounded-lg bg-danger-light/20 border border-danger/30 text-danger text-sm">{changeError}</div>
               )}
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button onClick={handleSkipPassword}
-                  className="flex-1 btn-ghost py-2.5">Skip for now</button>
+                  className="flex-1 btn-ghost py-2.5 order-2 sm:order-1">Skip for now</button>
                 <button onClick={handleChangePassword} disabled={changing}
-                  className="flex-1 btn-primary py-2.5">
+                  className="flex-1 btn-primary py-2.5 order-1 sm:order-2">
                   {changing ? 'Changing...' : mustChangePassword ? 'Set Password' : 'Change Password'}
                 </button>
               </div>

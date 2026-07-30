@@ -205,24 +205,31 @@ func (s *referralLinkService) RegisterWithReferral(code string, input *MemberReg
 	if err := validateRequired(input.Address, "address"); err != nil {
 		return nil, err
 	}
+	if err := validateRequired(input.PanCardID, "pan_card_id"); err != nil {
+		return nil, err
+	}
+	if err := validateRequired(input.AadhaarCard, "aadhaar_card"); err != nil {
+		return nil, err
+	}
+	if err := validateRequired(input.BankBranch, "bank_branch"); err != nil {
+		return nil, err
+	}
+
+	// Validate format of required fields
+	panRe := regexp.MustCompile(`^[A-Z]{5}[0-9]{4}[A-Z]{1}$`)
+	if !panRe.MatchString(strings.TrimSpace(strings.ToUpper(input.PanCardID))) {
+		return nil, fmt.Errorf("invalid PAN card format: expected 5 letters + 4 digits + 1 letter")
+	}
+	aadhaarRe := regexp.MustCompile(`^\d{12}$`)
+	if !aadhaarRe.MatchString(strings.TrimSpace(input.AadhaarCard)) {
+		return nil, fmt.Errorf("invalid Aadhaar card format: expected 12 digits")
+	}
 
 	// Validate optional fields format
 	if input.Email != "" {
 		emailRe := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
 		if !emailRe.MatchString(strings.TrimSpace(strings.ToLower(input.Email))) {
 			return nil, fmt.Errorf("invalid email format")
-		}
-	}
-	if input.PanCardID != "" {
-		panRe := regexp.MustCompile(`^[A-Z]{5}[0-9]{4}[A-Z]{1}$`)
-		if !panRe.MatchString(strings.TrimSpace(strings.ToUpper(input.PanCardID))) {
-			return nil, fmt.Errorf("invalid PAN card format: expected 5 letters + 4 digits + 1 letter")
-		}
-	}
-	if input.AadhaarCard != "" {
-		aadhaarRe := regexp.MustCompile(`^\d{12}$`)
-		if !aadhaarRe.MatchString(strings.TrimSpace(input.AadhaarCard)) {
-			return nil, fmt.Errorf("invalid Aadhaar card format: expected 12 digits")
 		}
 	}
 
