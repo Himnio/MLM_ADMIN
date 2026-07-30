@@ -74,7 +74,7 @@ services:
       JWT_REFRESH_EXPIRY: 7d
       JWT_ISSUER: mlm-admin-api
       
-      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://127.0.0.1:3000,http://frontend:3000,http://200.141.8.27
+      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://127.0.0.1:3000,http://frontend:3000,http://200.141.8.27,https://rudra-jjm.online
       CORS_ALLOWED_METHODS: GET,POST,PUT,DELETE,PATCH,OPTIONS
       CORS_ALLOWED_HEADERS: Origin,Content-Type,Accept,Authorization,X-Requested-With
       CORS_ALLOW_CREDENTIALS: true
