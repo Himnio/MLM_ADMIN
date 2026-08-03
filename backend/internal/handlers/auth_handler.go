@@ -224,7 +224,23 @@ func (h *AuthHandler) ChangePassword(c *gin.Context) {
 	}
 
 	if err := h.authService.ChangePassword(id, req.OldPassword, req.NewPassword); err != nil {
-		utils.BadRequestResponse(c, "Failed to change password", err.Error())
+		errMsg := err.Error()
+		// Client-side errors (wrong password, weak password)
+		switch errMsg {
+		case "invalid current password",
+			"admin not found",
+			"password must be at least 8 characters long",
+			"password must contain at least one uppercase letter",
+			"password must contain at least one lowercase letter",
+			"password must contain at least one digit",
+			"password must contain at least one special character":
+			utils.BadRequestResponse(c, errMsg, "")
+			return
+		}
+		h.logger.Error(err, "Admin change password failed", map[string]interface{}{
+			"admin_id": id.String(),
+		})
+		utils.InternalServerErrorResponse(c, "Failed to change password. Please try again.", "")
 		return
 	}
 

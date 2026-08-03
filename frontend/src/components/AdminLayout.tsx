@@ -51,8 +51,16 @@ export default function AdminLayout({
 
   const handleChangePassword = async () => {
     setChangeError('');
-    if (newPassword.length < 6) {
-      setChangeError('Password must be at least 6 characters');
+    if (newPassword.length < 8) {
+      setChangeError('Password must be at least 8 characters');
+      return;
+    }
+    if (!/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+      setChangeError('Password must contain at least one uppercase letter, one lowercase letter, and one digit');
+      return;
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPassword)) {
+      setChangeError('Password must contain at least one special character');
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -194,7 +202,7 @@ export default function AdminLayout({
               <div>
                 <label className="block text-sm font-medium text-text-secondary mb-1.5">New Password</label>
                 <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)}
-                  className="input" placeholder="Min 6 characters" />
+                  className="input" placeholder="Min 8 chars, A-Z, a-z, 0-9, special" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-text-secondary mb-1.5">Confirm New Password</label>
