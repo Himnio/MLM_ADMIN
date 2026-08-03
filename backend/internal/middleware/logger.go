@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

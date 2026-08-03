@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Member represents an MLM member in the system
+// Member represents an Rudra member in the system
 type Member struct {
 	ID           uuid.UUID      `gorm:"type:uuid;primary_key" json:"id"`
 	SponsorID    *uuid.UUID     `gorm:"type:uuid;index" json:"sponsor_id,omitempty"`

@@ -4,8 +4,8 @@ import (
 	"sync"
 	"time"
 
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,18 +43,18 @@ func RateLimiter(cfg config.RateLimitConfig) gin.HandlerFunc {
 
 		// Get client identifier (IP address)
 		clientIP := c.ClientIP()
-		
+
 		// Check if client is rate limited
 		if !limiter.allow(clientIP) {
 			utils.GetGlobalLogger().Warn("Rate limit exceeded", map[string]interface{}{
 				"client_ip": clientIP,
 				"path":      c.Request.URL.Path,
 			})
-			
+
 			c.JSON(429, gin.H{
-				"success": false,
-				"message": "Too many requests",
-				"error":   "Rate limit exceeded. Please try again later.",
+				"success":     false,
+				"message":     "Too many requests",
+				"error":       "Rate limit exceeded. Please try again later.",
 				"retry_after": limiter.window.Seconds(),
 			})
 			c.Abort()

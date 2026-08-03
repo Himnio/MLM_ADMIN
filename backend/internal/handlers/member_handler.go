@@ -3,10 +3,10 @@ package handlers
 import (
 	"net/http"
 
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/models"
-	"mlm-admin-backend/internal/services"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/models"
+	"rudra-admin-backend/internal/services"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -96,7 +96,7 @@ func (h *MemberHandler) GetMember(c *gin.Context) {
 }
 
 // @Summary Create member
-// @Description Create a new member in the MLM system
+// @Description Create a new member in the Rudra system
 // @Tags members
 // @Accept json
 // @Produce json
@@ -191,7 +191,7 @@ func (h *MemberHandler) GetDownline(c *gin.Context) {
 		return
 	}
 
-	maxLevel := utils.GetQueryParamInt(c, "level", h.config.MLM.MaxLevels)
+	maxLevel := utils.GetQueryParamInt(c, "level", h.config.Rudra.MaxLevels)
 
 	downline, err := h.memberService.GetDownline(id, maxLevel)
 	if err != nil {
@@ -218,7 +218,7 @@ func (h *MemberHandler) GetUpline(c *gin.Context) {
 		return
 	}
 
-	maxLevel := utils.GetQueryParamInt(c, "level", h.config.MLM.MaxLevels)
+	maxLevel := utils.GetQueryParamInt(c, "level", h.config.Rudra.MaxLevels)
 
 	upline, err := h.memberService.GetUpline(id, maxLevel)
 	if err != nil {

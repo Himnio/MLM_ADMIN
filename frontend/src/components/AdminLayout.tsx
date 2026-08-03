@@ -224,7 +224,7 @@ export default function AdminLayout({
             { key: 'dashboard' as SectionKey, label: 'Dashboard', icon: LayoutDashboard },
             { key: 'members' as SectionKey, label: 'Distributors', icon: Users },
             { key: 'referral-link' as SectionKey, label: 'Links', icon: Link2 },
-            { key: 'referrals' as SectionKey, label: 'MLM Tree', icon: GitBranch },
+            { key: 'referrals' as SectionKey, label: 'Rudra Tree', icon: GitBranch },
             { key: 'reports' as SectionKey, label: 'Reports', icon: BarChart3 },
           ] as const).map(item => {
             const Icon = item.icon;

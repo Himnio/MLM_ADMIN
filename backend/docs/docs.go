@@ -266,7 +266,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Get all MLM commission configurations for all levels",
+                "description": "Get all Rudra commission configurations for all levels",
                 "produces": [
                     "application/json"
                 ],
@@ -297,7 +297,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Update commission configuration for a specific MLM level",
+                "description": "Update commission configuration for a specific Rudra level",
                 "consumes": [
                     "application/json"
                 ],
@@ -311,7 +311,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "MLM Level (1-10)",
+                        "description": "Rudra Level (1-10)",
                         "name": "level",
                         "in": "path",
                         "required": true
@@ -610,7 +610,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Get member distribution across MLM levels",
+                "description": "Get member distribution across Rudra levels",
                 "produces": [
                     "application/json"
                 ],
@@ -821,7 +821,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Get paginated income records filtered by MLM level",
+                "description": "Get paginated income records filtered by Rudra level",
                 "produces": [
                     "application/json"
                 ],
@@ -832,7 +832,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "MLM Level (1-10)",
+                        "description": "Rudra Level (1-10)",
                         "name": "level",
                         "in": "path",
                         "required": true
@@ -987,7 +987,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Get snapshot history for a specific member at a specific MLM level",
+                "description": "Get snapshot history for a specific member at a specific Rudra level",
                 "produces": [
                     "application/json"
                 ],
@@ -1005,7 +1005,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "MLM Level (1-10)",
+                        "description": "Rudra Level (1-10)",
                         "name": "level",
                         "in": "path",
                         "required": true
@@ -1250,7 +1250,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Create a new member in the MLM system",
+                "description": "Create a new member in the Rudra system",
                 "consumes": [
                     "application/json"
                 ],
@@ -1635,7 +1635,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Get the MLM commission structure for all levels",
+                "description": "Get the Rudra commission structure for all levels",
                 "produces": [
                     "application/json"
                 ],
@@ -3210,8 +3210,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/api/v1",
 	Schemes:          []string{"http", "https"},
-	Title:            "MLM Admin API",
-	Description:      "Admin API for MLM management system\n\nThis API provides endpoints for managing MLM operations including:\n- Admin authentication and authorization\n- Member management\n- Referral tree management\n- Income calculations and distributions\n- Reports and analytics\n- Audit logging",
+	Title:            "Rudra Admin API",
+	Description:      "Admin API for Rudra management system\n\nThis API provides endpoints for managing Rudra operations including:\n- Admin authentication and authorization\n- Member management\n- Referral tree management\n- Income calculations and distributions\n- Reports and analytics\n- Audit logging",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

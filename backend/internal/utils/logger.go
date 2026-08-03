@@ -15,21 +15,21 @@ type Logger struct {
 
 // LogEntry represents a structured log entry
 type LogEntry struct {
-	Level     string                 `json:"level"`
-	Message   string                 `json:"message"`
-	Timestamp time.Time              `json:"timestamp"`
-	Service   string                 `json:"service,omitempty"`
-	Version   string                 `json:"version,omitempty"`
-	RequestID string                 `json:"request_id,omitempty"`
-	UserID    string                 `json:"user_id,omitempty"`
-	IPAddress string                 `json:"ip_address,omitempty"`
-	UserAgent string                 `json:"user_agent,omitempty"`
-	Path      string                 `json:"path,omitempty"`
-	Method    string                 `json:"method,omitempty"`
-	StatusCode int                   `json:"status_code,omitempty"`
-	Duration  string                 `json:"duration,omitempty"`
-	Error     string                 `json:"error,omitempty"`
-	Fields    map[string]interface{} `json:"fields,omitempty"`
+	Level      string                 `json:"level"`
+	Message    string                 `json:"message"`
+	Timestamp  time.Time              `json:"timestamp"`
+	Service    string                 `json:"service,omitempty"`
+	Version    string                 `json:"version,omitempty"`
+	RequestID  string                 `json:"request_id,omitempty"`
+	UserID     string                 `json:"user_id,omitempty"`
+	IPAddress  string                 `json:"ip_address,omitempty"`
+	UserAgent  string                 `json:"user_agent,omitempty"`
+	Path       string                 `json:"path,omitempty"`
+	Method     string                 `json:"method,omitempty"`
+	StatusCode int                    `json:"status_code,omitempty"`
+	Duration   string                 `json:"duration,omitempty"`
+	Error      string                 `json:"error,omitempty"`
+	Fields     map[string]interface{} `json:"fields,omitempty"`
 }
 
 // NewLogger creates a new logger instance
@@ -78,7 +78,7 @@ func (l *Logger) WithContext(fields map[string]interface{}) *Logger {
 	for key, value := range fields {
 		contextLogger = contextLogger.Interface(key, value)
 	}
-	
+
 	return &Logger{
 		logger: contextLogger.Logger(),
 	}
@@ -174,10 +174,10 @@ func (l *Logger) LogHTTPResponse(method, path string, statusCode int, duration t
 // LogHTTPRequest logs an HTTP request
 func (l *Logger) LogHTTPRequest(method, path, clientIP, userAgent string, fields map[string]interface{}) {
 	l.Info("HTTP request", mergeFields(fields, map[string]interface{}{
-		"method":      method,
-		"path":        path,
-		"ip_address":  clientIP,
-		"user_agent":  userAgent,
+		"method":     method,
+		"path":       path,
+		"ip_address": clientIP,
+		"user_agent": userAgent,
 	}))
 }
 

@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/services"
-	"mlm-admin-backend/internal/utils"
 	"net/http"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/services"
+	"rudra-admin-backend/internal/utils"
 	"strconv"
 	"time"
 
@@ -36,7 +36,7 @@ func NewIncomeHandler(
 type CalculateIncomeRequest struct {
 	MemberID        string `json:"member_id" binding:"required,uuid"`
 	SponsorID       string `json:"sponsor_id" binding:"required,uuid"`
-	Level           int    `json:"level" binding:"required,min=1,max=10"`
+	Level           int    `json:"level" binding:"required,min=1,max=12"`
 	TransactionType string `json:"transaction_type" binding:"required,oneof=registration referral upgrade bonus"`
 }
 
@@ -173,11 +173,11 @@ func (h *IncomeHandler) GetIncomeProjection(c *gin.Context) {
 }
 
 // @Summary Get income by level
-// @Description Get paginated income records filtered by MLM level
+// @Description Get paginated income records filtered by Rudra level
 // @Tags income
 // @Produce json
 // @Security Bearer
-// @Param level path int true "MLM Level (1-10)"
+// @Param level path int true "Rudra Level (1-12)"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(20)
 // @Success 200 {object} utils.Response
@@ -188,7 +188,7 @@ func (h *IncomeHandler) GetIncomeByLevel(c *gin.Context) {
 	levelStr := c.Param("level")
 	level, err := strconv.Atoi(levelStr)
 	if err != nil || level < 1 || level > 10 {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid level: must be between 1-10", err.Error())
+		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid level: must be between 1-12", err.Error())
 		return
 	}
 
@@ -208,7 +208,7 @@ func (h *IncomeHandler) GetIncomeByLevel(c *gin.Context) {
 }
 
 // @Summary Get commission configuration
-// @Description Get all MLM commission configurations for all levels
+// @Description Get all Rudra commission configurations for all levels
 // @Tags commission
 // @Produce json
 // @Security Bearer
@@ -234,12 +234,12 @@ type UpdateCommissionConfigRequest struct {
 }
 
 // @Summary Update commission configuration
-// @Description Update commission configuration for a specific MLM level
+// @Description Update commission configuration for a specific Rudra level
 // @Tags commission
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param level path int true "MLM Level (1-10)"
+// @Param level path int true "Rudra Level (1-12)"
 // @Param request body UpdateCommissionConfigRequest true "Commission config update"
 // @Success 200 {object} utils.Response
 // @Failure 400 {object} utils.Response
@@ -249,7 +249,7 @@ func (h *IncomeHandler) UpdateCommissionConfig(c *gin.Context) {
 	levelStr := c.Param("level")
 	level, err := strconv.Atoi(levelStr)
 	if err != nil || level < 1 || level > 10 {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid level: must be between 1-10", err.Error())
+		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid level: must be between 1-12", err.Error())
 		return
 	}
 
@@ -322,12 +322,12 @@ func (h *IncomeHandler) ReverseIncome(c *gin.Context) {
 }
 
 // @Summary Get level snapshot history
-// @Description Get snapshot history for a specific member at a specific MLM level
+// @Description Get snapshot history for a specific member at a specific Rudra level
 // @Tags income
 // @Produce json
 // @Security Bearer
 // @Param member_id path string true "Member ID"
-// @Param level path int true "MLM Level (1-10)"
+// @Param level path int true "Rudra Level (1-12)"
 // @Success 200 {object} utils.Response
 // @Failure 400 {object} utils.Response
 // @Failure 500 {object} utils.Response
@@ -342,7 +342,7 @@ func (h *IncomeHandler) GetLevelSnapshotHistory(c *gin.Context) {
 	levelStr := c.Param("level")
 	level, err := strconv.Atoi(levelStr)
 	if err != nil || level < 1 || level > 10 {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid level: must be between 1-10", err.Error())
+		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid level: must be between 1-12", err.Error())
 		return
 	}
 

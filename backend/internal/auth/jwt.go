@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"mlm-admin-backend/internal/config"
+	"rudra-admin-backend/internal/config"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -13,9 +13,9 @@ import (
 
 // JWTClaims represents the claims in a JWT token
 type JWTClaims struct {
-	UserID   string `json:"user_id"`
-	Email    string `json:"email"`
-	Role     string `json:"role"`
+	UserID    string `json:"user_id"`
+	Email     string `json:"email"`
+	Role      string `json:"role"`
 	TokenType string `json:"token_type"` // "access" or "refresh"
 	jwt.RegisteredClaims
 }
@@ -30,19 +30,19 @@ type TokenPair struct {
 
 // JWTManager handles JWT token operations
 type JWTManager struct {
-	secretKey    string
-	accessExpiry time.Duration
+	secretKey     string
+	accessExpiry  time.Duration
 	refreshExpiry time.Duration
-	issuer       string
+	issuer        string
 }
 
 // NewJWTManager creates a new JWT manager
 func NewJWTManager(cfg *config.JWTConfig) *JWTManager {
 	return &JWTManager{
-		secretKey:    cfg.Secret,
-		accessExpiry: cfg.AccessExpiry,
+		secretKey:     cfg.Secret,
+		accessExpiry:  cfg.AccessExpiry,
 		refreshExpiry: cfg.RefreshExpiry,
-		issuer:       cfg.Issuer,
+		issuer:        cfg.Issuer,
 	}
 }
 

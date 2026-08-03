@@ -27,7 +27,7 @@ const navItems: NavItem[] = [
   { key: 'members', label: 'Distributors', icon: Users },
   { key: 'referral-link', label: 'Referral Links', icon: Link2 },
   { key: 'referral-search', label: 'Referral Search', icon: Search },
-  { key: 'referrals', label: 'MLM Tree', icon: GitBranch },
+  { key: 'referrals', label: 'Rudra Tree', icon: GitBranch },
   { key: 'income', label: 'Income', icon: DollarSign },
   { key: 'reports', label: 'Reports', icon: BarChart3 },
 ];
@@ -57,11 +57,11 @@ export default function Sidebar({
       <div className="flex items-center justify-between h-16 px-4 border-b border-white/10">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/25">
-            <span className="text-white font-bold text-sm">M</span>
+            <span className="text-white font-bold text-sm">R</span>
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <h1 className="text-sm font-bold text-white truncate">MLM Admin</h1>
+              <h1 className="text-sm font-bold text-white truncate">Rudra Admin</h1>
               <p className="text-[10px] text-gray-500 truncate">Management Panel</p>
             </div>
           )}

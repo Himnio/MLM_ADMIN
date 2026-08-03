@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Users, Link2, Activity, Shield, UserCheck, Share2, Check, Loader2, Copy, CheckCheck, DollarSign, TrendingUp, Award, ExternalLink, ChevronRight, Calendar, GitBranch } from 'lucide-react';
+import { Users, Link2, Activity, Shield, UserCheck, Share2, Loader2, Copy, CheckCheck, DollarSign, TrendingUp, Award, ExternalLink, ChevronRight, Calendar, GitBranch } from 'lucide-react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
@@ -12,11 +12,10 @@ const STAT_ACCENTS = [
   { from: '#F59E0B', to: '#D97706' },
 ];
 
-export default function DistributorDashboardView() {
+export default function DistributorDashboardView({ onNavigate }: { onNavigate?: (section: 'dashboard' | 'downline' | 'referral' | 'tree') => void }) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [shared, setShared] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -76,16 +75,77 @@ export default function DistributorDashboardView() {
   const initials = data.first_name ? data.first_name.charAt(0).toUpperCase() + (data.last_name ? data.last_name.charAt(0).toUpperCase() : '') : 'D';
   const downlineCount = data.downline_count || data.downlines?.length || 0;
 
-  const copyCode = () => {
-    if (data.referral_code) {
-      navigator.clipboard.writeText(data.referral_code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+  const getReferralUrl = () => {
+    if (!data.referral_code) return '';
+    return typeof window !== 'undefined' ? `${window.location.origin}/register?ref=${data.referral_code}` : `/register?ref=${data.referral_code}`;
+  };
+
+  const copyReferralLink = () => {
+    const url = getReferralUrl();
+    if (!url) return;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const shareReferralLink = async () => {
+    const url = getReferralUrl();
+    if (!url) return;
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Join My Rudra Network',
+          text: 'Join my network and grow with me on Rudra!',
+          url,
+        });
+      } catch (err) {
+        // User cancelled share dialog - fall back to copy
+        if ((err as Error).name !== 'AbortError') {
+          copyReferralLink();
+        }
+      }
+    } else {
+      copyReferralLink();
     }
   };
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
+      {/* Referral Invite Card - Top Priority */}
+      {data.referral_code && (
+        <div className="stat-card relative overflow-hidden border-0">
+          <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(90deg, #10B981, #059669, #0D9488)' }} />
+          <div className="absolute inset-0 opacity-40 pointer-events-none" style={{ background: 'radial-gradient(600px circle at 85% 50%, rgba(16,185,129,0.08), transparent 45%)' }} />
+          <div className="relative flex items-center justify-between gap-3 p-4 sm:p-5">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/25">
+                <Share2 size={18} className="text-white" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-sm sm:text-base font-semibold text-text-primary truncate">Invite Your Network</h3>
+                <p className="text-xs text-text-muted truncate">Grow your team — share your referral link</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={shareReferralLink}
+                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-white text-emerald-600 text-sm font-semibold hover:bg-emerald-50 transition-all duration-200 shadow-lg shadow-emerald-500/20 active:scale-95"
+              >
+                <Share2 size={16} />
+                Share
+              </button>
+              <button
+                onClick={copyReferralLink}
+                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-semibold hover:from-emerald-600 hover:to-teal-700 transition-all duration-200 shadow-lg shadow-emerald-500/30 active:scale-95"
+              >
+                {copied ? <CheckCheck size={16} /> : <Copy size={16} />}
+                {copied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Welcome Hero */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 p-6 sm:p-8">
         <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-white/[0.06] blur-3xl" />
@@ -182,13 +242,17 @@ export default function DistributorDashboardView() {
           </div>
           <div className="space-y-2">
             {[
-              { icon: Users, label: 'View Your Downline', color: 'text-primary', href: 'downline' },
-              { icon: GitBranch, label: 'Explore MLM Tree', color: 'text-purple-500', href: 'tree' },
-              { icon: ExternalLink, label: 'Share Referral Link', color: 'text-emerald-500', href: 'referral' },
+              { icon: Users, label: 'View Your Downline', color: 'text-primary', section: 'downline' as const },
+              { icon: GitBranch, label: 'Explore Rudra Tree', color: 'text-purple-500', section: 'tree' as const },
+              { icon: ExternalLink, label: 'Share Referral Link', color: 'text-emerald-500', section: 'referral' as const },
             ].map((action, i) => {
               const Icon = action.icon;
               return (
-                <div key={i} className="flex items-center justify-between p-3 rounded-xl hover:bg-surface-hover transition-colors cursor-pointer group">
+                <button
+                  key={i}
+                  onClick={() => onNavigate?.(action.section)}
+                  className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-surface-hover transition-colors cursor-pointer group text-left"
+                >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-surface-hover flex items-center justify-center">
                       <Icon size={16} className={action.color} />
@@ -196,63 +260,12 @@ export default function DistributorDashboardView() {
                     <span className="text-sm font-medium text-text-primary">{action.label}</span>
                   </div>
                   <ChevronRight size={14} className="text-text-muted group-hover:translate-x-0.5 transition-transform" />
-                </div>
+                </button>
               );
             })}
           </div>
         </div>
       </div>
-
-      {/* Referral Code Card */}
-      {data.referral_code && (
-        <div className="stat-card !p-0 overflow-hidden border-0">
-          <div className="bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent p-5 sm:p-6 border-b border-border">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
-                  <Link2 size={20} className="text-emerald-500" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-text-primary">Your Referral Code</h3>
-                  <p className="text-xs text-text-muted">Share this to invite new distributors</p>
-                </div>
-              </div>
-              <button onClick={() => {
-                const url = typeof window !== 'undefined' ? `${window.location.origin}/register?ref=${data.referral_code}` : `/register?ref=${data.referral_code}`;
-                if (navigator.share) {
-                  navigator.share({ title: 'Join my network', text: `Join my network using referral code: ${data.referral_code}`, url }).catch(() => {});
-                } else {
-                  navigator.clipboard.writeText(url);
-                }
-                setShared(true);
-                setTimeout(() => setShared(false), 2000);
-              }} className="btn-secondary btn-sm sm:btn-sm flex-shrink-0">
-                {shared ? <Check size={16} /> : <Share2 size={16} />}
-                {shared ? 'Shared!' : 'Share Link'}
-              </button>
-            </div>
-          </div>
-          <div className="px-5 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
-            <code className="font-mono text-lg sm:text-xl font-bold text-emerald-500 tracking-wider bg-emerald-500/5 px-4 py-2.5 rounded-xl border border-emerald-500/20 flex-1 truncate">
-              {data.referral_code}
-            </code>
-            <div className="flex items-center gap-2">
-              <button onClick={copyCode} className="btn-icon p-2.5 rounded-xl hover:bg-emerald-500/10" title="Copy code">
-                {copied ? <CheckCheck size={18} className="text-emerald-500" /> : <Copy size={18} />}
-              </button>
-              <button onClick={() => {
-                const url = typeof window !== 'undefined' ? `${window.location.origin}/register?ref=${data.referral_code}` : `/register?ref=${data.referral_code}`;
-                navigator.clipboard.writeText(url);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-              }} className="btn-secondary btn-sm flex-shrink-0">
-                <Copy size={14} />
-                Copy Link
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Recent Downline Members */}
       {data.downlines && data.downlines.length > 0 && (

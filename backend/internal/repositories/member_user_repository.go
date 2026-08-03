@@ -3,8 +3,8 @@ package repositories
 import (
 	"errors"
 
-	"mlm-admin-backend/internal/database"
-	"mlm-admin-backend/internal/models"
+	"rudra-admin-backend/internal/database"
+	"rudra-admin-backend/internal/models"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"

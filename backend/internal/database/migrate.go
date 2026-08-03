@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"os"
 
-	"mlm-admin-backend/internal/config"
+	"rudra-admin-backend/internal/config"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -49,7 +49,7 @@ func postgresMigrateDSN(cfg *config.DatabaseConfig) (string, error) {
 		Scheme: "postgres",
 		User:   url.UserPassword(cfg.User, cfg.Password),
 		Host:   fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
-		Path: "/" + cfg.Name,
+		Path:   "/" + cfg.Name,
 	}
 	q := u.Query()
 	q.Set("sslmode", cfg.SSLMode)

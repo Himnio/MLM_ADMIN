@@ -3,7 +3,7 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'MLM Admin Dashboard',
+  title: 'Rudra Admin Dashboard',
   description: 'Multi-Level Marketing Administration System',
 }
 

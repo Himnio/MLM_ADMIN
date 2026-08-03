@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"math"
 
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/models"
-	"mlm-admin-backend/internal/repositories"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/models"
+	"rudra-admin-backend/internal/repositories"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/google/uuid"
 )
@@ -187,8 +187,8 @@ func (s *referralService) UpdateCommissionConfig(level int, input *UpdateCommiss
 
 // GetTreeDownline gets the downline tree for a member
 func (s *referralService) GetTreeDownline(memberID uuid.UUID, maxLevel int) (*ReferralTreeResponse, error) {
-	if maxLevel < 1 || maxLevel > s.config.MLM.MaxLevels {
-		maxLevel = s.config.MLM.MaxLevels
+	if maxLevel < 1 || maxLevel > s.config.Rudra.MaxLevels {
+		maxLevel = s.config.Rudra.MaxLevels
 	}
 
 	members, err := s.referralRepo.GetDownlineWithLevels(memberID, maxLevel)
@@ -246,8 +246,8 @@ func (s *referralService) GetTreeDownline(memberID uuid.UUID, maxLevel int) (*Re
 
 // GetTreeUpline gets the upline chain for a member
 func (s *referralService) GetTreeUpline(memberID uuid.UUID, maxLevel int) (*ReferralTreeResponse, error) {
-	if maxLevel < 1 || maxLevel > s.config.MLM.MaxLevels {
-		maxLevel = s.config.MLM.MaxLevels
+	if maxLevel < 1 || maxLevel > s.config.Rudra.MaxLevels {
+		maxLevel = s.config.Rudra.MaxLevels
 	}
 
 	members, err := s.referralRepo.GetUplineWithLevels(memberID, maxLevel)
@@ -301,7 +301,7 @@ func (s *referralService) GetTreeUpline(memberID uuid.UUID, maxLevel int) (*Refe
 
 // GetTreeSummary gets a summary of the referral tree for a member
 func (s *referralService) GetTreeSummary(memberID uuid.UUID) (*TreeSummaryResponse, error) {
-	maxLevel := s.config.MLM.MaxLevels
+	maxLevel := s.config.Rudra.MaxLevels
 
 	downline, err := s.referralRepo.GetDownlineWithLevels(memberID, maxLevel)
 	if err != nil {
@@ -466,7 +466,7 @@ func (s *referralService) GetReferralStats(memberID uuid.UUID) (*ReferralStatsRe
 	}
 
 	// Get downline with levels
-	maxLevel := s.config.MLM.MaxLevels
+	maxLevel := s.config.Rudra.MaxLevels
 	downline, err := s.referralRepo.GetDownlineWithLevels(memberID, maxLevel)
 	if err != nil {
 		return nil, err
@@ -503,7 +503,7 @@ func (s *referralService) UpdateReferralCounts(memberID uuid.UUID, referralID uu
 	}
 
 	// Traverse upline to update their referral counts at appropriate levels
-	upline, err := s.referralRepo.GetUplineWithLevels(memberID, s.config.MLM.MaxLevels)
+	upline, err := s.referralRepo.GetUplineWithLevels(memberID, s.config.Rudra.MaxLevels)
 	if err != nil {
 		return err
 	}
@@ -511,7 +511,7 @@ func (s *referralService) UpdateReferralCounts(memberID uuid.UUID, referralID uu
 	for _, u := range upline {
 		// The new referral is at level+1 for this upline member
 		referralLevel := u.RelationshipLevel + 1
-		if referralLevel <= s.config.MLM.MaxLevels {
+		if referralLevel <= s.config.Rudra.MaxLevels {
 			if err := s.referralRepo.UpdateReferralCount(u.ID, referralLevel, 1); err != nil {
 				s.logger.Error(err, "Failed to update upline referral count", nil)
 				continue

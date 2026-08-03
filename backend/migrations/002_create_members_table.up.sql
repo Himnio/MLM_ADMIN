@@ -49,7 +49,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Add comments
-COMMENT ON TABLE members IS 'Stores MLM member information';
+COMMENT ON TABLE members IS 'Stores Rudra member information';
 COMMENT ON COLUMN members.id IS 'Unique identifier for the member';
 COMMENT ON COLUMN members.sponsor_id IS 'Reference to the sponsor (parent) member';
 COMMENT ON COLUMN members.member_code IS 'Unique member code generated automatically';

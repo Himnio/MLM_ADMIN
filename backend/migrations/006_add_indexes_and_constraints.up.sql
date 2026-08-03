@@ -46,7 +46,7 @@ CREATE TRIGGER validate_member_code_before_insert
 CREATE OR REPLACE FUNCTION get_member_hierarchy(
     p_member_id UUID,
     p_direction VARCHAR DEFAULT 'upline', -- 'upline' or 'downline'
-    p_max_levels INTEGER DEFAULT 10
+    p_max_levels INTEGER DEFAULT 12
 )
 RETURNS TABLE (
     member_id UUID,
@@ -140,7 +140,9 @@ RETURNS TABLE (
     level_7_count BIGINT,
     level_8_count BIGINT,
     level_9_count BIGINT,
-    level_10_count BIGINT
+    level_10_count BIGINT,
+    level_11_count BIGINT,
+    level_12_count BIGINT
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -164,7 +166,7 @@ BEGIN
             d.path || m.id
         FROM members m
         INNER JOIN downline d ON m.sponsor_id = d.member_id
-        WHERE NOT m.id = ANY(d.path) AND d.level < 10
+        WHERE NOT m.id = ANY(d.path) AND d.level < 12
     )
     SELECT 
         COUNT(*) FILTER (WHERE level > 0) as total_downline,
@@ -178,7 +180,9 @@ BEGIN
         COUNT(*) FILTER (WHERE level = 7) as level_7_count,
         COUNT(*) FILTER (WHERE level = 8) as level_8_count,
         COUNT(*) FILTER (WHERE level = 9) as level_9_count,
-        COUNT(*) FILTER (WHERE level = 10) as level_10_count
+        COUNT(*) FILTER (WHERE level = 10) as level_10_count,
+        COUNT(*) FILTER (WHERE level = 11) as level_11_count,
+        COUNT(*) FILTER (WHERE level = 12) as level_12_count
     FROM downline;
 END;
 $$ LANGUAGE plpgsql;

@@ -1,4 +1,4 @@
--- Create referrals table (Adjacency List Model for MLM tree)
+-- Create referrals table (Adjacency List Model for Rudra tree)
 CREATE TABLE IF NOT EXISTS referrals (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     parent_id UUID NOT NULL REFERENCES members(id) ON DELETE CASCADE,
@@ -141,8 +141,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Add comments
-COMMENT ON TABLE referrals IS 'Stores referral relationships in the MLM tree structure';
+COMMENT ON TABLE referrals IS 'Stores referral relationships in the Rudra tree structure';
 COMMENT ON COLUMN referrals.id IS 'Unique identifier for the referral relationship';
 COMMENT ON COLUMN referrals.parent_id IS 'ID of the parent (sponsor) member';
 COMMENT ON COLUMN referrals.child_id IS 'ID of the child (downline) member';
-COMMENT ON COLUMN referrals.level IS 'Level in the MLM hierarchy (1-10)';
+COMMENT ON COLUMN referrals.level IS 'Level in the Rudra hierarchy (1-10)';

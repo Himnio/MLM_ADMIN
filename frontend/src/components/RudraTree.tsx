@@ -74,7 +74,7 @@ function calcLayout(root: TreeNode): Map<string, { x: number; y: number }> {
   return positions;
 }
 
-export function MLMTree({
+export function RudraTree({
   rootNode,
   currentUserId,
   onNodeClick
@@ -296,11 +296,11 @@ export function MLMTree({
   );
 }
 
-export function MLMTreeWrapper({
+export function RudraTreeWrapper({
   rootData,
   currentUserId,
   onNodeClick,
-  title = 'MLM Tree'
+  title = 'Rudra Tree'
 }: {
   rootData: TreeNode;
   currentUserId?: string;
@@ -337,7 +337,7 @@ export function MLMTreeWrapper({
         )}
       </div>
 
-      <MLMTree
+      <RudraTree
         rootNode={rootData}
         currentUserId={currentUserId}
         onNodeClick={(node) => {

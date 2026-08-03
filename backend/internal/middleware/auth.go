@@ -3,9 +3,9 @@ package middleware
 import (
 	"strings"
 
-	"mlm-admin-backend/internal/auth"
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/auth"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )

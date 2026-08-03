@@ -49,7 +49,7 @@ export default function DistributorReferralView() {
       try {
         await navigator.share({
           title: 'Join my network',
-          text: `Join my MLM network using my referral link: ${info.referral_code}`,
+          text: `Join my Rudra network using my referral link: ${info.referral_code}`,
           url: url,
         });
         setShared(true);

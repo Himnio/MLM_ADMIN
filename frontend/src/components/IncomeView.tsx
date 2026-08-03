@@ -48,7 +48,7 @@ export default function IncomeView() {
             <div className="p-2.5 bg-primary/10 rounded-lg"><DollarSign size={20} className="text-primary" /></div>
             <div>
               <h3 className="text-lg font-semibold text-text-primary">Commission Configuration</h3>
-              <p className="text-xs text-text-muted">Manage MLM commission levels</p>
+              <p className="text-xs text-text-muted">Manage Rudra commission levels</p>
             </div>
           </div>
           <button onClick={() => setShowCalculate(true)} className="btn-primary flex items-center gap-2">

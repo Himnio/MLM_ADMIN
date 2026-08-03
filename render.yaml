@@ -1,23 +1,23 @@
 # ============================================================
-# Render Blueprint - MLM Admin Deployment
+# Render Blueprint - Rudra Admin Deployment
 # ============================================================
 # Frontend proxies /api/v1/* to the backend via internal DNS.
 # No CORS issues, no Dashboard env vars needed for API access.
 #
 # Optional after deploy:
-#   mlm-backend → Environment → FRONTEND_URL
+#   rudra-backend → Environment → FRONTEND_URL
 #   (needed for redirects/password-reset links)
 # ============================================================
 
 databases:
-  - name: mlm-postgres
+  - name: rudra-postgres
     plan: free
-    databaseName: mlm_admin
-    user: mlm_admin
+    databaseName: rudra_admin
+    user: rudra_admin
 
 services:
   - type: keyvalue
-    name: mlm-redis
+    name: rudra-redis
     plan: free
     maxmemoryPolicy: allkeys-lru
     ipAllowList:
@@ -26,7 +26,7 @@ services:
 
   # -------------------- Backend API --------------------
   - type: web
-    name: mlm-backend
+    name: rudra-backend
     runtime: docker
     plan: free
     dockerfilePath: ./backend/Dockerfile
@@ -39,7 +39,7 @@ services:
       - key: APP_ENV
         value: production
       - key: APP_NAME
-        value: mlm-admin-api
+        value: rudra-admin-api
       - key: APP_VERSION
         value: 1.0.0
       - key: LOG_LEVEL
@@ -56,15 +56,15 @@ services:
         generateValue: true
       - key: DATABASE_URL
         fromDatabase:
-          name: mlm-postgres
+          name: rudra-postgres
           property: connectionString
       - key: REDIS_URL
         fromService:
           type: keyvalue
-          name: mlm-redis
+          name: rudra-redis
           property: connectionString
       # FRONTEND_URL: Set this manually in Render Dashboard to your frontend URL
-      # (e.g. https://mlm-frontend.onrender.com) for backend-generated links.
+      # (e.g. https://rudra-frontend.onrender.com) for backend-generated links.
       # The frontend now constructs referral links client-side, so this is optional.
       - key: CORS_ALLOWED_ORIGINS
         value: "*"
@@ -73,7 +73,7 @@ services:
 
   # -------------------- Frontend --------------------
   - type: web
-    name: mlm-frontend
+    name: rudra-frontend
     runtime: docker
     plan: free
     dockerfilePath: ./frontend/Dockerfile
@@ -83,7 +83,7 @@ services:
         value: production
       # Backend internal DNS name — Render resolves to the correct container
       - key: BACKEND_HOST
-        value: mlm-backend
+        value: rudra-backend
       # Must match PORT set on the backend service above
       - key: BACKEND_PORT
         value: "8080"

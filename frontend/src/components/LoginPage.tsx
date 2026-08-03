@@ -44,9 +44,9 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         </div>
         <div className="relative z-10 text-center">
           <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-2xl">
-            <span className="text-4xl font-bold text-white">M</span>
+            <span className="text-4xl font-bold text-white">R</span>
           </div>
-          <h2 className="text-3xl font-bold text-white mb-3">MLM Admin Panel</h2>
+          <h2 className="text-3xl font-bold text-white mb-3">Rudra Admin Panel</h2>
           <p className="text-indigo-200/80 text-lg max-w-md">
             Manage your multi-level marketing network with powerful analytics and real-time insights.
           </p>
@@ -71,7 +71,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-10">
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-xl shadow-primary/30">
-              <span className="text-3xl font-bold text-white">M</span>
+              <span className="text-3xl font-bold text-white">R</span>
             </div>
             <h2 className="text-2xl font-bold text-text-primary">Welcome Back</h2>
             <p className="text-text-muted mt-1">Sign in to your admin account</p>
@@ -141,7 +141,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           </form>
 
           <p className="mt-8 text-center text-xs text-text-muted">
-            &copy; {new Date().getFullYear()} MLM Admin Panel. All rights reserved.
+            &copy; {new Date().getFullYear()} Rudra Admin Panel. All rights reserved.
           </p>
         </div>
       </div>

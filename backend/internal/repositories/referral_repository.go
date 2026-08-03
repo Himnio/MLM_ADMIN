@@ -4,14 +4,14 @@ import (
 	"errors"
 	"time"
 
-	"mlm-admin-backend/internal/database"
-	"mlm-admin-backend/internal/models"
+	"rudra-admin-backend/internal/database"
+	"rudra-admin-backend/internal/models"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
-// ReferralRepository handles database operations for MLM referral system
+// ReferralRepository handles database operations for Rudra referral system
 type ReferralRepository interface {
 	// Commission configs
 	GetCommissionConfigByLevel(level int) (*models.CommissionConfig, error)

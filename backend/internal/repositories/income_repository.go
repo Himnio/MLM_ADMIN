@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"mlm-admin-backend/internal/database"
-	"mlm-admin-backend/internal/models"
+	"rudra-admin-backend/internal/database"
+	"rudra-admin-backend/internal/models"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -488,8 +488,8 @@ func (r *commissionRepository) GetAll() ([]*models.CommissionConfig, error) {
 
 // GetByLevel retrieves commission configuration for a specific level
 func (r *commissionRepository) GetByLevel(level int) (*models.CommissionConfig, error) {
-	if level < 1 || level > 10 {
-		return nil, fmt.Errorf("invalid level: %d, must be between 1-10", level)
+	if level < 1 || level > 12 {
+		return nil, fmt.Errorf("invalid level: %d, must be between 1-12", level)
 	}
 
 	var config models.CommissionConfig

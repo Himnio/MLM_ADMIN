@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS level_snapshots (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     member_id UUID NOT NULL REFERENCES members(id) ON DELETE CASCADE,
-    level INTEGER NOT NULL CHECK (level >= 1 AND level <= 10),
+    level INTEGER NOT NULL CHECK (level >= 1 AND level <= 12),
     seat_filled INTEGER NOT NULL DEFAULT 0,
     seat_capacity INTEGER NOT NULL,
     income_potential NUMERIC(10,2) NOT NULL,

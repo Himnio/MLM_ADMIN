@@ -3,10 +3,10 @@ package services
 import (
 	"fmt"
 
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/models"
-	"mlm-admin-backend/internal/repositories"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/models"
+	"rudra-admin-backend/internal/repositories"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"

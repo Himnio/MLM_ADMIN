@@ -11,15 +11,15 @@ import (
 	"syscall"
 	"time"
 
-	_ "mlm-admin-backend/docs"
-	"mlm-admin-backend/internal/auth"
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/database"
-	"mlm-admin-backend/internal/handlers"
-	"mlm-admin-backend/internal/middleware"
-	"mlm-admin-backend/internal/repositories"
-	"mlm-admin-backend/internal/services"
-	"mlm-admin-backend/internal/utils"
+	_ "rudra-admin-backend/docs"
+	"rudra-admin-backend/internal/auth"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/database"
+	"rudra-admin-backend/internal/handlers"
+	"rudra-admin-backend/internal/middleware"
+	"rudra-admin-backend/internal/repositories"
+	"rudra-admin-backend/internal/services"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -31,11 +31,11 @@ var (
 	fullRouter  http.Handler
 )
 
-// @title MLM Admin API
+// @title Rudra Admin API
 // @version 1.0.0
-// @description Admin API for MLM management system
+// @description Admin API for Rudra management system
 // @description
-// @description This API provides endpoints for managing MLM operations including:
+// @description This API provides endpoints for managing Rudra operations including:
 // @description - Admin authentication and authorization
 // @description - Member management
 // @description - Referral tree management
@@ -50,7 +50,7 @@ var (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token
 func main() {
-	fmt.Fprintf(os.Stderr, "MLM_ADMIN_BOOT: main() started\n")
+	fmt.Fprintf(os.Stderr, "RUDRA_ADMIN_BOOT: main() started\n")
 
 	// --- ONE gateway HTTP server from the very first moment ---
 	bootPort := os.Getenv("PORT")
@@ -60,7 +60,7 @@ func main() {
 	if bootPort == "" {
 		bootPort = "8080"
 	}
-	fmt.Fprintf(os.Stderr, "MLM_ADMIN_BOOT: binding to port %s\n", bootPort)
+	fmt.Fprintf(os.Stderr, "RUDRA_ADMIN_BOOT: binding to port %s\n", bootPort)
 
 	var (
 		backendReady atomic.Bool
@@ -86,9 +86,9 @@ func main() {
 	}
 
 	go func() {
-		fmt.Fprintf(os.Stderr, "MLM_ADMIN_BOOT: gateway listening\n")
+		fmt.Fprintf(os.Stderr, "RUDRA_ADMIN_BOOT: gateway listening\n")
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			fmt.Fprintf(os.Stderr, "MLM_ADMIN_BOOT: ListenAndServe error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "RUDRA_ADMIN_BOOT: ListenAndServe error: %v\n", err)
 		}
 	}()
 
@@ -100,11 +100,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
-	fmt.Fprintf(os.Stderr, "MLM_ADMIN_BOOT: config loaded, env=%s\n", cfg.App.Env)
+	fmt.Fprintf(os.Stderr, "RUDRA_ADMIN_BOOT: config loaded, env=%s\n", cfg.App.Env)
 
 	logger := utils.NewLogger(cfg.App.Env, cfg.Logging.Level, cfg.Logging.Format, cfg.Logging.Output)
 	utils.InitGlobalLogger(cfg.App.Env, cfg.Logging.Level, cfg.Logging.Format, cfg.Logging.Output)
-	logger.Info("Starting MLM Admin API", map[string]interface{}{"version": cfg.App.Version, "env": cfg.App.Env, "port": cfg.App.Port})
+	logger.Info("Starting Rudra Admin API", map[string]interface{}{"version": cfg.App.Version, "env": cfg.App.Env, "port": cfg.App.Port})
 
 	logger.Info("Waiting for database to be ready...", nil)
 	if err := database.WaitForDatabase(&cfg.Database, 30*time.Second); err != nil {
@@ -251,7 +251,7 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 				memberRoutes.GET("/stats", memberHandler.GetMemberStats)
 				memberRoutes.GET("/search", memberHandler.SearchMembers)
 				memberRoutes.GET("/:id", memberHandler.GetMember)
-					memberRoutes.POST("", middleware.RequireRole("super_admin"), memberHandler.CreateMember)
+				memberRoutes.POST("", middleware.RequireRole("super_admin"), memberHandler.CreateMember)
 				memberRoutes.PUT("/:id", middleware.RequireRole("super_admin"), memberHandler.UpdateMember)
 				memberRoutes.DELETE("/:id", middleware.RequireRole("super_admin"), memberHandler.DeleteMember)
 

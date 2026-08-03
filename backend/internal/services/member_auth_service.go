@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"mlm-admin-backend/internal/auth"
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/models"
-	"mlm-admin-backend/internal/repositories"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/auth"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/models"
+	"rudra-admin-backend/internal/repositories"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -27,10 +27,10 @@ type MemberAuthService interface {
 }
 
 type memberAuthService struct {
-	repo    repositories.MemberUserRepository
-	jwtMgr  *auth.JWTManager
-	config  *config.Config
-	logger  *utils.Logger
+	repo   repositories.MemberUserRepository
+	jwtMgr *auth.JWTManager
+	config *config.Config
+	logger *utils.Logger
 }
 
 func NewMemberAuthService(

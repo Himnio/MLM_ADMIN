@@ -7,10 +7,10 @@ import (
 	"regexp"
 	"strings"
 
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/models"
-	"mlm-admin-backend/internal/repositories"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/models"
+	"rudra-admin-backend/internal/repositories"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/google/uuid"
 )
@@ -52,12 +52,12 @@ type MemberRegistrationInput struct {
 }
 
 type referralLinkService struct {
-	repo       repositories.ReferralLinkRepository
-	memberRepo  repositories.MemberUserRepository
+	repo           repositories.ReferralLinkRepository
+	memberRepo     repositories.MemberUserRepository
 	memberTreeRepo repositories.MemberRepository
-	authSvc    MemberAuthService
-	config     *config.Config
-	logger     *utils.Logger
+	authSvc        MemberAuthService
+	config         *config.Config
+	logger         *utils.Logger
 }
 
 func NewReferralLinkService(
@@ -136,7 +136,7 @@ func (s *referralLinkService) CreateReferralCode(createdByUsername string, admin
 		}
 		memberUserID = &user.ID
 
-		// Create a member record (MLM tree node) for this distributor
+		// Create a member record (Rudra tree node) for this distributor
 		fullName := distInput.FirstName + " " + distInput.LastName
 		member := &models.Member{
 			MemberUserID: &user.ID,
@@ -298,7 +298,7 @@ func (s *referralLinkService) RegisterWithReferral(code string, input *MemberReg
 		return nil, fmt.Errorf("failed to create user: %w", err)
 	}
 
-	// Create a member record (MLM tree node) for this new distributor
+	// Create a member record (Rudra tree node) for this new distributor
 	fullName := strings.TrimSpace(input.FirstName) + " " + strings.TrimSpace(input.LastName)
 	member := &models.Member{
 		MemberUserID: &user.ID,

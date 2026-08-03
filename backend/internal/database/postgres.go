@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"time"
 
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/utils"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

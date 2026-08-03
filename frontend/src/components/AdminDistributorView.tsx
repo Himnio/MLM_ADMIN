@@ -7,7 +7,7 @@ import {
   Search, Users, ChevronRight, ChevronDown, Loader2, Shield,
   User, Mail, Phone, Calendar, MapPin, CreditCard, Building2, ToggleLeft, ToggleRight, Trash2, X, Share2,
 } from 'lucide-react';
-import { MLMTreeWrapper, TreeNode as MLMTreeNode } from './MLMTree';
+import { RudraTreeWrapper, TreeNode as RudraTreeNode } from './RudraTree';
 
 interface ApiTreeNode {
   id: string;
@@ -20,8 +20,8 @@ interface ApiTreeNode {
   downlines?: ApiTreeNode[];
 }
 
-function convertToTreeNode(apiNode: ApiTreeNode, level = 0): MLMTreeNode {
-  const children: MLMTreeNode[] = [];
+function convertToTreeNode(apiNode: ApiTreeNode, level = 0): RudraTreeNode {
+  const children: RudraTreeNode[] = [];
   
   if (apiNode.downlines && apiNode.downlines.length > 0) {
     apiNode.downlines.forEach(child => {
@@ -457,7 +457,7 @@ export default function AdminDistributorView() {
                 </p>
                 {detailTree && detailTree.distributor ? (
                   <div className="h-[400px]">
-                    <MLMTreeWrapper
+                    <RudraTreeWrapper
                       rootData={convertToTreeNode(detailTree.distributor, detailTree)}
                       title="Downline Tree"
                     />

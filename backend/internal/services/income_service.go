@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/models"
-	"mlm-admin-backend/internal/repositories"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/models"
+	"rudra-admin-backend/internal/repositories"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/google/uuid"
 )
@@ -75,9 +75,9 @@ func NewIncomeService(
 	}
 
 	// Convert to calculator configs
-	calcConfigs := make([]*utils.MLMLevelConfig, 0)
+	calcConfigs := make([]*utils.RudraLevelConfig, 0)
 	for _, cfg := range configs {
-		calcConfigs = append(calcConfigs, &utils.MLMLevelConfig{
+		calcConfigs = append(calcConfigs, &utils.RudraLevelConfig{
 			Level:                cfg.Level,
 			IncomeAmount:         cfg.IncomeAmount,
 			SeatCapacity:         cfg.SeatCapacity,
@@ -275,7 +275,7 @@ func (s *incomeService) CalculateDownlineIncome(memberID uuid.UUID) (map[int]flo
 	totalIncome := 0.0
 
 	// Get all completed income records for this member
-	for level := 1; level <= 10; level++ {
+	for level := 1; level <= s.config.Rudra.MaxLevels; level++ {
 		incomes, _, err := s.incomeRepo.GetByMemberIDAndLevel(memberID, level, 1, 1000)
 		if err != nil {
 			return nil, 0, fmt.Errorf("failed to get income records for level %d: %w", level, err)

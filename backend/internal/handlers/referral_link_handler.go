@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strings"
 
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/models"
-	"mlm-admin-backend/internal/services"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/models"
+	"rudra-admin-backend/internal/services"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -308,11 +308,11 @@ func (h *ReferralLinkHandler) SearchByCreator(c *gin.Context) {
 	}
 
 	type codeResult struct {
-		ReferralCode       string                    `json:"referral_code"`
-		CreatedByUsername  string                    `json:"created_by_username"`
-		CreatedAt          string                    `json:"created_at"`
+		ReferralCode       string                     `json:"referral_code"`
+		CreatedByUsername  string                     `json:"created_by_username"`
+		CreatedAt          string                     `json:"created_at"`
 		Registrations      []*models.MemberUserPublic `json:"registrations"`
-		TotalRegistrations int                       `json:"total_registrations"`
+		TotalRegistrations int                        `json:"total_registrations"`
 	}
 
 	results := make([]codeResult, 0, len(codes))

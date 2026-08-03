@@ -9,18 +9,18 @@ import (
 
 // Admin represents an admin user in the system
 type Admin struct {
-	ID           uuid.UUID      `gorm:"type:uuid;primary_key" json:"id"`
-	Email        string         `gorm:"type:varchar(255);uniqueIndex;not null" json:"email"`
-	PasswordHash string         `gorm:"type:varchar(255);not null" json:"-"`
-	FullName     string         `gorm:"type:varchar(255);not null" json:"full_name"`
-	Role         string         `gorm:"type:varchar(50);not null;default:'admin'" json:"role"`
-	IsActive     bool           `gorm:"not null;default:true" json:"is_active"`
-	LastLogin    *time.Time     `json:"last_login,omitempty"`
-	FailedAttempts int           `gorm:"not null;default:0" json:"-"`
-	LockedUntil  *time.Time     `json:"-"`
-	CreatedAt    time.Time      `json:"created_at"`
-	UpdatedAt    time.Time      `json:"updated_at"`
-	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+	ID             uuid.UUID      `gorm:"type:uuid;primary_key" json:"id"`
+	Email          string         `gorm:"type:varchar(255);uniqueIndex;not null" json:"email"`
+	PasswordHash   string         `gorm:"type:varchar(255);not null" json:"-"`
+	FullName       string         `gorm:"type:varchar(255);not null" json:"full_name"`
+	Role           string         `gorm:"type:varchar(50);not null;default:'admin'" json:"role"`
+	IsActive       bool           `gorm:"not null;default:true" json:"is_active"`
+	LastLogin      *time.Time     `json:"last_login,omitempty"`
+	FailedAttempts int            `gorm:"not null;default:0" json:"-"`
+	LockedUntil    *time.Time     `json:"-"`
+	CreatedAt      time.Time      `json:"created_at"`
+	UpdatedAt      time.Time      `json:"updated_at"`
+	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 // TableName specifies the table name for Admin model

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/services"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/services"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -34,7 +34,7 @@ func NewReferralHandler(
 }
 
 // @Summary Get commission config
-// @Description Get the MLM commission structure for all levels
+// @Description Get the Rudra commission structure for all levels
 // @Tags referrals
 // @Produce json
 // @Security Bearer
@@ -100,7 +100,7 @@ func (h *ReferralHandler) GetDownline(c *gin.Context) {
 		return
 	}
 
-	maxLevel := utils.GetQueryParamInt(c, "level", h.config.MLM.MaxLevels)
+	maxLevel := utils.GetQueryParamInt(c, "level", h.config.Rudra.MaxLevels)
 
 	tree, err := h.referralService.GetTreeDownline(id, maxLevel)
 	if err != nil {
@@ -128,7 +128,7 @@ func (h *ReferralHandler) GetUpline(c *gin.Context) {
 		return
 	}
 
-	maxLevel := utils.GetQueryParamInt(c, "level", h.config.MLM.MaxLevels)
+	maxLevel := utils.GetQueryParamInt(c, "level", h.config.Rudra.MaxLevels)
 
 	tree, err := h.referralService.GetTreeUpline(id, maxLevel)
 	if err != nil {
@@ -195,7 +195,7 @@ func (h *ReferralHandler) GetIncomeProjection(c *gin.Context) {
 // @Tags referrals
 // @Produce json
 // @Security Bearer
-// @Param level path int true "Level number (1-10)"
+// @Param level path int true "Level number (1-12)"
 // @Success 200 {object} utils.Response{data=services.GrowthProjectionResponse}
 // @Router /api/v1/referrals/projected-growth/{level} [get]
 func (h *ReferralHandler) CalculateProjectedGrowth(c *gin.Context) {

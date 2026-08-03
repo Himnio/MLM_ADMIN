@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/models"
-	"mlm-admin-backend/internal/repositories"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/models"
+	"rudra-admin-backend/internal/repositories"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/google/uuid"
 )
@@ -213,8 +213,8 @@ func (s *memberService) GetDownline(id uuid.UUID, maxLevel int) ([]*models.Membe
 		return nil, errors.New("member not found")
 	}
 
-	if maxLevel < 1 || maxLevel > s.config.MLM.MaxLevels {
-		maxLevel = s.config.MLM.MaxLevels
+	if maxLevel < 1 || maxLevel > s.config.Rudra.MaxLevels {
+		maxLevel = s.config.Rudra.MaxLevels
 	}
 
 	downline, err := s.memberRepo.GetDownline(id, maxLevel)
@@ -248,8 +248,8 @@ func (s *memberService) GetUpline(id uuid.UUID, maxLevel int) ([]*models.Member,
 		return nil, errors.New("member not found")
 	}
 
-	if maxLevel < 1 || maxLevel > s.config.MLM.MaxLevels {
-		maxLevel = s.config.MLM.MaxLevels
+	if maxLevel < 1 || maxLevel > s.config.Rudra.MaxLevels {
+		maxLevel = s.config.Rudra.MaxLevels
 	}
 
 	return s.memberRepo.GetUpline(id, maxLevel)

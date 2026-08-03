@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/services"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/services"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -138,7 +138,7 @@ func (h *DashboardHandler) GetMemberGrowthChart(c *gin.Context) {
 }
 
 // @Summary Level distribution
-// @Description Get member distribution across MLM levels
+// @Description Get member distribution across Rudra levels
 // @Tags dashboard
 // @Produce json
 // @Security Bearer

@@ -45,7 +45,7 @@ VALUES (
 ) ON CONFLICT (email) DO NOTHING;
 
 -- Add comment
-COMMENT ON TABLE admins IS 'Stores admin user accounts for the MLM management system';
+COMMENT ON TABLE admins IS 'Stores admin user accounts for the Rudra management system';
 COMMENT ON COLUMN admins.id IS 'Unique identifier for the admin';
 COMMENT ON COLUMN admins.email IS 'Admin email address used for login';
 COMMENT ON COLUMN admins.password_hash IS 'Bcrypt hashed password';

@@ -7,22 +7,22 @@ import (
 )
 
 type MemberUser struct {
-	ID            uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	MemberID      string    `gorm:"column:member_id;type:varchar(20);uniqueIndex;not null" json:"member_id"`
-	Username      string    `gorm:"column:username;type:varchar(100);uniqueIndex;not null" json:"username"`
-	PasswordHash  string    `gorm:"column:password_hash;type:varchar(255);not null" json:"-"`
-	FirstName     string    `gorm:"column:first_name;type:varchar(100);not null" json:"first_name"`
-	LastName      string    `gorm:"column:last_name;type:varchar(100);not null" json:"last_name"`
-	Mobile        string    `gorm:"column:mobile;type:varchar(20);not null" json:"mobile"`
-	Gender        string    `gorm:"column:gender;type:varchar(10);not null" json:"gender"`
-	DOB           string    `gorm:"column:dob;type:date;not null" json:"dob"`
-	Address       string    `gorm:"column:address;type:text;not null" json:"address"`
-	Email         string    `gorm:"column:email;type:varchar(150)" json:"email,omitempty"`
-	PanCardID     string    `gorm:"column:pan_card_id;type:varchar(20)" json:"pan_card_id,omitempty"`
-	AadhaarCard   string    `gorm:"column:aadhaar_card;type:varchar(20)" json:"aadhaar_card,omitempty"`
-	BankAccount   string    `gorm:"column:bank_account;type:varchar(50)" json:"bank_account,omitempty"`
-	BankIFSC      string    `gorm:"column:bank_ifsc;type:varchar(20)" json:"bank_ifsc,omitempty"`
-	BankBranch    string    `gorm:"column:bank_branch;type:varchar(100)" json:"bank_branch,omitempty"`
+	ID                 uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	MemberID           string    `gorm:"column:member_id;type:varchar(20);uniqueIndex;not null" json:"member_id"`
+	Username           string    `gorm:"column:username;type:varchar(100);uniqueIndex;not null" json:"username"`
+	PasswordHash       string    `gorm:"column:password_hash;type:varchar(255);not null" json:"-"`
+	FirstName          string    `gorm:"column:first_name;type:varchar(100);not null" json:"first_name"`
+	LastName           string    `gorm:"column:last_name;type:varchar(100);not null" json:"last_name"`
+	Mobile             string    `gorm:"column:mobile;type:varchar(20);not null" json:"mobile"`
+	Gender             string    `gorm:"column:gender;type:varchar(10);not null" json:"gender"`
+	DOB                string    `gorm:"column:dob;type:date;not null" json:"dob"`
+	Address            string    `gorm:"column:address;type:text;not null" json:"address"`
+	Email              string    `gorm:"column:email;type:varchar(150)" json:"email,omitempty"`
+	PanCardID          string    `gorm:"column:pan_card_id;type:varchar(20)" json:"pan_card_id,omitempty"`
+	AadhaarCard        string    `gorm:"column:aadhaar_card;type:varchar(20)" json:"aadhaar_card,omitempty"`
+	BankAccount        string    `gorm:"column:bank_account;type:varchar(50)" json:"bank_account,omitempty"`
+	BankIFSC           string    `gorm:"column:bank_ifsc;type:varchar(20)" json:"bank_ifsc,omitempty"`
+	BankBranch         string    `gorm:"column:bank_branch;type:varchar(100)" json:"bank_branch,omitempty"`
 	ReferralCode       string    `gorm:"column:referral_code;type:varchar(50);not null" json:"referral_code"`
 	IsActive           bool      `gorm:"column:is_active;default:false" json:"is_active"`
 	MustChangePassword bool      `gorm:"column:must_change_password;default:true" json:"must_change_password"`
@@ -84,10 +84,10 @@ func ToMemberUserPublic(u *MemberUser) *MemberUserPublic {
 }
 
 type RegistrationResponse struct {
-	MemberID      string `json:"member_id"`
-	Username      string `json:"username"`
-	Password      string `json:"password"`
-	Message       string `json:"message"`
+	MemberID string `json:"member_id"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Message  string `json:"message"`
 }
 
 // DistributorDownlinePublic is a downline member view WITHOUT sensitive data (PAN, Aadhaar, bank details)

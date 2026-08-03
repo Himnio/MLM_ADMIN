@@ -4,10 +4,10 @@ import (
 	"time"
 )
 
-// CommissionConfig represents MLM commission structure per level
+// CommissionConfig represents Rudra commission structure per level
 type CommissionConfig struct {
 	ID                   string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	Level                int       `gorm:"not null;uniqueIndex" json:"level"`                       // Level in MLM (1-10)
+	Level                int       `gorm:"not null;uniqueIndex" json:"level"`                       // Level in Rudra (1-12)
 	IncomeAmount         float64   `gorm:"type:numeric(10,2);not null" json:"income_amount"`        // Income per referral at this level
 	SeatCapacity         int       `gorm:"not null" json:"seat_capacity"`                           // Max referrals allowed at this level
 	CommissionPercentage float64   `gorm:"type:numeric(5,2);not null" json:"commission_percentage"` // % of referral's package

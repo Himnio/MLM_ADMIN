@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"mlm-admin-backend/internal/config"
+	"rudra-admin-backend/internal/config"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +14,7 @@ import (
 func CORS(cfg config.CORSConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		origin := c.Request.Header.Get("Origin")
-		
+
 		// Check if origin is allowed
 		allowed := false
 		for _, allowedOrigin := range cfg.AllowedOrigins {
@@ -32,11 +32,11 @@ func CORS(cfg config.CORSConfig) gin.HandlerFunc {
 		// Set other CORS headers
 		c.Writer.Header().Set("Access-Control-Allow-Methods", strings.Join(cfg.AllowedMethods, ", "))
 		c.Writer.Header().Set("Access-Control-Allow-Headers", strings.Join(cfg.AllowedHeaders, ", "))
-		
+
 		if cfg.AllowCredentials {
 			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		}
-		
+
 		c.Writer.Header().Set("Access-Control-Max-Age", fmt.Sprintf("%d", cfg.MaxAge))
 
 		// Handle preflight requests

@@ -14,7 +14,7 @@ const sectionTitles: Record<DistributorSection, string> = {
   dashboard: 'Dashboard',
   downline: 'My Downline',
   referral: 'My Referral Link',
-  tree: 'My MLM Tree',
+  tree: 'My Rudra Tree',
 };
 
 export default function MemberDashboardPage() {
@@ -151,11 +151,11 @@ export default function MemberDashboardPage() {
 
   const renderSection = () => {
     switch (activeSection) {
-      case 'dashboard': return <DistributorDashboardView />;
+      case 'dashboard': return <DistributorDashboardView onNavigate={setActiveSection} />;
       case 'downline': return <DistributorDownlineView />;
       case 'referral': return <DistributorReferralView />;
       case 'tree': return <DistributorTreeView />;
-      default: return <DistributorDashboardView />;
+      default: return <DistributorDashboardView onNavigate={setActiveSection} />;
     }
   };
 

@@ -58,7 +58,7 @@ export default function ReferralsView() {
           <div className="p-2.5 bg-primary/10 rounded-lg"><Settings size={20} className="text-primary" /></div>
           <div>
             <h3 className="text-lg font-semibold text-text-primary">Commission Configuration</h3>
-            <p className="text-xs text-text-muted">MLM commission rate structure by level</p>
+            <p className="text-xs text-text-muted">Rudra commission rate structure by level</p>
           </div>
         </div>
         {commissionConfig.length === 0 ? (

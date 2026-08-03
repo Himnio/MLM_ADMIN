@@ -6,9 +6,9 @@ import (
 	"runtime"
 	"time"
 
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/database"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/database"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -49,10 +49,10 @@ type ServiceInfo struct {
 
 // SystemInfo contains system metrics
 type SystemInfo struct {
-	GoVersion   string `json:"go_version"`
-	NumGoroutine int   `json:"num_goroutine"`
-	NumCPU      int    `json:"num_cpu"`
-	MemoryAlloc string `json:"memory_alloc"`
+	GoVersion    string `json:"go_version"`
+	NumGoroutine int    `json:"num_goroutine"`
+	NumCPU       int    `json:"num_cpu"`
+	MemoryAlloc  string `json:"memory_alloc"`
 }
 
 // ComponentState represents the state of a component

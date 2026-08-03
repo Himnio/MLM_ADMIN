@@ -733,16 +733,16 @@ host: localhost:8080
 info:
   contact: {}
   description: |-
-    Admin API for MLM management system
+    Admin API for Rudra management system
 
-    This API provides endpoints for managing MLM operations including:
+    This API provides endpoints for managing Rudra operations including:
     - Admin authentication and authorization
     - Member management
     - Referral tree management
     - Income calculations and distributions
     - Reports and analytics
     - Audit logging
-  title: MLM Admin API
+  title: Rudra Admin API
   version: 1.0.0
 paths:
   /api/v1/auth/change-password:
@@ -901,7 +901,7 @@ paths:
       - auth
   /api/v1/commission/config:
     get:
-      description: Get all MLM commission configurations for all levels
+      description: Get all Rudra commission configurations for all levels
       produces:
       - application/json
       responses:
@@ -922,9 +922,9 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update commission configuration for a specific MLM level
+      description: Update commission configuration for a specific Rudra level
       parameters:
-      - description: MLM Level (1-10)
+      - description: Rudra Level (1-10)
         in: path
         name: level
         required: true
@@ -1099,7 +1099,7 @@ paths:
       - dashboard
   /api/v1/dashboard/levels:
     get:
-      description: Get member distribution across MLM levels
+      description: Get member distribution across Rudra levels
       produces:
       - application/json
       responses:
@@ -1257,9 +1257,9 @@ paths:
       - income
   /api/v1/income/level/{level}:
     get:
-      description: Get paginated income records filtered by MLM level
+      description: Get paginated income records filtered by Rudra level
       parameters:
-      - description: MLM Level (1-10)
+      - description: Rudra Level (1-10)
         in: path
         name: level
         required: true
@@ -1365,14 +1365,14 @@ paths:
       - income
   /api/v1/income/member/{member_id}/snapshot/{level}:
     get:
-      description: Get snapshot history for a specific member at a specific MLM level
+      description: Get snapshot history for a specific member at a specific Rudra level
       parameters:
       - description: Member ID
         in: path
         name: member_id
         required: true
         type: string
-      - description: MLM Level (1-10)
+      - description: Rudra Level (1-10)
         in: path
         name: level
         required: true
@@ -1496,7 +1496,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new member in the MLM system
+      description: Create a new member in the Rudra system
       parameters:
       - description: Member creation details
         in: body
@@ -1861,7 +1861,7 @@ paths:
       - referrals
   /api/v1/referrals/commission-config:
     get:
-      description: Get the MLM commission structure for all levels
+      description: Get the Rudra commission structure for all levels
       produces:
       - application/json
       responses:

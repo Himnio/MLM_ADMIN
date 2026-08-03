@@ -1,7 +1,7 @@
--- Create level_commission_configs table to store MLM income structure
+-- Create level_commission_configs table to store Rudra income structure
 CREATE TABLE IF NOT EXISTS level_commission_configs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    level INTEGER NOT NULL CHECK (level >= 1 AND level <= 10),
+    level INTEGER NOT NULL CHECK (level >= 1 AND level <= 12),
     income_amount NUMERIC(10,2) NOT NULL DEFAULT 0,
     seat_capacity INTEGER NOT NULL DEFAULT 0,
     commission_percentage NUMERIC(5,2) NOT NULL DEFAULT 0,
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS level_commission_configs (
     UNIQUE(level)
 );
 
--- Insert default MLM income structure (10-level plan)
+-- Insert default Rudra income structure (12-level plan)
 INSERT INTO level_commission_configs (level, income_amount, seat_capacity, commission_percentage) VALUES
     (1, 100.00, 10, 10.00),
     (2, 200.00, 30, 7.00),
@@ -22,13 +22,15 @@ INSERT INTO level_commission_configs (level, income_amount, seat_capacity, commi
     (7, 6400.00, 7290, 2.00),
     (8, 12800.00, 21870, 1.50),
     (9, 25600.00, 65610, 1.00),
-    (10, 51200.00, 196830, 0.50);
+    (10, 51200.00, 196830, 0.50),
+    (11, 102400.00, 590490, 0.25),
+    (12, 204800.00, 1771470, 0.125);
 
 -- Create table for income projections
 CREATE TABLE IF NOT EXISTS income_projections (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     member_id UUID NOT NULL REFERENCES members(id) ON DELETE CASCADE,
-    level INTEGER NOT NULL CHECK (level >= 1 AND level <= 10),
+    level INTEGER NOT NULL CHECK (level >= 1 AND level <= 12),
     potential_income NUMERIC(10,2) NOT NULL DEFAULT 0,
     actual_income NUMERIC(10,2) NOT NULL DEFAULT 0,
     seat_filled INTEGER NOT NULL DEFAULT 0,

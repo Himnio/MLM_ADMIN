@@ -9,8 +9,8 @@ CREATE INDEX IF NOT EXISTS idx_incomes_processed_at ON incomes(processed_at DESC
 -- Create composite index for income summation queries
 CREATE INDEX IF NOT EXISTS idx_incomes_member_status ON incomes(member_id, status);
 
--- Add constraint to ensure level is between 1-10
-ALTER TABLE incomes ADD CONSTRAINT check_income_level CHECK (level >= 1 AND level <= 10);
+-- Add constraint to ensure level is between 1-12
+ALTER TABLE incomes ADD CONSTRAINT check_income_level CHECK (level >= 1 AND level <= 12);
 
 -- Update income_projections with better indexes
 CREATE INDEX IF NOT EXISTS idx_income_projections_member_level ON income_projections(member_id, level);

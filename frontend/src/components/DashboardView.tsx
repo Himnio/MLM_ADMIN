@@ -16,7 +16,7 @@ import {
   LineChart, Line, PieChart, Pie, Cell, Legend, AreaChart, Area,
 } from 'recharts';
 import {
-  Users, DollarSign, GitBranch, TrendingUp, AlertTriangle, Award, Clock, Link2, Share2, Check,
+  Users, DollarSign, GitBranch, TrendingUp, AlertTriangle, Award, Share2, CheckCheck, Copy,
 } from 'lucide-react';
 
 const GRADIENT_ACCENTS = [
@@ -38,7 +38,7 @@ export default function DashboardView() {
   const [levelDist, setLevelDist] = useState<LevelDistribution | null>(null);
   const [loading, setLoading] = useState(true);
   const [myReferralCode, setMyReferralCode] = useState<string | null>(null);
-  const [shared, setShared] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -68,6 +68,40 @@ export default function DashboardView() {
       }
     }).catch(() => {});
   }, []);
+
+  const getReferralUrl = () => {
+    if (!myReferralCode) return '';
+    return typeof window !== 'undefined' ? `${window.location.origin}/register?ref=${myReferralCode}` : `/register?ref=${myReferralCode}`;
+  };
+
+  const copyReferralLink = () => {
+    const url = getReferralUrl();
+    if (!url) return;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const shareReferralLink = async () => {
+    const url = getReferralUrl();
+    if (!url) return;
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Join My Rudra Network',
+          text: 'Join my network and grow with me on Rudra!',
+          url,
+        });
+      } catch (err) {
+        // User cancelled share dialog - fall back to copy
+        if ((err as Error).name !== 'AbortError') {
+          copyReferralLink();
+        }
+      }
+    } else {
+      copyReferralLink();
+    }
+  };
 
   if (loading) {
     return (
@@ -120,6 +154,41 @@ export default function DashboardView() {
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
+      {/* Referral Invite Card - Top Priority */}
+      {myReferralCode && (
+        <div className="stat-card relative overflow-hidden border-0">
+          <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(90deg, #6366F1, #4F46E5, #7C3AED)' }} />
+          <div className="absolute inset-0 opacity-40 pointer-events-none" style={{ background: 'radial-gradient(600px circle at 85% 50%, rgba(99,102,241,0.08), transparent 45%)' }} />
+          <div className="relative flex items-center justify-between gap-3 p-4 sm:p-5">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/25">
+                <Share2 size={18} className="text-white" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-sm sm:text-base font-semibold text-text-primary truncate">Invite Your Network</h3>
+                <p className="text-xs text-text-muted truncate">Grow your team — share your referral link</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={shareReferralLink}
+                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-white text-indigo-600 text-sm font-semibold hover:bg-indigo-50 transition-all duration-200 shadow-lg shadow-indigo-500/20 active:scale-95"
+              >
+                <Share2 size={16} />
+                Share
+              </button>
+              <button
+                onClick={copyReferralLink}
+                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg shadow-indigo-500/30 active:scale-95"
+              >
+                {copied ? <CheckCheck size={16} /> : <Copy size={16} />}
+                {copied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Welcome Banner */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#4F46E5] via-[#6366F1] to-[#7C3AED] p-6 sm:p-8">
         <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-white/[0.06] blur-3xl" />
@@ -128,7 +197,7 @@ export default function DashboardView() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-white">Dashboard Overview</h2>
-              <p className="text-sm text-white/70 mt-1">Track your MLM network performance at a glance</p>
+              <p className="text-sm text-white/70 mt-1">Track your Rudra network performance at a glance</p>
             </div>
             <span className="inline-flex items-center px-3.5 py-1.5 rounded-lg bg-white/10 text-white text-xs font-medium backdrop-blur-sm border border-white/10 w-fit">
               {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
@@ -259,7 +328,7 @@ export default function DashboardView() {
         {/* Level Distribution */}
         <div className="stat-card">
           <h3 className="text-base font-semibold text-text-primary mb-1">Level Distribution</h3>
-          <p className="text-xs text-text-muted mb-4">Members by MLM hierarchy level</p>
+          <p className="text-xs text-text-muted mb-4">Members by Rudra hierarchy level</p>
           {levelData.length > 0 ? (
             <ResponsiveContainer width="100%" height={280}>
               <PieChart>
@@ -341,46 +410,6 @@ export default function DashboardView() {
           )}
         </div>
       </div>
-
-      {/* Referral Code Card */}
-      {myReferralCode && (
-        <div className="stat-card !p-0 overflow-hidden border-0">
-          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 sm:p-6 border-b border-border">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
-                  <Link2 size={20} className="text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-text-primary">Your Referral Code</h3>
-                  <p className="text-xs text-text-muted">Share this code to invite new distributors</p>
-                </div>
-              </div>
-              <button onClick={() => {
-                const url = typeof window !== 'undefined' ? `${window.location.origin}/register?ref=${myReferralCode}` : `/register?ref=${myReferralCode}`;
-                if (navigator.share) {
-                  navigator.share({ title: 'Join my network', text: `Join my network using referral code: ${myReferralCode}`, url }).catch(() => {});
-                } else {
-                  navigator.clipboard.writeText(url);
-                }
-                setShared(true);
-                setTimeout(() => setShared(false), 2000);
-              }} className="btn-secondary btn-sm sm:btn-sm flex-shrink-0">
-                {shared ? <Check size={16} /> : <Share2 size={16} />}
-                {shared ? 'Shared!' : 'Share Link'}
-              </button>
-            </div>
-          </div>
-          <div className="px-5 sm:px-6 py-4">
-            <div className="flex items-center gap-3">
-              <code className="font-mono text-lg sm:text-xl font-bold text-primary tracking-wider bg-primary/5 px-4 py-2.5 rounded-xl border border-primary/20">
-                {myReferralCode}
-              </code>
-              <span className="text-xs text-text-muted">Registration link includes this code automatically</span>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

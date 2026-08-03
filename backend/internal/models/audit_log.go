@@ -9,19 +9,19 @@ import (
 
 // AuditLog represents an audit log entry for tracking changes
 type AuditLog struct {
-	ID         uuid.UUID      `gorm:"type:uuid;primary_key" json:"id"`
-	AdminID    *uuid.UUID     `gorm:"type:uuid;index" json:"admin_id,omitempty"`
-	Action     string         `gorm:"type:varchar(100);not null;index" json:"action"`
-	EntityType string         `gorm:"type:varchar(50);index" json:"entity_type,omitempty"`
-	EntityID   *uuid.UUID     `gorm:"type:uuid" json:"entity_id,omitempty"`
-	OldValue   string         `gorm:"type:jsonb" json:"old_value,omitempty"`
-	NewValue   string         `gorm:"type:jsonb" json:"new_value,omitempty"`
-	IPAddress  string         `gorm:"type:varchar(45)" json:"ip_address,omitempty"`
-	UserAgent  string         `gorm:"type:text" json:"user_agent,omitempty"`
-	CreatedAt  time.Time      `gorm:"not null;index" json:"created_at"`
-	
+	ID         uuid.UUID  `gorm:"type:uuid;primary_key" json:"id"`
+	AdminID    *uuid.UUID `gorm:"type:uuid;index" json:"admin_id,omitempty"`
+	Action     string     `gorm:"type:varchar(100);not null;index" json:"action"`
+	EntityType string     `gorm:"type:varchar(50);index" json:"entity_type,omitempty"`
+	EntityID   *uuid.UUID `gorm:"type:uuid" json:"entity_id,omitempty"`
+	OldValue   string     `gorm:"type:jsonb" json:"old_value,omitempty"`
+	NewValue   string     `gorm:"type:jsonb" json:"new_value,omitempty"`
+	IPAddress  string     `gorm:"type:varchar(45)" json:"ip_address,omitempty"`
+	UserAgent  string     `gorm:"type:text" json:"user_agent,omitempty"`
+	CreatedAt  time.Time  `gorm:"not null;index" json:"created_at"`
+
 	// Relationships
-	Admin      *Admin         `gorm:"foreignKey:AdminID" json:"admin,omitempty"`
+	Admin *Admin `gorm:"foreignKey:AdminID" json:"admin,omitempty"`
 }
 
 // TableName specifies the table name for AuditLog model
@@ -76,17 +76,17 @@ type CreateAuditLogInput struct {
 
 // AuditLogResponse represents the response for audit log data
 type AuditLogResponse struct {
-	ID         string     `json:"id"`
-	AdminID    *string    `json:"admin_id,omitempty"`
-	AdminName  *string    `json:"admin_name,omitempty"`
-	Action     string     `json:"action"`
-	EntityType string     `json:"entity_type,omitempty"`
-	EntityID   *string    `json:"entity_id,omitempty"`
-	OldValue   string     `json:"old_value,omitempty"`
-	NewValue   string     `json:"new_value,omitempty"`
-	IPAddress  string     `json:"ip_address,omitempty"`
-	UserAgent  string     `json:"user_agent,omitempty"`
-	CreatedAt  time.Time  `json:"created_at"`
+	ID         string    `json:"id"`
+	AdminID    *string   `json:"admin_id,omitempty"`
+	AdminName  *string   `json:"admin_name,omitempty"`
+	Action     string    `json:"action"`
+	EntityType string    `json:"entity_type,omitempty"`
+	EntityID   *string   `json:"entity_id,omitempty"`
+	OldValue   string    `json:"old_value,omitempty"`
+	NewValue   string    `json:"new_value,omitempty"`
+	IPAddress  string    `json:"ip_address,omitempty"`
+	UserAgent  string    `json:"user_agent,omitempty"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 // ToResponse converts AuditLog to AuditLogResponse
@@ -101,21 +101,21 @@ func (a *AuditLog) ToResponse() *AuditLogResponse {
 		UserAgent:  a.UserAgent,
 		CreatedAt:  a.CreatedAt,
 	}
-	
+
 	if a.AdminID != nil {
 		adminIDStr := a.AdminID.String()
 		resp.AdminID = &adminIDStr
 	}
-	
+
 	if a.Admin != nil {
 		resp.AdminName = &a.Admin.FullName
 	}
-	
+
 	if a.EntityID != nil {
 		entityIDStr := a.EntityID.String()
 		resp.EntityID = &entityIDStr
 	}
-	
+
 	return resp
 }
 
@@ -133,7 +133,7 @@ type AuditLogFilter struct {
 // ToMap converts AuditLogFilter to a map for GORM queries
 func (f *AuditLogFilter) ToMap() map[string]interface{} {
 	m := make(map[string]interface{})
-	
+
 	if f.AdminID != nil {
 		m["admin_id"] = *f.AdminID
 	}
@@ -149,24 +149,24 @@ func (f *AuditLogFilter) ToMap() map[string]interface{} {
 	if f.IPAddress != nil {
 		m["ip_address"] = *f.IPAddress
 	}
-	
+
 	return m
 }
 
 // AuditLogSummary represents a summary of audit log data
 type AuditLogSummary struct {
-	TotalLogs     int64                `json:"total_logs"`
-	ByAction      map[string]int64     `json:"by_action"`
-	ByEntityType  map[string]int64     `json:"by_entity_type"`
-	UniqueAdmins  int64                `json:"unique_admins"`
-	PeriodStart   time.Time            `json:"period_start"`
-	PeriodEnd     time.Time            `json:"period_end"`
+	TotalLogs    int64            `json:"total_logs"`
+	ByAction     map[string]int64 `json:"by_action"`
+	ByEntityType map[string]int64 `json:"by_entity_type"`
+	UniqueAdmins int64            `json:"unique_admins"`
+	PeriodStart  time.Time        `json:"period_start"`
+	PeriodEnd    time.Time        `json:"period_end"`
 }
 
 // NewAuditLog creates a new audit log entry
 func NewAuditLog(action AuditAction, entityType EntityType, entityID *uuid.UUID, adminID *uuid.UUID, oldValue, newValue interface{}, ipAddress, userAgent string) *AuditLog {
 	var oldValStr, newValStr string
-	
+
 	// In production, you would marshal the interface to JSON
 	// For simplicity, we're using string representation
 	if oldValue != nil {
@@ -175,7 +175,7 @@ func NewAuditLog(action AuditAction, entityType EntityType, entityID *uuid.UUID,
 	if newValue != nil {
 		newValStr = formatValue(newValue)
 	}
-	
+
 	return &AuditLog{
 		Action:     string(action),
 		EntityType: string(entityType),

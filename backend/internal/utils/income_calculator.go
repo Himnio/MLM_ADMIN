@@ -5,8 +5,8 @@ import (
 	"math"
 )
 
-// MLMLevelConfig represents a single level configuration in the MLM structure
-type MLMLevelConfig struct {
+// RudraLevelConfig represents a single level configuration in the Rudra structure
+type RudraLevelConfig struct {
 	Level                int     `json:"level"`
 	IncomeAmount         float64 `json:"income_amount"`
 	SeatCapacity         int     `json:"seat_capacity"`
@@ -23,14 +23,14 @@ type IncomeCalculationParams struct {
 	GrowthPercentage  float64 // For projections
 }
 
-// IncomeCalculator handles all MLM income calculations
+// IncomeCalculator handles all Rudra income calculations
 type IncomeCalculator struct {
-	configs map[int]*MLMLevelConfig
+	configs map[int]*RudraLevelConfig
 }
 
 // NewIncomeCalculator creates a new income calculator with level configurations
-func NewIncomeCalculator(configs []*MLMLevelConfig) *IncomeCalculator {
-	configMap := make(map[int]*MLMLevelConfig)
+func NewIncomeCalculator(configs []*RudraLevelConfig) *IncomeCalculator {
+	configMap := make(map[int]*RudraLevelConfig)
 	for _, cfg := range configs {
 		configMap[cfg.Level] = cfg
 	}
@@ -41,8 +41,8 @@ func NewIncomeCalculator(configs []*MLMLevelConfig) *IncomeCalculator {
 // Formula: Income = (BaseAmount × CommissionPercentage / 100) × (SeatsFilled / SeatCapacity)
 func (ic *IncomeCalculator) CalculateIncomeForLevel(params IncomeCalculationParams) (float64, error) {
 	// Validate level
-	if params.Level < 1 || params.Level > 10 {
-		return 0, fmt.Errorf("invalid level: %d, must be between 1-10", params.Level)
+	if params.Level < 1 || params.Level > 12 {
+		return 0, fmt.Errorf("invalid level: %d, must be between 1-12", params.Level)
 	}
 
 	// Validate seats
@@ -137,7 +137,7 @@ func (ic *IncomeCalculator) CalculateRemainingSeats(level, seatsFilled int) (int
 }
 
 // GetLevelConfig returns configuration for a specific level
-func (ic *IncomeCalculator) GetLevelConfig(level int) (*MLMLevelConfig, error) {
+func (ic *IncomeCalculator) GetLevelConfig(level int) (*RudraLevelConfig, error) {
 	cfg, exists := ic.configs[level]
 	if !exists {
 		return nil, fmt.Errorf("level %d not configured", level)
@@ -145,9 +145,9 @@ func (ic *IncomeCalculator) GetLevelConfig(level int) (*MLMLevelConfig, error) {
 	return cfg, nil
 }
 
-// ValidateAllLevelsConfigured checks if all 10 levels are configured
+// ValidateAllLevelsConfigured checks if all 12 levels are configured
 func (ic *IncomeCalculator) ValidateAllLevelsConfigured() error {
-	for i := 1; i <= 10; i++ {
+	for i := 1; i <= 12; i++ {
 		if _, exists := ic.configs[i]; !exists {
 			return fmt.Errorf("level %d is not configured", i)
 		}
@@ -183,7 +183,7 @@ func (ic *IncomeCalculator) CalculateMaxPossibleIncome() (float64, map[int]float
 	totalIncome := 0.0
 	levelIncomes := make(map[int]float64)
 
-	for level := 1; level <= 10; level++ {
+	for level := 1; level <= 12; level++ {
 		potential, err := ic.CalculatePotentialIncome(level)
 		if err != nil {
 			return 0, nil, err
@@ -200,7 +200,7 @@ func (ic *IncomeCalculator) CalculateLevelProgression(seatsPerLevel map[int]int)
 	levelIncomes := make(map[int]float64)
 	totalIncome := 0.0
 
-	for level := 1; level <= 10; level++ {
+	for level := 1; level <= 12; level++ {
 		cfg, err := ic.GetLevelConfig(level)
 		if err != nil {
 			return nil, 0, err

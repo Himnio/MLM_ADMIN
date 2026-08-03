@@ -18,7 +18,7 @@ const navItems: NavItem[] = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { key: 'downline', label: 'My Downline', icon: Users },
   { key: 'referral', label: 'My Referral Link', icon: Link2 },
-  { key: 'tree', label: 'My MLM Tree', icon: GitBranch },
+  { key: 'tree', label: 'My Rudra Tree', icon: GitBranch },
 ];
 
 interface DistributorLayoutProps {

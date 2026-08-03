@@ -3,11 +3,11 @@ package handlers
 import (
 	"net/http"
 
-	"mlm-admin-backend/internal/auth"
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/models"
-	"mlm-admin-backend/internal/services"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/auth"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/models"
+	"rudra-admin-backend/internal/services"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"

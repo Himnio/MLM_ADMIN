@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS incomes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     member_id UUID NOT NULL REFERENCES members(id) ON DELETE CASCADE,
     from_member_id UUID NOT NULL REFERENCES members(id) ON DELETE CASCADE,
-    level INTEGER NOT NULL CHECK (level >= 1 AND level <= 10),
+    level INTEGER NOT NULL CHECK (level >= 1 AND level <= 12),
     amount DECIMAL(10,2) NOT NULL CHECK (amount >= 0),
     percentage DECIMAL(5,2) NOT NULL CHECK (percentage > 0 AND percentage <= 100),
     transaction_id VARCHAR(100) UNIQUE NOT NULL,
@@ -111,11 +111,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Add comments
-COMMENT ON TABLE incomes IS 'Stores income transactions from MLM commission calculations';
+COMMENT ON TABLE incomes IS 'Stores income transactions from Rudra commission calculations';
 COMMENT ON COLUMN incomes.id IS 'Unique identifier for the income record';
 COMMENT ON COLUMN incomes.member_id IS 'ID of the member receiving the income';
 COMMENT ON COLUMN incomes.from_member_id IS 'ID of the member whose activity generated the income';
-COMMENT ON COLUMN incomes.level IS 'Level in the MLM hierarchy at which this income was calculated';
+COMMENT ON COLUMN incomes.level IS 'Level in the Rudra hierarchy at which this income was calculated';
 COMMENT ON COLUMN incomes.amount IS 'Amount of income earned';
 COMMENT ON COLUMN incomes.percentage IS 'Percentage of base amount used to calculate this income';
 COMMENT ON COLUMN incomes.transaction_id IS 'Unique transaction identifier for tracking';

@@ -1,4 +1,4 @@
-module mlm-admin-backend
+module rudra-admin-backend
 
 go 1.23
 

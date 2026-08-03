@@ -88,7 +88,7 @@ function LoginForm() {
       <div className="w-full max-w-sm animate-fade-in">
         <div className="text-center mb-8">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-xl shadow-primary/30">
-            <span className="text-3xl font-bold text-white">M</span>
+            <span className="text-3xl font-bold text-white">R</span>
           </div>
           <h1 className="text-2xl font-bold text-text-primary">Member Login</h1>
           <p className="text-sm text-text-muted mt-1">Sign in with your Member ID or Username</p>

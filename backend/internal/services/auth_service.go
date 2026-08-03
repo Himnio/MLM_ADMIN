@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"mlm-admin-backend/internal/auth"
-	"mlm-admin-backend/internal/config"
-	"mlm-admin-backend/internal/models"
-	"mlm-admin-backend/internal/repositories"
-	"mlm-admin-backend/internal/utils"
+	"rudra-admin-backend/internal/auth"
+	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/models"
+	"rudra-admin-backend/internal/repositories"
+	"rudra-admin-backend/internal/utils"
 
 	"github.com/google/uuid"
 )
@@ -254,10 +254,10 @@ type LoginRequest struct {
 
 // LoginResponse represents a login response
 type LoginResponse struct {
-	AccessToken  string              `json:"access_token"`
-	RefreshToken string              `json:"refresh_token"`
-	ExpiresAt    time.Time           `json:"expires_at"`
-	TokenType    string              `json:"token_type"`
+	AccessToken  string                `json:"access_token"`
+	RefreshToken string                `json:"refresh_token"`
+	ExpiresAt    time.Time             `json:"expires_at"`
+	TokenType    string                `json:"token_type"`
 	Admin        *models.AdminResponse `json:"admin"`
 }
 

@@ -20,7 +20,7 @@ const sectionTitles: Record<SectionKey, string> = {
   members: 'Distributors Management',
   'referral-link': 'Referral Links',
   'referral-search': 'Referral Search',
-  referrals: 'MLM Tree',
+  referrals: 'Rudra Tree',
   income: 'Income Management',
   reports: 'Reports & Analytics',
 };

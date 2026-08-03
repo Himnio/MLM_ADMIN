@@ -21,7 +21,7 @@ type Config struct {
 	Swagger    SwaggerConfig
 	Security   SecurityConfig
 	Pagination PaginationConfig
-	MLM        MLMConfig
+	Rudra      RudraConfig
 }
 
 // AppConfig holds application-specific configuration
@@ -57,19 +57,19 @@ type RedisConfig struct {
 
 // JWTConfig holds JWT configuration
 type JWTConfig struct {
-	Secret         string
-	AccessExpiry   time.Duration
-	RefreshExpiry  time.Duration
-	Issuer         string
+	Secret        string
+	AccessExpiry  time.Duration
+	RefreshExpiry time.Duration
+	Issuer        string
 }
 
 // CORSConfig holds CORS configuration
 type CORSConfig struct {
-	AllowedOrigins []string
-	AllowedMethods []string
-	AllowedHeaders []string
+	AllowedOrigins   []string
+	AllowedMethods   []string
+	AllowedHeaders   []string
 	AllowCredentials bool
-	MaxAge         int
+	MaxAge           int
 }
 
 // RateLimitConfig holds rate limiting configuration
@@ -89,17 +89,17 @@ type LoggingConfig struct {
 
 // SwaggerConfig holds Swagger documentation configuration
 type SwaggerConfig struct {
-	Enabled   bool
-	Host      string
-	BasePath  string
+	Enabled  bool
+	Host     string
+	BasePath string
 }
 
 // SecurityConfig holds security configuration
 type SecurityConfig struct {
-	BcryptCost      int
-	SessionTimeout  time.Duration
+	BcryptCost       int
+	SessionTimeout   time.Duration
 	MaxLoginAttempts int
-	LockoutDuration time.Duration
+	LockoutDuration  time.Duration
 }
 
 // PaginationConfig holds pagination configuration
@@ -109,9 +109,9 @@ type PaginationConfig struct {
 	MaxLimit     int
 }
 
-// MLMConfig holds MLM-specific configuration
-type MLMConfig struct {
-	MaxLevels              int
+// RudraConfig holds Rudra-specific configuration
+type RudraConfig struct {
+	MaxLevels                  int
 	IncomeCalculationBatchSize int
 }
 
@@ -140,7 +140,7 @@ func Load() (*Config, error) {
 		App: AppConfig{
 			Env:         getEnv("APP_ENV", "development"),
 			Port:        port,
-			Name:        getEnv("APP_NAME", "mlm-admin-api"),
+			Name:        getEnv("APP_NAME", "rudra-admin-api"),
 			Version:     getEnv("APP_VERSION", "1.0.0"),
 			URL:         getEnv("APP_URL", "http://localhost:8080"),
 			FrontendURL: getEnv("FRONTEND_URL", "http://localhost:3000"),
@@ -149,7 +149,7 @@ func Load() (*Config, error) {
 			DatabaseURL:     getEnv("DATABASE_URL", ""),
 			Host:            getEnv("DB_HOST", "localhost"),
 			Port:            getEnv("DB_PORT", "5432"),
-			Name:            getEnv("DB_NAME", "mlm_admin"),
+			Name:            getEnv("DB_NAME", "rudra_admin"),
 			User:            getEnv("DB_USER", "admin"),
 			Password:        getEnv("DB_PASSWORD", ""),
 			SSLMode:         getEnv("DB_SSL_MODE", "disable"),
@@ -166,7 +166,7 @@ func Load() (*Config, error) {
 			Secret:        getEnvOrPanic("JWT_SECRET"),
 			AccessExpiry:  getEnvDuration("JWT_ACCESS_EXPIRY", 24*time.Hour),
 			RefreshExpiry: getEnvDuration("JWT_REFRESH_EXPIRY", 7*24*time.Hour),
-			Issuer:        getEnv("JWT_ISSUER", "mlm-admin-api"),
+			Issuer:        getEnv("JWT_ISSUER", "rudra-admin-api"),
 		},
 		CORS: CORSConfig{
 			AllowedOrigins:   getEnvArray("CORS_ALLOWED_ORIGINS", []string{"http://localhost:3000"}),
@@ -192,18 +192,18 @@ func Load() (*Config, error) {
 			BasePath: getEnv("SWAGGER_BASE_PATH", "/api/v1"),
 		},
 		Security: SecurityConfig{
-			BcryptCost:      getEnvInt("BCRYPT_COST", 12),
-			SessionTimeout:  getEnvDuration("SESSION_TIMEOUT", 30*time.Minute),
+			BcryptCost:       getEnvInt("BCRYPT_COST", 12),
+			SessionTimeout:   getEnvDuration("SESSION_TIMEOUT", 30*time.Minute),
 			MaxLoginAttempts: getEnvInt("MAX_LOGIN_ATTEMPTS", 5),
-			LockoutDuration: getEnvDuration("LOCKOUT_DURATION", 15*time.Minute),
+			LockoutDuration:  getEnvDuration("LOCKOUT_DURATION", 15*time.Minute),
 		},
 		Pagination: PaginationConfig{
 			DefaultPage:  getEnvInt("DEFAULT_PAGE", 1),
 			DefaultLimit: getEnvInt("DEFAULT_LIMIT", 20),
 			MaxLimit:     getEnvInt("MAX_LIMIT", 100),
 		},
-		MLM: MLMConfig{
-			MaxLevels:              getEnvInt("MLM_MAX_LEVELS", 10),
+		Rudra: RudraConfig{
+			MaxLevels:                  getEnvInt("RUDRA_MAX_LEVELS", 12),
 			IncomeCalculationBatchSize: getEnvInt("INCOME_CALCULATION_BATCH_SIZE", 100),
 		},
 	}
@@ -295,7 +295,7 @@ func splitString(s, delimiter string) []string {
 	if s == "" {
 		return []string{}
 	}
-	
+
 	var result []string
 	for _, part := range split(s, delimiter) {
 		trimmed := trimSpace(part)

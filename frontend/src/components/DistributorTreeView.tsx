@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { GitBranch, Users, Loader2 } from 'lucide-react';
-import { MLMTreeWrapper, TreeNode as MLMTreeNode } from './MLMTree';
+import { RudraTreeWrapper, TreeNode as RudraTreeNode } from './RudraTree';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
@@ -17,8 +17,8 @@ interface ApiTreeNode {
   level: number;
 }
 
-function convertApiNode(apiNode: ApiTreeNode, allNodes: Map<string, ApiTreeNode>): MLMTreeNode {
-  const children: MLMTreeNode[] = [];
+function convertApiNode(apiNode: ApiTreeNode, allNodes: Map<string, ApiTreeNode>): RudraTreeNode {
+  const children: RudraTreeNode[] = [];
   allNodes.forEach(node => {
     if (node.id !== apiNode.id && node.level === apiNode.level + 1) {
       // Simple heuristic: if this node is one level deeper, it might be a child
@@ -39,20 +39,20 @@ function convertApiNode(apiNode: ApiTreeNode, allNodes: Map<string, ApiTreeNode>
   };
 }
 
-function buildTree(apiRoot: ApiTreeNode, allNodes: ApiTreeNode[]): MLMTreeNode {
+function buildTree(apiRoot: ApiTreeNode, allNodes: ApiTreeNode[]): RudraTreeNode {
   const nodesByLevel = new Map<number, ApiTreeNode[]>();
   allNodes.forEach(node => {
     if (!nodesByLevel.has(node.level)) nodesByLevel.set(node.level, []);
     nodesByLevel.get(node.level)!.push(node);
   });
 
-  function buildNode(node: ApiTreeNode): MLMTreeNode {
+  function buildNode(node: ApiTreeNode): RudraTreeNode {
     const childLevel = node.level + 1;
     const potentialChildren = nodesByLevel.get(childLevel) || [];
     
     // For a proper tree, we'd need parent references. 
     // As a visual approximation, distribute children under parents at next level
-    const children: MLMTreeNode[] = potentialChildren.map(child => buildNode(child));
+    const children: RudraTreeNode[] = potentialChildren.map(child => buildNode(child));
     
     return {
       id: node.id,
@@ -70,7 +70,7 @@ function buildTree(apiRoot: ApiTreeNode, allNodes: ApiTreeNode[]): MLMTreeNode {
 }
 
 export default function DistributorTreeView() {
-  const [tree, setTree] = useState<MLMTreeNode | null>(null);
+  const [tree, setTree] = useState<RudraTreeNode | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -94,9 +94,9 @@ export default function DistributorTreeView() {
             nodesByLevel.get(node.level)!.push(node);
           });
 
-          const nodeMap = new Map<string, MLMTreeNode>();
+          const nodeMap = new Map<string, RudraTreeNode>();
 
-          function buildNode(apiNode: ApiTreeNode): MLMTreeNode {
+          function buildNode(apiNode: ApiTreeNode): RudraTreeNode {
             const childLevel = apiNode.level + 1;
             const potentialChildren = nodesByLevel.get(childLevel) || [];
             
@@ -104,7 +104,7 @@ export default function DistributorTreeView() {
             // In production you'd have explicit parent_id references
             const children = potentialChildren.map(child => buildNode(child));
             
-            const node: MLMTreeNode = {
+            const node: RudraTreeNode = {
               id: apiNode.id,
               name: `${apiNode.first_name} ${apiNode.last_name}`.trim(),
               memberId: apiNode.member_id,
@@ -142,10 +142,10 @@ export default function DistributorTreeView() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center gap-3">
         <GitBranch size={20} className="text-primary" />
-        <h2 className="text-lg font-semibold text-text-primary">My MLM Tree</h2>
+        <h2 className="text-lg font-semibold text-text-primary">My Rudra Tree</h2>
       </div>
 
-      <MLMTreeWrapper
+      <RudraTreeWrapper
         rootData={tree}
         currentUserId={userId}
         title="Your Network"
