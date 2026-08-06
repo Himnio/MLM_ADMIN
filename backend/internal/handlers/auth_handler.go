@@ -188,6 +188,39 @@ func (h *AuthHandler) GetProfile(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Profile retrieved successfully", admin.ToResponse())
 }
 
+// UpdateProfile updates the currently logged in admin's profile
+func (h *AuthHandler) UpdateProfile(c *gin.Context) {
+	adminID := c.GetString("admin_id")
+	if adminID == "" {
+		utils.UnauthorizedResponse(c, "Not authenticated", "")
+		return
+	}
+
+	id, err := uuid.Parse(adminID)
+	if err != nil {
+		utils.BadRequestResponse(c, "Invalid admin ID", err.Error())
+		return
+	}
+
+	var input models.UpdateAdminInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		utils.BadRequestResponse(c, "Invalid request", err.Error())
+		return
+	}
+
+	admin, err := h.authService.UpdateAdminProfile(id, &input)
+	if err != nil {
+		if err.Error() == "no fields to update" {
+			utils.BadRequestResponse(c, err.Error(), "")
+			return
+		}
+		utils.InternalServerErrorResponse(c, "Failed to update profile", err.Error())
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Profile updated successfully", admin.ToResponse())
+}
+
 // @Summary Change password
 // @Description Change the password of the currently logged in admin
 // @Tags auth

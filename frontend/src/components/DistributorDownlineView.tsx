@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Users, User, Mail, Phone, Calendar, Loader2, ChevronRight, Shield } from 'lucide-react';
+import { Users, User, Mail, Phone, Calendar, Loader2, ChevronRight, Shield, Pencil } from 'lucide-react';
+import EditDistributorProfileModal, { DistributorEditableProfile } from './EditDistributorProfileModal';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
@@ -28,8 +29,9 @@ export default function DistributorDownlineView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selected, setSelected] = useState<DownlineMember | null>(null);
+  const [editing, setEditing] = useState<DownlineMember | null>(null);
 
-  useEffect(() => {
+  const fetchDownlines = () => {
     const token = localStorage.getItem('member_token');
     if (!token) return;
 
@@ -43,6 +45,10 @@ export default function DistributorDownlineView() {
       })
       .catch(() => setError('Network error'))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchDownlines();
   }, []);
 
   if (loading) return <div className="flex justify-center py-16"><Loader2 size={32} className="animate-spin text-primary" /></div>;
@@ -80,7 +86,7 @@ export default function DistributorDownlineView() {
           <div key={d.id} className="stat-card cursor-pointer" onClick={() => setSelected(d)}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
                   {d.first_name?.charAt(0)}{d.last_name?.charAt(0)}
                 </div>
                 <div>
@@ -142,13 +148,19 @@ export default function DistributorDownlineView() {
           <div className="bg-modal rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto shadow-modal border border-border" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-6 border-b border-border">
               <h2 className="text-lg font-semibold text-text-primary">{selected.first_name} {selected.last_name}</h2>
-              <button onClick={() => setSelected(null)} className="p-1.5 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text-primary">
-                ✕
-              </button>
+              <div className="flex items-center gap-2">
+                <button onClick={(e) => { e.stopPropagation(); setEditing(selected); }}
+                  className="p-1.5 hover:bg-primary-light rounded-lg transition-colors text-primary">
+                  <Pencil size={16} />
+                </button>
+                <button onClick={() => setSelected(null)} className="p-1.5 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text-primary">
+                  ✕
+                </button>
+              </div>
             </div>
             <div className="p-6 space-y-4">
               <div className="flex items-center gap-3 mb-4">
-                <Shield size={16} className={selected.is_active ? 'text-emerald-500' : 'text-gray-400'} />
+                <Shield size={16} className={selected.is_active ? 'text-success' : 'text-text-muted'} />
                 <span className={selected.is_active ? 'badge-success' : 'badge-default'}>
                   {selected.is_active ? 'Payout On' : 'Payout Off'}
                 </span>
@@ -181,6 +193,18 @@ export default function DistributorDownlineView() {
             </div>
           </div>
         </div>
+      )}
+
+      {editing && (
+        <EditDistributorProfileModal
+          distributor={editing as unknown as DistributorEditableProfile}
+          endpoint={`/member/downline/${editing.id}`}
+          title={`Edit ${editing.first_name} ${editing.last_name}`}
+          onClose={() => setEditing(null)}
+          onSuccess={fetchDownlines}
+          hideSensitive
+          token={typeof window !== 'undefined' ? localStorage.getItem('member_token') || undefined : undefined}
+        />
       )}
     </div>
   );

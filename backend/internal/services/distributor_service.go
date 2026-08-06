@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"strings"
 
 	"rudra-admin-backend/internal/config"
 	"rudra-admin-backend/internal/models"
@@ -22,6 +23,8 @@ type DistributorService interface {
 	DeleteDistributor(memberUserID uuid.UUID) error
 	GetDownlineByMemberUserID(memberUserID uuid.UUID) ([]*models.DistributorDownlinePublic, error)
 	AdminResetPassword(memberUserID uuid.UUID, newPassword string) error
+	UpdateDistributorProfile(memberUserID uuid.UUID, input *models.UpdateMemberUserInput) (*models.MemberUser, error)
+	UpdateDownlineProfile(memberUserID uuid.UUID, downlineMemberUserID uuid.UUID, input *models.UpdateMemberUserInput) (*models.MemberUser, error)
 }
 
 type distributorService struct {
@@ -290,4 +293,130 @@ func (s *distributorService) AdminResetPassword(memberUserID uuid.UUID, newPassw
 		return err
 	}
 	return s.memberUserRepo.SetPasswordMustChange(memberUserID)
+}
+
+// UpdateDistributorProfile updates a distributor's profile (admin or self-service).
+func (s *distributorService) UpdateDistributorProfile(memberUserID uuid.UUID, input *models.UpdateMemberUserInput) (*models.MemberUser, error) {
+	if err := validateUpdateInput(input); err != nil {
+		return nil, err
+	}
+
+	user, err := s.memberUserRepo.GetByID(memberUserID)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, fmt.Errorf("distributor not found")
+	}
+
+	if err := s.memberUserRepo.UpdateProfile(memberUserID, input); err != nil {
+		return nil, err
+	}
+
+	// Sync denormalized full_name/email/phone on the members tree record
+	s.syncMemberTreeRecord(memberUserID, input)
+
+	return s.memberUserRepo.GetByID(memberUserID)
+}
+
+// UpdateDownlineProfile updates the profile of a distributor in the caller's downline tree.
+// It verifies the target is actually a downline member of the caller before allowing edits.
+func (s *distributorService) UpdateDownlineProfile(memberUserID uuid.UUID, downlineMemberUserID uuid.UUID, input *models.UpdateMemberUserInput) (*models.MemberUser, error) {
+	if err := validateUpdateInput(input); err != nil {
+		return nil, err
+	}
+
+	// Load caller's own member tree node
+	callerMember, err := s.memberTreeRepo.GetByMemberUserID(memberUserID)
+	if err != nil {
+		return nil, err
+	}
+	if callerMember == nil {
+		return nil, fmt.Errorf("distributor tree record not found")
+	}
+
+	// Load target's member tree node
+	targetMember, err := s.memberTreeRepo.GetByMemberUserID(downlineMemberUserID)
+	if err != nil {
+		return nil, err
+	}
+	if targetMember == nil {
+		return nil, fmt.Errorf("downline distributor not found")
+	}
+
+	// Verify target is a downline of the caller
+	if targetMember.ID == callerMember.ID {
+		return nil, fmt.Errorf("cannot edit your own profile in downline")
+	}
+	allDownline, err := s.memberTreeRepo.GetDownline(callerMember.ID, 12)
+	if err != nil {
+		return nil, err
+	}
+	isDownline := false
+	for _, d := range allDownline {
+		if d.ID == targetMember.ID {
+			isDownline = true
+			break
+		}
+	}
+	if !isDownline {
+		return nil, fmt.Errorf("target is not in your downline")
+	}
+
+	if err := s.memberUserRepo.UpdateProfile(downlineMemberUserID, input); err != nil {
+		return nil, err
+	}
+
+	s.syncMemberTreeRecord(downlineMemberUserID, input)
+
+	return s.memberUserRepo.GetByID(downlineMemberUserID)
+}
+
+// syncMemberTreeRecord keeps the members table in sync when name/contact fields change.
+func (s *distributorService) syncMemberTreeRecord(memberUserID uuid.UUID, input *models.UpdateMemberUserInput) {
+	member, err := s.memberTreeRepo.GetByMemberUserID(memberUserID)
+	if err != nil || member == nil {
+		return
+	}
+	changed := false
+	if input.FirstName != "" || input.LastName != "" {
+		// Recompute full name from the authoritative member_user record
+		if user, err := s.memberUserRepo.GetByID(memberUserID); err == nil && user != nil {
+			member.FullName = strings.TrimSpace(user.FirstName) + " " + strings.TrimSpace(user.LastName)
+			changed = true
+		}
+	}
+	if input.Email != "" {
+		member.Email = strings.TrimSpace(strings.ToLower(input.Email))
+		changed = true
+	}
+	if input.Mobile != "" {
+		member.Phone = strings.TrimSpace(input.Mobile)
+		changed = true
+	}
+	if changed {
+		if err := s.memberTreeRepo.Update(member); err != nil {
+			s.logger.Error(err, "Failed to sync member tree record", map[string]interface{}{"member_user_id": memberUserID.String()})
+		}
+	}
+}
+
+// validateUpdateInput validates the set of editable profile fields.
+func validateUpdateInput(input *models.UpdateMemberUserInput) error {
+	if input == nil || input.IsEmpty() {
+		return fmt.Errorf("no fields to update")
+	}
+	if input.Mobile != "" && len(input.Mobile) < 8 {
+		return fmt.Errorf("mobile number must be at least 8 characters")
+	}
+	if input.Email != "" && !strings.Contains(input.Email, "@") {
+		return fmt.Errorf("invalid email address")
+	}
+	if len(input.FirstName) > 100 {
+		return fmt.Errorf("first name is too long")
+	}
+	if len(input.LastName) > 100 {
+		return fmt.Errorf("last name is too long")
+	}
+	return nil
 }

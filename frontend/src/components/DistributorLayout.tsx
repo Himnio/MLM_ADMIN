@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Menu, Bell, User, LogOut, KeyRound, Sun, Moon, LayoutDashboard, Users, Link2, GitBranch, ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { ThemeToggle, useTheme } from './ThemeProvider';
+import { Menu, Bell, User, LogOut, KeyRound, Sun, Moon, LayoutDashboard, Users, Link2, GitBranch, ChevronLeft, ChevronRight, X, Pencil } from 'lucide-react';
+import { useTheme } from './ThemeProvider';
+import EditDistributorProfileModal, { DistributorEditableProfile } from './EditDistributorProfileModal';
 
 const API_BASE = '/api/v1';
 
@@ -28,6 +29,7 @@ interface DistributorLayoutProps {
   children: React.ReactNode;
   title: string;
   profileName?: string;
+  onProfileUpdated?: (profile: DistributorEditableProfile) => void;
 }
 
 export default function DistributorLayout({
@@ -37,6 +39,7 @@ export default function DistributorLayout({
   children,
   title,
   profileName,
+  onProfileUpdated,
 }: DistributorLayoutProps) {
   const { setRole } = useTheme();
   
@@ -53,7 +56,40 @@ export default function DistributorLayout({
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changeError, setChangeError] = useState('');
   const [changing, setChanging] = useState(false);
+  const [editProfileData, setEditProfileData] = useState<DistributorEditableProfile | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  const openEditProfile = async () => {
+    setProfileOpen(false);
+    setLoadingProfile(true);
+    const token = localStorage.getItem('member_token');
+    try {
+      const res = await fetch(`${API_BASE}/member/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then(r => r.json());
+      if (res.success && res.data) {
+        setEditProfileData(res.data as DistributorEditableProfile);
+      }
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
+
+  const refreshProfile = async () => {
+    const token = localStorage.getItem('member_token');
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_BASE}/member/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then(r => r.json());
+      if (res.success && res.data) {
+        const profile = res.data as DistributorEditableProfile;
+        localStorage.setItem('member_user', JSON.stringify(res.data));
+        onProfileUpdated?.(profile);
+      }
+    } catch {}
+  };
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -110,21 +146,21 @@ export default function DistributorLayout({
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between h-16 px-4 border-b border-white/10">
+      <div className="flex items-center justify-between h-16 px-4 border-b border-border">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/25">
+          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
             <span className="text-white font-bold text-sm">D</span>
           </div>
           {!sidebarCollapsed && (
             <div className="min-w-0">
-              <h1 className="text-sm font-bold text-white truncate">Distributor</h1>
-              <p className="text-[10px] text-gray-500 truncate">Partner Panel</p>
+              <h1 className="text-sm font-bold text-text-primary truncate">Distributor</h1>
+              <p className="text-[10px] text-text-muted truncate">Partner Panel</p>
             </div>
           )}
         </div>
         <button
           onClick={() => setMobileOpen(false)}
-          className="lg:hidden p-1.5 rounded-lg hover:bg-white/10 text-gray-400 transition-colors"
+          className="lg:hidden p-1.5 rounded-lg hover:bg-surface-hover text-text-muted transition-colors"
         >
           <X size={18} />
         </button>
@@ -151,17 +187,17 @@ export default function DistributorLayout({
         })}
       </nav>
 
-      <div className="border-t border-white/10 p-4 space-y-2">
+      <div className="border-t border-border p-4 space-y-2">
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="hidden lg:flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-sidebar-hover transition-all duration-200"
+          className="hidden lg:flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-text-muted hover:text-text-primary hover:bg-surface-hover transition-all duration-200"
         >
           {sidebarCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           {!sidebarCollapsed && <span>Collapse</span>}
         </button>
         <button
           onClick={onLogout}
-          className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-danger hover:bg-danger-light/20 transition-all duration-200"
+          className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-text-muted hover:text-danger hover:bg-danger-light transition-all duration-200"
           title="Logout"
         >
           <LogOut size={18} />
@@ -227,7 +263,6 @@ export default function DistributorLayout({
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <ThemeToggle />
             <button className="btn-icon text-text-secondary relative" aria-label="Notifications">
               <Bell size={20} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-danger rounded-full ring-2 ring-header" />
@@ -237,7 +272,7 @@ export default function DistributorLayout({
               <div onClick={() => setProfileOpen(!profileOpen)}
                 className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-surface-hover transition-colors cursor-pointer"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
                   {profileName ? profileName.charAt(0).toUpperCase() : 'D'}
                 </div>
                 <div className="text-left">
@@ -256,6 +291,12 @@ export default function DistributorLayout({
                   >
                     <KeyRound size={16} />
                     Change Password
+                  </button>
+                  <button onClick={openEditProfile}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:bg-surface-hover transition-colors"
+                  >
+                    <Pencil size={16} />
+                    Edit Profile
                   </button>
                 </div>
               )}
@@ -343,6 +384,17 @@ export default function DistributorLayout({
           })}
         </div>
       </nav>
+
+      {editProfileData && (
+        <EditDistributorProfileModal
+          distributor={editProfileData}
+          endpoint="/member/profile"
+          title={loadingProfile ? 'Loading...' : 'Edit My Profile'}
+          onClose={() => setEditProfileData(null)}
+          onSuccess={refreshProfile}
+          token={typeof window !== 'undefined' ? localStorage.getItem('member_token') || undefined : undefined}
+        />
+      )}
     </div>
   );
 }

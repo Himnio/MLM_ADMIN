@@ -139,9 +139,9 @@ export default function ReferralsView() {
             {treeSummary && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 bg-surface rounded-lg">
                 <div><p className="text-xs text-text-muted">Total Members</p><p className="text-lg font-bold text-text-primary">{treeSummary.total_members}</p></div>
-                <div><p className="text-xs text-text-muted">Active</p><p className="text-lg font-bold text-emerald-600">{treeSummary.active_members}</p></div>
+                <div><p className="text-xs text-text-muted">Active</p><p className="text-lg font-bold text-success">{treeSummary.active_members}</p></div>
                 <div><p className="text-xs text-text-muted">Total Levels</p><p className="text-lg font-bold text-primary">{treeSummary.total_levels}</p></div>
-                <div><p className="text-xs text-text-muted">Total Income</p><p className="text-lg font-bold text-emerald-600">{formatCurrency(treeSummary.total_income)}</p></div>
+                <div><p className="text-xs text-text-muted">Total Income</p><p className="text-lg font-bold text-success">{formatCurrency(treeSummary.total_income)}</p></div>
               </div>
             )}
 
@@ -150,7 +150,7 @@ export default function ReferralsView() {
                 <div><p className="text-xs text-text-muted">Total Referrals</p><p className="text-lg font-bold text-primary">{stats.total_referrals}</p></div>
                 <div><p className="text-xs text-text-muted">Direct</p><p className="text-lg font-bold text-text-primary">{stats.direct_referrals}</p></div>
                 <div><p className="text-xs text-text-muted">Indirect</p><p className="text-lg font-bold text-text-primary">{stats.indirect_referrals}</p></div>
-                <div><p className="text-xs text-text-muted">Max Depth</p><p className="text-lg font-bold text-purple-600">{stats.max_tree_depth}</p></div>
+                <div><p className="text-xs text-text-muted">Max Depth</p><p className="text-lg font-bold text-primary">{stats.max_tree_depth}</p></div>
               </div>
             )}
 

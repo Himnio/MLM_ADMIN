@@ -5,9 +5,10 @@ import { api } from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
 import {
   Search, Users, ChevronRight, ChevronDown, Loader2, Shield,
-  User, Mail, Phone, Calendar, MapPin, CreditCard, Building2, ToggleLeft, ToggleRight, Trash2, X, Share2,
+  User, Mail, Phone, Calendar, MapPin, CreditCard, Building2, ToggleLeft, ToggleRight, Trash2, X, Share2, Pencil,
 } from 'lucide-react';
 import { RudraTreeWrapper, TreeNode as RudraTreeNode } from './RudraTree';
+import EditDistributorProfileModal, { DistributorEditableProfile } from './EditDistributorProfileModal';
 
 interface ApiTreeNode {
   id: string;
@@ -85,6 +86,7 @@ export default function AdminDistributorView() {
   const [resetPasswordValue, setResetPasswordValue] = useState('');
   const [resetError, setResetError] = useState('');
   const [resetting, setResetting] = useState(false);
+  const [editingDistributor, setEditingDistributor] = useState<Distributor | null>(null);
 
   const fetchDistributors = useCallback(async () => {
     setLoading(true);
@@ -235,7 +237,7 @@ export default function AdminDistributorView() {
               <ChevronRight size={14} className={`transition-transform ${expanded ? 'rotate-90' : ''}`} />
             ) : null}
           </button>
-          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
+          <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
             {node.first_name?.charAt(0)}{node.last_name?.charAt(0)}
           </div>
           <span className="flex-1 truncate font-medium text-text-primary min-w-0">
@@ -338,7 +340,7 @@ export default function AdminDistributorView() {
                       <td>
                         <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
                           <button onClick={() => confirmToggleActive(d)} disabled={togglingId === d.id}
-                            className={`btn-icon border border-border ${d.is_active ? 'text-emerald-500' : 'text-gray-400'}`}
+                            className={`btn-icon border border-border ${d.is_active ? 'text-success' : 'text-text-muted'}`}
                             title={d.is_active ? 'Disable Payout' : 'Enable Payout'}
                           >
                             {togglingId === d.id ? <Loader2 size={14} className="animate-spin" /> : d.is_active ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
@@ -437,7 +439,11 @@ export default function AdminDistributorView() {
                   </button>
                 )}
                 {isSuperAdmin && (
-                  <div className="pt-3 mt-3 border-t border-border">
+                  <div className="pt-3 mt-3 border-t border-border space-y-2">
+                    <button onClick={() => setEditingDistributor(selected)}
+                      className="w-full py-2.5 rounded-xl font-medium text-sm text-primary bg-primary/10 hover:bg-primary/20 transition-all flex items-center justify-center gap-2">
+                      <Pencil size={15} /> Edit Profile
+                    </button>
                     <button onClick={() => { setShowResetPassword(true); setResetPasswordValue(''); setResetError(''); }}
                       className="w-full py-2.5 rounded-xl font-medium text-sm text-white bg-danger hover:bg-danger/80 transition-all">
                       Reset Password
@@ -500,6 +506,16 @@ export default function AdminDistributorView() {
             </div>
           </div>
         </div>
+      )}
+
+      {editingDistributor && (
+        <EditDistributorProfileModal
+          distributor={editingDistributor as DistributorEditableProfile}
+          endpoint={`/admin/distributors/${editingDistributor.id}`}
+          title={`Edit ${editingDistributor.first_name} ${editingDistributor.last_name}`}
+          onClose={() => setEditingDistributor(null)}
+          onSuccess={fetchDistributors}
+        />
       )}
 
       {confirmToggle && (

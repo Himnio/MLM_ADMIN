@@ -14,217 +14,77 @@
     --transition-slow: 300ms ease-out;
   }
 
-  /* Light Theme - Admin (Default) */
-  [data-theme="light"][data-role="admin"] {
+  /* ============================================================
+     Flat Neutral — Single Light Theme
+     Plain white surfaces, near-black text, one dark accent.
+     Uniform across Admin and Distributor roles.
+     ============================================================ */
+  :root,
+  [data-theme="light"],
+  [data-theme="dark"] {
+    color-scheme: light;
+
     --bg-primary: #ffffff;
-    --bg-secondary: #f8fafc;
-    --bg-surface: #f1f5f9;
-    --bg-surface-hover: #e2e8f0;
+    --bg-secondary: #f8f9fb;
+    --bg-surface: #f2f3f6;
+    --bg-surface-hover: #e9ebef;
     --bg-surface-elevated: #ffffff;
     --bg-input: #ffffff;
-    --bg-header: rgba(255, 255, 255, 0.85);
-    --bg-sidebar: #0f172a;
+    --bg-input-hover: #f4f5f8;
+    --bg-header: rgba(255, 255, 255, 0.95);
+    --bg-sidebar: #fbfcfd;
     --bg-card: #ffffff;
-    --bg-card-hover: #f8fafc;
+    --bg-card-hover: #f7f8fa;
     --bg-modal: #ffffff;
-    --bg-glass: rgba(255, 255, 255, 0.7);
-    --bg-gradient-start: #6366f1;
-    --bg-gradient-end: #4f46e5;
+    --bg-glass: rgba(255, 255, 255, 0.9);
+    --bg-gradient-start: #111827;
+    --bg-gradient-end: #111827;
 
-    --text-primary: #0f172a;
-    --text-secondary: #334155;
-    --text-muted: #94a3b8;
+    --text-primary: #101318;
+    --text-secondary: #2f3440;
+    --text-muted: #5a6170;
     --text-inverse: #ffffff;
-    --text-sidebar: #94a3b8;
-    --text-sidebar-active: #ffffff;
+    --text-sidebar: #23282f;
+    --text-sidebar-active: #0f1115;
 
-    --border-primary: #e2e8f0;
-    --border-secondary: #cbd5e1;
-    --border-input: #e2e8f0;
-    --border-sidebar: #1e293b;
+    --border-primary: #d9dce1;
+    --border-secondary: #c2c6cd;
+    --border-input: #c2c6cd;
+    --border-sidebar: #e2e5ea;
 
-    --primary: #6366f1;
-    --primary-dark: #4f46e5;
-    --primary-light: #eef2ff;
-    --primary-hover: #4f46e5;
+    --primary: #111827;
+    --primary-dark: #000000;
+    --primary-light: rgba(17, 24, 39, 0.09);
+    --primary-hover: #374151;
 
-    --success: #10b981;
-    --success-light: #d1fae5;
-    --warning: #f59e0b;
-    --warning-light: #fef3c7;
-    --danger: #ef4444;
-    --danger-light: #fee2e2;
-    --info: #3b82f6;
-    --info-light: #dbeafe;
+    --success: #059669;
+    --success-light: rgba(5, 150, 105, 0.12);
+    --warning: #b45309;
+    --warning-light: rgba(180, 83, 9, 0.12);
+    --danger: #dc2626;
+    --danger-light: rgba(220, 38, 38, 0.12);
+    --info: #2563eb;
+    --info-light: rgba(37, 99, 235, 0.12);
 
-    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.03);
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
-    --shadow-card: 0 1px 3px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.04);
-    --shadow-card-hover: 0 10px 24px rgb(0 0 0 / 0.08), 0 4px 8px rgb(0 0 0 / 0.04);
-    --shadow-modal: 0 25px 50px -12px rgb(0 0 0 / 0.15);
-    --shadow-sidebar: 4px 0 20px -2px rgb(0 0 0 / 0.06);
-    --shadow-glow: 0 0 24px rgb(99 102 241 / 0.25);
+    --shadow-xs: 0 1px 2px 0 rgb(17 24 39 / 0.06);
+    --shadow-sm: 0 1px 3px 0 rgb(17 24 39 / 0.1);
+    --shadow-card: 0 1px 3px rgb(17 24 39 / 0.08), 0 1px 2px rgb(17 24 39 / 0.05);
+    --shadow-card-hover: 0 6px 20px rgb(17 24 39 / 0.12), 0 2px 6px rgb(17 24 39 / 0.08);
+    --shadow-modal: 0 20px 60px -12px rgb(17 24 39 / 0.28);
+    --shadow-sidebar: 1px 0 12px rgb(17 24 39 / 0.08);
+    --shadow-glow: 0 0 24px rgb(17 24 39 / 0.12);
   }
 
-  /* Dark Theme - Admin */
-  [data-theme="dark"][data-role="admin"] {
-    --bg-primary: #070b14;
-    --bg-secondary: #0d1117;
-    --bg-surface: #0d1117;
-    --bg-surface-hover: #161b22;
-    --bg-surface-elevated: #070b14;
-    --bg-input: #161b22;
-    --bg-header: rgba(13, 17, 23, 0.92);
-    --bg-sidebar: #070b14;
-    --bg-card: #161b22;
-    --bg-card-hover: #1c2333;
-    --bg-modal: #161b22;
-    --bg-glass: rgba(22, 27, 34, 0.8);
-    --bg-gradient-start: #818cf8;
-    --bg-gradient-end: #6366f1;
-
-    --text-primary: #f0f6fc;
-    --text-secondary: #c9d1d9;
-    --text-muted: #8b949e;
-    --text-inverse: #0d1117;
-    --text-sidebar: #8b949e;
-    --text-sidebar-active: #f0f6fc;
-
-    --border-primary: #21262d;
-    --border-secondary: #30363d;
-    --border-input: #30363d;
-    --border-sidebar: #161b22;
-
-    --primary: #818cf8;
-    --primary-dark: #6366f1;
-    --primary-light: rgba(129, 140, 248, 0.12);
-    --primary-hover: #a5b4fc;
-
-    --success: #3fb950;
-    --success-light: rgba(63, 185, 80, 0.12);
-    --warning: #d29922;
-    --warning-light: rgba(210, 153, 34, 0.12);
-    --danger: #f85149;
-    --danger-light: rgba(248, 81, 73, 0.12);
-    --info: #58a6ff;
-    --info-light: rgba(88, 166, 255, 0.12);
-
-    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
-    --shadow-card: 0 4px 12px rgb(0 0 0 / 0.3), 0 1px 3px rgb(0 0 0 / 0.4);
-    --shadow-card-hover: 0 8px 24px rgb(0 0 0 / 0.4);
-    --shadow-modal: 0 16px 48px rgb(0 0 0 / 0.5);
-    --shadow-sidebar: 2px 0 16px rgb(0 0 0 / 0.3);
-    --shadow-glow: 0 0 24px rgb(129 140 248 / 0.35);
+  /* Distributor role uses the same flat neutral palette for uniformity */
+  [data-role="distributor"] {
+    --primary: #111827;
+    --primary-dark: #000000;
+    --primary-hover: #374151;
+    --primary-light: rgba(17, 24, 39, 0.07);
+    --bg-gradient-start: #111827;
+    --bg-gradient-end: #111827;
+    --shadow-glow: 0 0 24px rgb(17 24 39 / 0.1);
   }
-
-  /* Light Theme - Distributor */
-  [data-theme="light"][data-role="distributor"] {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f0fdf4;
-    --bg-surface: #f0fdf4;
-    --bg-surface-hover: #dcfce7;
-    --bg-surface-elevated: #ffffff;
-    --bg-input: #ffffff;
-    --bg-header: rgba(255, 255, 255, 0.85);
-    --bg-sidebar: #064e3b;
-    --bg-card: #ffffff;
-    --bg-card-hover: #f0fdf4;
-    --bg-modal: #ffffff;
-    --bg-glass: rgba(255, 255, 255, 0.7);
-    --bg-gradient-start: #10b981;
-    --bg-gradient-end: #059669;
-
-    --text-primary: #064e3b;
-    --text-secondary: #047857;
-    --text-muted: #6b8e7a;
-    --text-inverse: #ffffff;
-    --text-sidebar: #6ee7b7;
-    --text-sidebar-active: #ffffff;
-
-    --border-primary: #bbf7d0;
-    --border-secondary: #86efac;
-    --border-input: #bbf7d0;
-    --border-sidebar: #065f46;
-
-    --primary: #10b981;
-    --primary-dark: #059669;
-    --primary-light: #d1fae5;
-    --primary-hover: #059669;
-
-    --success: #10b981;
-    --success-light: #d1fae5;
-    --warning: #f59e0b;
-    --warning-light: #fef3c7;
-    --danger: #ef4444;
-    --danger-light: #fee2e2;
-    --info: #3b82f6;
-    --info-light: #dbeafe;
-
-    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.03);
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
-    --shadow-card: 0 1px 3px rgb(16 185 129 / 0.08), 0 1px 2px rgb(16 185 129 / 0.06);
-    --shadow-card-hover: 0 10px 24px rgb(16 185 129 / 0.12), 0 4px 8px rgb(16 185 129 / 0.08);
-    --shadow-modal: 0 25px 50px -12px rgb(0 0 0 / 0.15);
-    --shadow-sidebar: 4px 0 20px -2px rgb(16 185 129 / 0.12);
-    --shadow-glow: 0 0 24px rgb(16 185 129 / 0.25);
-  }
-
-  /* Dark Theme - Distributor */
-  [data-theme="dark"][data-role="distributor"] {
-    --bg-primary: #051f17;
-    --bg-secondary: #0a2d22;
-    --bg-surface: #0a2d22;
-    --bg-surface-hover: #0f3d2f;
-    --bg-surface-elevated: #051f17;
-    --bg-input: #0f3d2f;
-    --bg-header: rgba(10, 45, 34, 0.92);
-    --bg-sidebar: #051f17;
-    --bg-card: #0f3d2f;
-    --bg-card-hover: #144d3c;
-    --bg-modal: #0f3d2f;
-    --bg-glass: rgba(15, 61, 47, 0.8);
-    --bg-gradient-start: #34d399;
-    --bg-gradient-end: #10b981;
-
-    --text-primary: #ecfdf5;
-    --text-secondary: #a7f3d0;
-    --text-muted: #6ee7b7;
-    --text-inverse: #0a2d22;
-    --text-sidebar: #6ee7b7;
-    --text-sidebar-active: #ecfdf5;
-
-    --border-primary: #0f3d2f;
-    --border-secondary: #145d48;
-    --border-input: #145d48;
-    --border-sidebar: #0a2d22;
-
-    --primary: #34d399;
-    --primary-dark: #10b981;
-    --primary-light: rgba(52, 211, 153, 0.12);
-    --primary-hover: #6ee7b7;
-
-    --success: #34d399;
-    --success-light: rgba(52, 211, 153, 0.12);
-    --warning: #fbbf24;
-    --warning-light: rgba(251, 191, 36, 0.12);
-    --danger: #f87171;
-    --danger-light: rgba(248, 113, 113, 0.12);
-    --info: #60a5fa;
-    --info-light: rgba(96, 165, 250, 0.12);
-
-    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
-    --shadow-card: 0 4px 12px rgb(0 0 0 / 0.3), 0 1px 3px rgb(0 0 0 / 0.4);
-    --shadow-card-hover: 0 8px 24px rgb(0 0 0 / 0.4);
-    --shadow-modal: 0 16px 48px rgb(0 0 0 / 0.5);
-    --shadow-sidebar: 2px 0 16px rgb(0 0 0 / 0.3);
-    --shadow-glow: 0 0 24px rgb(52 211 153 / 0.35);
-  }
-
-  /* Generic light/dark */
-  [data-theme="light"] { color-scheme: light; }
-  [data-theme="dark"] { color-scheme: dark; }
 
   html { scroll-behavior: smooth; }
 
@@ -272,10 +132,7 @@
   }
   .sidebar-link.active {
     color: var(--text-sidebar-active);
-    background: rgba(129, 140, 248, 0.1);
-  }
-  [data-role="distributor"] .sidebar-link.active {
-    background: rgba(52, 211, 153, 0.1);
+    background: var(--primary-light);
   }
   .sidebar-link.active::before {
     content: '';
@@ -352,19 +209,6 @@
     color: var(--text-secondary);
   }
   .btn-icon:hover { background-color: var(--bg-surface-hover); }
-
-  /* Theme toggle pill */
-  .theme-toggle-btn {
-    @apply flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium
-           border transition-all duration-200 cursor-pointer select-none;
-    background-color: var(--bg-surface);
-    color: var(--text-secondary);
-    border-color: var(--border-primary);
-  }
-  .theme-toggle-btn:hover {
-    background-color: var(--bg-surface-hover);
-    border-color: var(--border-secondary);
-  }
 
   /* Tables */
   .data-table { @apply w-full; }

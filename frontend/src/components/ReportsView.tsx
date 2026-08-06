@@ -106,10 +106,10 @@ export default function ReportsView() {
       )}
 
       {dashboardMetrics && (
-        <div className="stat-card bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+        <div className="stat-card">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div><p className="text-xs text-text-muted">Total Members</p><p className="text-2xl font-bold text-text-primary mt-1">{dashboardMetrics.total_members}</p></div>
-            <div><p className="text-xs text-text-muted">Active Members</p><p className="text-2xl font-bold text-emerald-600 mt-1">{dashboardMetrics.active_members}</p></div>
+            <div><p className="text-xs text-text-muted">Active Members</p><p className="text-2xl font-bold text-success mt-1">{dashboardMetrics.active_members}</p></div>
             <div><p className="text-xs text-text-muted">Total Referrals</p><p className="text-2xl font-bold text-text-primary mt-1">{dashboardMetrics.total_referrals}</p></div>
             <div><p className="text-xs text-text-muted">Growth Rate</p><p className="text-2xl font-bold text-primary mt-1">{dashboardMetrics.growth_rate}%</p></div>
           </div>
@@ -164,7 +164,7 @@ export default function ReportsView() {
               <p className="text-sm text-text-secondary mb-2">Memory Usage</p>
               <div className="w-full h-2.5 bg-border rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all"
+                  className="h-full bg-primary rounded-full transition-all"
                   style={{ width: `${(health.memory_used / (health.memory_used + health.memory_free)) * 100}%` }}
                 />
               </div>

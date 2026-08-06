@@ -8,6 +8,7 @@ import (
 	"rudra-admin-backend/internal/repositories"
 	"rudra-admin-backend/internal/utils"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -23,6 +24,7 @@ type DashboardService interface {
 	GetIncomeChartData(period string) (*IncomeChartData, error)
 	GetMemberGrowthChart(period string) (*MemberGrowthChart, error)
 	GetLevelDistribution() (*LevelDistribution, error)
+	GetDistributorsByLevel() (*models.DistributorsByLevelResponse, error)
 	GetTopEarners(limit int) ([]*TopEarner, error)
 
 	// Activity
@@ -348,6 +350,97 @@ func (s *dashboardService) GetLevelDistribution() (*LevelDistribution, error) {
 		Levels: levels,
 		Counts: counts,
 	}, nil
+}
+
+// GetDistributorsByLevel returns all distributors grouped by their tree level (1-12).
+// Level 1 = root members (no sponsor), each level deeper is one step down the referral tree.
+func (s *dashboardService) GetDistributorsByLevel() (*models.DistributorsByLevelResponse, error) {
+	members, err := s.memberRepo.GetAllMembersWithLevel()
+	if err != nil {
+		return nil, err
+	}
+
+	configs, err := s.referralRepo.GetAllCommissionConfigs()
+	if err != nil {
+		return nil, err
+	}
+
+	// Compute direct downline counts for every member in one grouped query
+	var downlineCounts []struct {
+		SponsorID uuid.UUID
+		Count     int64
+	}
+	if err := s.db.Table("members").
+		Select("sponsor_id, COUNT(*) as count").
+		Where("sponsor_id IS NOT NULL AND deleted_at IS NULL").
+		Group("sponsor_id").
+		Scan(&downlineCounts).Error; err != nil {
+		return nil, err
+	}
+	countByMember := make(map[string]int, len(downlineCounts))
+	for _, dc := range downlineCounts {
+		countByMember[dc.SponsorID.String()] = int(dc.Count)
+	}
+
+	entriesByLevel := make(map[int][]*models.DistributorLevelEntry)
+	for _, m := range members {
+		entry := &models.DistributorLevelEntry{
+			Level:         m.RelationshipLevel,
+			ID:            m.ID.String(),
+			MemberID:      m.MemberCode,
+			FirstName:     m.FullName,
+			DownlineCount: countByMember[m.ID.String()],
+		}
+
+		// Enrich with member_user profile when linked
+		if m.MemberUserID != nil {
+			var profile struct {
+				MemberID  string
+				Username  string
+				FirstName string
+				LastName  string
+				Mobile    string
+				Email     string
+				IsActive  bool
+				CreatedAt time.Time
+			}
+			if err := s.db.Table("member_users").
+				Select("member_id, username, first_name, last_name, mobile, email, is_active, created_at").
+				Where("id = ?", m.MemberUserID).
+				Scan(&profile).Error; err == nil {
+				entry.ID = m.MemberUserID.String()
+				entry.MemberID = profile.MemberID
+				entry.Username = profile.Username
+				entry.FirstName = profile.FirstName
+				entry.LastName = profile.LastName
+				entry.Mobile = profile.Mobile
+				entry.Email = profile.Email
+				entry.IsActive = profile.IsActive
+				entry.CreatedAt = profile.CreatedAt.Format("2006-01-02T15:04:05Z")
+			}
+		}
+
+		entriesByLevel[m.RelationshipLevel] = append(entriesByLevel[m.RelationshipLevel], entry)
+	}
+
+	levels := make([]*models.DistributorLevelGroup, 0, len(configs))
+	for _, c := range configs {
+		entries := entriesByLevel[c.Level]
+		if entries == nil {
+			entries = []*models.DistributorLevelEntry{}
+		}
+		levels = append(levels, &models.DistributorLevelGroup{
+			Level:                c.Level,
+			Count:                len(entries),
+			FilledSeats:          len(entries),
+			SeatCapacity:         c.SeatCapacity,
+			IncomeAmount:         c.IncomeAmount,
+			CommissionPercentage: c.CommissionPercentage,
+			Distributors:         entries,
+		})
+	}
+
+	return &models.DistributorsByLevelResponse{Levels: levels}, nil
 }
 
 // GetTopEarners returns top earning members

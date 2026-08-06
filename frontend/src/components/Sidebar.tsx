@@ -12,9 +12,10 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Layers,
 } from 'lucide-react';
 
-export type SectionKey = 'dashboard' | 'members' | 'referral-link' | 'referral-search' | 'referrals' | 'income' | 'reports';
+export type SectionKey = 'dashboard' | 'members' | 'referral-link' | 'referral-search' | 'referrals' | 'income' | 'reports' | 'distributor-levels';
 
 interface NavItem {
   key: SectionKey;
@@ -25,6 +26,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { key: 'members', label: 'Distributors', icon: Users },
+  { key: 'distributor-levels', label: 'Distributor Levels', icon: Layers },
   { key: 'referral-link', label: 'Referral Links', icon: Link2 },
   { key: 'referral-search', label: 'Referral Search', icon: Search },
   { key: 'referrals', label: 'Rudra Tree', icon: GitBranch },
@@ -54,22 +56,22 @@ export default function Sidebar({
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center justify-between h-16 px-4 border-b border-white/10">
+      <div className="flex items-center justify-between h-16 px-4 border-b border-border">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/25">
+          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
             <span className="text-white font-bold text-sm">R</span>
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <h1 className="text-sm font-bold text-white truncate">Rudra Admin</h1>
-              <p className="text-[10px] text-gray-500 truncate">Management Panel</p>
+              <h1 className="text-sm font-bold text-text-primary truncate">Rudra Admin</h1>
+              <p className="text-[10px] text-text-muted truncate">Management Panel</p>
             </div>
           )}
         </div>
         {/* Mobile close */}
         <button
           onClick={onMobileClose}
-          className="lg:hidden p-1.5 rounded-lg hover:bg-white/10 text-gray-400 transition-colors"
+          className="lg:hidden p-1.5 rounded-lg hover:bg-surface-hover text-text-muted transition-colors"
         >
           <X size={18} />
         </button>
@@ -98,11 +100,11 @@ export default function Sidebar({
       </nav>
 
       {/* Collapse toggle (desktop) + Logout */}
-      <div className="border-t border-white/10 p-4 space-y-2">
+      <div className="border-t border-border p-4 space-y-2">
         {/* Collapse button - desktop only */}
         <button
           onClick={onToggle}
-          className="hidden lg:flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-sidebar-hover transition-all duration-200"
+          className="hidden lg:flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-text-muted hover:text-text-primary hover:bg-surface-hover transition-all duration-200"
         >
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           {!collapsed && <span>Collapse</span>}
@@ -111,7 +113,7 @@ export default function Sidebar({
         {/* Logout */}
         <button
           onClick={onLogout}
-          className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-danger hover:bg-danger-light/20 transition-all duration-200"
+          className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-text-muted hover:text-danger hover:bg-danger-light transition-all duration-200"
           title="Logout"
         >
           <LogOut size={18} />
@@ -126,7 +128,7 @@ export default function Sidebar({
       {/* Desktop sidebar */}
       <aside
         className={`hidden lg:flex flex-col fixed left-0 top-0 h-full z-30
-          bg-sidebar shadow-sidebar
+          bg-sidebar border-r border-border shadow-sidebar
           transition-all duration-300 ease-in-out
           ${collapsed ? 'w-[72px]' : 'w-[var(--sidebar-width)]'}
         `}

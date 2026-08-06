@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"rudra-admin-backend/internal/config"
+	"rudra-admin-backend/internal/models"
 	"rudra-admin-backend/internal/services"
 	"rudra-admin-backend/internal/utils"
 
@@ -274,4 +275,121 @@ func (h *DistributorHandler) GetOwnTree(c *gin.Context) {
 	}
 
 	utils.SuccessResponse(c, http.StatusOK, "Tree retrieved", tree)
+}
+
+// Admin: update a distributor's profile
+func (h *DistributorHandler) UpdateDistributor(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		utils.BadRequestResponse(c, "Invalid distributor ID", "")
+		return
+	}
+
+	var req models.UpdateMemberUserInput
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.BadRequestResponse(c, "Invalid request", err.Error())
+		return
+	}
+
+	user, err := h.service.UpdateDistributorProfile(id, &req)
+	if err != nil {
+		if err.Error() == "distributor not found" {
+			utils.NotFoundResponse(c, "Distributor not found", "")
+			return
+		}
+		if err.Error() == "no fields to update" {
+			utils.BadRequestResponse(c, err.Error(), "")
+			return
+		}
+		h.logger.Error(err, "Failed to update distributor", nil)
+		utils.InternalServerErrorResponse(c, "Failed to update distributor", "")
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Distributor updated successfully", models.ToMemberUserPublic(user))
+}
+
+// Distributor: update their own profile
+func (h *DistributorHandler) UpdateOwnProfile(c *gin.Context) {
+	userIDStr := c.GetString("member_user_id")
+	if userIDStr == "" {
+		utils.UnauthorizedResponse(c, "Not authenticated", "")
+		return
+	}
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		utils.UnauthorizedResponse(c, "Invalid user ID", "")
+		return
+	}
+
+	var input models.UpdateMemberUserInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		utils.BadRequestResponse(c, "Invalid request", err.Error())
+		return
+	}
+
+	user, err := h.service.UpdateDistributorProfile(userID, &input)
+	if err != nil {
+		if err.Error() == "distributor not found" {
+			utils.NotFoundResponse(c, "Distributor not found", "")
+			return
+		}
+		if err.Error() == "no fields to update" {
+			utils.BadRequestResponse(c, err.Error(), "")
+			return
+		}
+		h.logger.Error(err, "Failed to update profile", nil)
+		utils.InternalServerErrorResponse(c, "Failed to update profile", "")
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Profile updated successfully", models.ToMemberUserPublic(user))
+}
+
+// Distributor: update a downline member's profile
+func (h *DistributorHandler) UpdateDownline(c *gin.Context) {
+	userIDStr := c.GetString("member_user_id")
+	if userIDStr == "" {
+		utils.UnauthorizedResponse(c, "Not authenticated", "")
+		return
+	}
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		utils.UnauthorizedResponse(c, "Invalid user ID", "")
+		return
+	}
+
+	idStr := c.Param("id")
+	downlineID, err := uuid.Parse(idStr)
+	if err != nil {
+		utils.BadRequestResponse(c, "Invalid downline distributor ID", "")
+		return
+	}
+
+	var input models.UpdateMemberUserInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		utils.BadRequestResponse(c, "Invalid request", err.Error())
+		return
+	}
+
+	user, err := h.service.UpdateDownlineProfile(userID, downlineID, &input)
+	if err != nil {
+		switch err.Error() {
+		case "no fields to update":
+			utils.BadRequestResponse(c, err.Error(), "")
+			return
+		case "downline distributor not found":
+			utils.NotFoundResponse(c, "Downline distributor not found", "")
+			return
+		case "target is not in your downline", "cannot edit your own profile in downline", "distributor tree record not found":
+			utils.ForbiddenResponse(c, err.Error(), "")
+			return
+		}
+		h.logger.Error(err, "Failed to update downline profile", nil)
+		utils.InternalServerErrorResponse(c, "Failed to update downline", "")
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Downline distributor updated successfully", models.ToMemberUserPublic(user))
 }

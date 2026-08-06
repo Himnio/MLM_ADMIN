@@ -28,6 +28,7 @@ type MemberRepository interface {
 	CheckCircularReference(sponsorID, memberID uuid.UUID) (bool, error)
 	HardDeleteByMemberUserID(memberUserID uuid.UUID) error
 	GetImmediateDownline(sponsorID uuid.UUID) ([]*models.Member, error)
+	GetAllMembersWithLevel() ([]*models.MemberWithLevel, error)
 }
 
 type memberRepository struct {
@@ -227,11 +228,43 @@ func (r *memberRepository) GetUpline(memberID uuid.UUID, maxLevel int) ([]*model
 	return members, nil
 }
 
-// GetDownlineCount returns the total downline count for a member
+// GetImmediateDownline returns direct referrals of a sponsor
 func (r *memberRepository) GetImmediateDownline(sponsorID uuid.UUID) ([]*models.Member, error) {
 	var members []*models.Member
 	err := r.db.DB.Where("sponsor_id = ?", sponsorID).Preload("Sponsor").Order("created_at DESC").Find(&members).Error
 	return members, err
+}
+
+// GetAllMembersWithLevel returns all members with their tree level (1-12)
+// using a recursive CTE. Level 1 = root members (no sponsor), each level deeper
+// is one step down the referral tree.
+func (r *memberRepository) GetAllMembersWithLevel() ([]*models.MemberWithLevel, error) {
+	var members []*models.MemberWithLevel
+
+	query := `
+		WITH RECURSIVE referral_tree AS (
+			SELECT id, sponsor_id, member_user_id, 1 as lvl
+			FROM members m
+			WHERE sponsor_id IS NULL AND deleted_at IS NULL
+
+			UNION ALL
+
+			SELECT m.id, m.sponsor_id, m.member_user_id, rt.lvl + 1
+			FROM members m
+			INNER JOIN referral_tree rt ON m.sponsor_id = rt.id
+			WHERE m.deleted_at IS NULL AND rt.lvl < 12
+		)
+		SELECT m.id, m.sponsor_id, m.member_user_id, m.status, rt.lvl as relationship_level
+		FROM referral_tree rt
+		INNER JOIN members m ON m.id = rt.id
+		ORDER BY rt.lvl, m.created_at DESC
+	`
+
+	if err := r.db.DB.Raw(query).Scan(&members).Error; err != nil {
+		return nil, err
+	}
+
+	return members, nil
 }
 
 func (r *memberRepository) GetDownlineCount(memberID uuid.UUID) (int, error) {

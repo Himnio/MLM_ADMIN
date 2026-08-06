@@ -123,6 +123,38 @@ type DistributorReferralInfo struct {
 	TotalUsed    int    `json:"total_used"`
 }
 
+// DistributorLevelEntry is a distributor grouped by their tree level (1-12)
+type DistributorLevelEntry struct {
+	ID            string  `json:"id"`
+	Level         int     `json:"level"`
+	MemberID      string  `json:"member_id"`
+	Username      string  `json:"username"`
+	FirstName     string  `json:"first_name"`
+	LastName      string  `json:"last_name"`
+	Mobile        string  `json:"mobile"`
+	Email         string  `json:"email,omitempty"`
+	IsActive      bool    `json:"is_active"`
+	CreatedAt     string  `json:"created_at"`
+	DownlineCount int     `json:"downline_count"`
+	TotalIncome   float64 `json:"total_income"`
+}
+
+// DistributorLevelGroup groups distributors and seats for a single level
+type DistributorLevelGroup struct {
+	Level                int                      `json:"level"`
+	Count                int                      `json:"count"`
+	FilledSeats          int                      `json:"filled_seats"`
+	SeatCapacity         int                      `json:"seat_capacity"`
+	IncomeAmount         float64                  `json:"income_amount"`
+	CommissionPercentage float64                  `json:"commission_percentage"`
+	Distributors         []*DistributorLevelEntry `json:"distributors"`
+}
+
+// DistributorsByLevelResponse wraps all level groups
+type DistributorsByLevelResponse struct {
+	Levels []*DistributorLevelGroup `json:"levels"`
+}
+
 func ToDistributorDownlinePublic(u *MemberUser, level int, sponsorID, sponsorName string, downlineCount int) *DistributorDownlinePublic {
 	if u == nil {
 		return nil
@@ -145,4 +177,33 @@ func ToDistributorDownlinePublic(u *MemberUser, level int, sponsorID, sponsorNam
 		DownlineCount: downlineCount,
 		Level:         level,
 	}
+}
+
+// UpdateMemberUserInput represents editable profile fields for a distributor.
+// These fields mirror the member_users table columns that can be changed
+// by an admin, by the distributor themselves, or by a distributor editing a downline member.
+type UpdateMemberUserInput struct {
+	FirstName    string `json:"first_name"`
+	LastName     string `json:"last_name"`
+	Mobile       string `json:"mobile"`
+	Gender       string `json:"gender"`
+	DOB          string `json:"dob"`
+	Address      string `json:"address"`
+	Email        string `json:"email"`
+	PanCardID    string `json:"pan_card_id"`
+	AadhaarCard  string `json:"aadhaar_card"`
+	BankAccount  string `json:"bank_account"`
+	BankIFSC     string `json:"bank_ifsc"`
+	BankBranch   string `json:"bank_branch"`
+}
+
+// IsEmpty reports whether no editable field was provided.
+func (in *UpdateMemberUserInput) IsEmpty() bool {
+	if in == nil {
+		return true
+	}
+	return in.FirstName == "" && in.LastName == "" && in.Mobile == "" &&
+		in.Gender == "" && in.DOB == "" && in.Address == "" && in.Email == "" &&
+		in.PanCardID == "" && in.AadhaarCard == "" && in.BankAccount == "" &&
+		in.BankIFSC == "" && in.BankBranch == ""
 }

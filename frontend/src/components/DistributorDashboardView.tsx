@@ -6,10 +6,10 @@ import { Users, Link2, Activity, Shield, UserCheck, Share2, Loader2, Copy, Check
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
 const STAT_ACCENTS = [
-  { from: '#10B981', to: '#059669' },
-  { from: '#6366F1', to: '#4F46E5' },
-  { from: '#8B5CF6', to: '#7C3AED' },
-  { from: '#F59E0B', to: '#D97706' },
+  { from: '#111827', to: '#374151' },
+  { from: '#374151', to: '#4B5563' },
+  { from: '#4B5563', to: '#6B7280' },
+  { from: '#6B7280', to: '#9CA3AF' },
 ];
 
 export default function DistributorDashboardView({ onNavigate }: { onNavigate?: (section: 'dashboard' | 'downline' | 'referral' | 'tree') => void }) {
@@ -113,12 +113,10 @@ export default function DistributorDashboardView({ onNavigate }: { onNavigate?: 
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
       {/* Referral Invite Card - Top Priority */}
       {data.referral_code && (
-        <div className="stat-card relative overflow-hidden border-0">
-          <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(90deg, #10B981, #059669, #0D9488)' }} />
-          <div className="absolute inset-0 opacity-40 pointer-events-none" style={{ background: 'radial-gradient(600px circle at 85% 50%, rgba(16,185,129,0.08), transparent 45%)' }} />
+        <div className="stat-card relative overflow-hidden">
           <div className="relative flex items-center justify-between gap-3 p-4 sm:p-5">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/25">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
                 <Share2 size={18} className="text-white" />
               </div>
               <div className="min-w-0">
@@ -129,16 +127,16 @@ export default function DistributorDashboardView({ onNavigate }: { onNavigate?: 
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
                 onClick={shareReferralLink}
-                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-white text-emerald-600 text-sm font-semibold hover:bg-emerald-50 transition-all duration-200 shadow-lg shadow-emerald-500/20 active:scale-95"
+                className="btn-secondary btn-sm"
               >
-                <Share2 size={16} />
+                <Share2 size={15} />
                 Share
               </button>
               <button
                 onClick={copyReferralLink}
-                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-semibold hover:from-emerald-600 hover:to-teal-700 transition-all duration-200 shadow-lg shadow-emerald-500/30 active:scale-95"
+                className="btn-primary btn-sm"
               >
-                {copied ? <CheckCheck size={16} /> : <Copy size={16} />}
+                {copied ? <CheckCheck size={15} /> : <Copy size={15} />}
                 {copied ? 'Copied!' : 'Copy'}
               </button>
             </div>
@@ -147,25 +145,22 @@ export default function DistributorDashboardView({ onNavigate }: { onNavigate?: 
       )}
 
       {/* Welcome Hero */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 p-6 sm:p-8">
-        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-white/[0.06] blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-white/[0.03] blur-3xl" />
-        <div className="absolute top-10 left-10 w-40 h-40 rounded-full bg-white/[0.04] blur-2xl" />
+      <div className="relative overflow-hidden rounded-2xl bg-card border border-border shadow-card p-6 sm:p-8">
         <div className="relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white text-xl sm:text-2xl font-bold flex-shrink-0 shadow-lg">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary flex items-center justify-center text-white text-xl sm:text-2xl font-bold flex-shrink-0">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-                <h2 className="text-xl sm:text-2xl font-bold text-white truncate">Welcome, {data.first_name}!</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-text-primary truncate">Welcome, {data.first_name}!</h2>
                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                  data.is_active ? 'bg-emerald-400/20 text-emerald-100 border border-emerald-400/30' : 'bg-white/10 text-white/70 border border-white/10'
+                  data.is_active ? 'badge-success' : 'badge-neutral'
                 }`}>
                   {data.is_active ? 'Active' : 'Inactive'}
                 </span>
               </div>
-              <p className="text-sm text-white/70 mt-1">Member ID: {data.member_id} &middot; @{data.username}</p>
+              <p className="text-sm text-text-muted mt-1">Member ID: {data.member_id} &middot; @{data.username}</p>
             </div>
           </div>
         </div>
@@ -243,8 +238,8 @@ export default function DistributorDashboardView({ onNavigate }: { onNavigate?: 
           <div className="space-y-2">
             {[
               { icon: Users, label: 'View Your Downline', color: 'text-primary', section: 'downline' as const },
-              { icon: GitBranch, label: 'Explore Rudra Tree', color: 'text-purple-500', section: 'tree' as const },
-              { icon: ExternalLink, label: 'Share Referral Link', color: 'text-emerald-500', section: 'referral' as const },
+              { icon: GitBranch, label: 'Explore Rudra Tree', color: 'text-text-secondary', section: 'tree' as const },
+              { icon: ExternalLink, label: 'Share Referral Link', color: 'text-text-secondary', section: 'referral' as const },
             ].map((action, i) => {
               const Icon = action.icon;
               return (
@@ -285,7 +280,7 @@ export default function DistributorDashboardView({ onNavigate }: { onNavigate?: 
             {data.downlines.slice(0, 5).map((d: any) => (
               <div key={d.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-surface-hover transition-colors">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                     {d.first_name?.charAt(0)}{d.last_name?.charAt(0)}
                   </div>
                   <div className="min-w-0">

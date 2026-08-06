@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"errors"
+	"strings"
 
 	"rudra-admin-backend/internal/database"
 	"rudra-admin-backend/internal/models"
@@ -22,6 +23,7 @@ type MemberUserRepository interface {
 	CountByReferralCode(code string) (int64, error)
 	GetAll(page, limit int) ([]*models.MemberUser, int64, error)
 	Update(user *models.MemberUser) error
+	UpdateProfile(id uuid.UUID, input *models.UpdateMemberUserInput) error
 	ToggleActive(id uuid.UUID) error
 	UpdatePassword(id uuid.UUID, passwordHash string) error
 	SetPasswordChanged(id uuid.UUID) error
@@ -145,6 +147,54 @@ func (r *memberUserRepository) GetAll(page, limit int) ([]*models.MemberUser, in
 
 func (r *memberUserRepository) Update(user *models.MemberUser) error {
 	return r.db.DB.Save(user).Error
+}
+
+// UpdateProfile updates only the provided editable fields on a member_user.
+// Empty string fields are skipped so callers can send a partial payload.
+func (r *memberUserRepository) UpdateProfile(id uuid.UUID, input *models.UpdateMemberUserInput) error {
+	updates := make(map[string]interface{})
+	if input.FirstName != "" {
+		updates["first_name"] = strings.TrimSpace(input.FirstName)
+	}
+	if input.LastName != "" {
+		updates["last_name"] = strings.TrimSpace(input.LastName)
+	}
+	if input.Mobile != "" {
+		updates["mobile"] = strings.TrimSpace(input.Mobile)
+	}
+	if input.Gender != "" {
+		updates["gender"] = input.Gender
+	}
+	if input.DOB != "" {
+		updates["dob"] = input.DOB
+	}
+	if input.Address != "" {
+		updates["address"] = strings.TrimSpace(input.Address)
+	}
+	if input.Email != "" {
+		updates["email"] = strings.TrimSpace(strings.ToLower(input.Email))
+	}
+	if input.PanCardID != "" {
+		updates["pan_card_id"] = strings.TrimSpace(strings.ToUpper(input.PanCardID))
+	}
+	if input.AadhaarCard != "" {
+		updates["aadhaar_card"] = strings.TrimSpace(input.AadhaarCard)
+	}
+	if input.BankAccount != "" {
+		updates["bank_account"] = strings.TrimSpace(input.BankAccount)
+	}
+	if input.BankIFSC != "" {
+		updates["bank_ifsc"] = strings.TrimSpace(strings.ToUpper(input.BankIFSC))
+	}
+	if input.BankBranch != "" {
+		updates["bank_branch"] = strings.TrimSpace(input.BankBranch)
+	}
+
+	if len(updates) == 0 {
+		return nil
+	}
+
+	return r.db.DB.Model(&models.MemberUser{}).Where("id = ?", id).Updates(updates).Error
 }
 
 func (r *memberUserRepository) ToggleActive(id uuid.UUID) error {

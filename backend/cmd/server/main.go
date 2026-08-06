@@ -235,6 +235,7 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 			{
 				authProtected.POST("/logout", authHandler.Logout)
 				authProtected.GET("/me", authHandler.GetProfile)
+				authProtected.PUT("/me", authHandler.UpdateProfile)
 				authProtected.POST("/change-password", authHandler.ChangePassword)
 				authProtected.POST("/register", middleware.RequireRole("super_admin"), authHandler.Register)
 			}
@@ -303,6 +304,7 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 				dashboardRoutes.GET("/charts/income", dashboardHandler.GetIncomeChartData)
 				dashboardRoutes.GET("/charts/growth", dashboardHandler.GetMemberGrowthChart)
 				dashboardRoutes.GET("/levels", dashboardHandler.GetLevelDistribution)
+				dashboardRoutes.GET("/distributors-by-level", dashboardHandler.GetDistributorsByLevel)
 				dashboardRoutes.GET("/top-earners", dashboardHandler.GetTopEarners)
 				dashboardRoutes.GET("/activity", dashboardHandler.GetRecentActivity)
 				dashboardRoutes.GET("/alerts", dashboardHandler.GetSystemAlerts)
@@ -322,6 +324,7 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 				referralLinkAdmin.GET("/distributor-tree/:id", distributorHandler.GetDistributorTree)
 				referralLinkAdmin.GET("/distributors/:id/downline", distributorHandler.GetDownlineByID)
 				referralLinkAdmin.POST("/distributors/:id/reset-password", middleware.RequireRole("super_admin"), distributorHandler.AdminResetPassword)
+				referralLinkAdmin.PUT("/distributors/:id", distributorHandler.UpdateDistributor)
 			}
 		}
 
@@ -336,6 +339,8 @@ func setupRouter(cfg *config.Config, db *database.PostgresDB, logger *utils.Logg
 			memberProtected.GET("/downline", distributorHandler.GetDownline)
 			memberProtected.GET("/referral-info", distributorHandler.GetReferralInfo)
 			memberProtected.GET("/tree", distributorHandler.GetOwnTree)
+			memberProtected.PUT("/profile", distributorHandler.UpdateOwnProfile)
+			memberProtected.PUT("/downline/:id", distributorHandler.UpdateDownline)
 		}
 	}
 

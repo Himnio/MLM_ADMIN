@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Menu, Bell, User, LogOut, KeyRound, X, Sun, Moon, LayoutDashboard, Users, Link2, GitBranch, BarChart3 } from 'lucide-react';
-import { ThemeToggle, useTheme } from './ThemeProvider';
+import { Menu, Bell, User, LogOut, KeyRound, X, LayoutDashboard, Users, Link2, GitBranch, BarChart3, Pencil } from 'lucide-react';
+import { useTheme } from './ThemeProvider';
 import Sidebar, { type SectionKey } from './Sidebar';
+import EditAdminProfileModal from './EditAdminProfileModal';
 
 const API_BASE = '/api/v1';
 
@@ -37,6 +38,7 @@ export default function AdminLayout({
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changeError, setChangeError] = useState('');
   const [changing, setChanging] = useState(false);
+  const [showEditProfile, setShowEditProfile] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -134,7 +136,6 @@ export default function AdminLayout({
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <ThemeToggle />
             <button className="btn-icon text-text-secondary relative" aria-label="Notifications">
               <Bell size={20} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-danger rounded-full ring-2 ring-header" />
@@ -144,7 +145,7 @@ export default function AdminLayout({
               <div onClick={() => setProfileOpen(!profileOpen)}
                 className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-surface-hover transition-colors cursor-pointer"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
                   A
                 </div>
                 <div className="text-left">
@@ -163,6 +164,12 @@ export default function AdminLayout({
                   >
                     <KeyRound size={16} />
                     Change Password
+                  </button>
+                  <button onClick={() => { setProfileOpen(false); setShowEditProfile(true); }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:bg-surface-hover transition-colors"
+                  >
+                    <Pencil size={16} />
+                    Edit Profile
                   </button>
                 </div>
               )}
@@ -256,6 +263,8 @@ export default function AdminLayout({
           })}
         </div>
       </nav>
+
+      {showEditProfile && <EditAdminProfileModal onClose={() => setShowEditProfile(false)} />}
     </div>
   );
 }

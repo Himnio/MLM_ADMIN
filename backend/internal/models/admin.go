@@ -13,6 +13,7 @@ type Admin struct {
 	Email          string         `gorm:"type:varchar(255);uniqueIndex;not null" json:"email"`
 	PasswordHash   string         `gorm:"type:varchar(255);not null" json:"-"`
 	FullName       string         `gorm:"type:varchar(255);not null" json:"full_name"`
+	Phone          string         `gorm:"type:varchar(20)" json:"phone"`
 	Role           string         `gorm:"type:varchar(50);not null;default:'admin'" json:"role"`
 	IsActive       bool           `gorm:"not null;default:true" json:"is_active"`
 	LastLogin      *time.Time     `json:"last_login,omitempty"`
@@ -106,6 +107,13 @@ type UpdateAdminInput struct {
 	FullName *string `json:"full_name,omitempty" validate:"omitempty"`
 	Role     *string `json:"role,omitempty" validate:"omitempty,oneof=admin viewer super_admin"`
 	IsActive *bool   `json:"is_active,omitempty"`
+	Phone    *string `json:"phone,omitempty" validate:"omitempty"`
+}
+
+// IsEmpty returns true if no updatable field is set
+func (u *UpdateAdminInput) IsEmpty() bool {
+	return u == nil ||
+		(u.Email == nil && u.FullName == nil && u.Role == nil && u.IsActive == nil && u.Phone == nil)
 }
 
 // AdminResponse represents the response for admin data
@@ -113,6 +121,7 @@ type AdminResponse struct {
 	ID        string     `json:"id"`
 	Email     string     `json:"email"`
 	FullName  string     `json:"full_name"`
+	Phone     string     `json:"phone,omitempty"`
 	Role      string     `json:"role"`
 	IsActive  bool       `json:"is_active"`
 	LastLogin *time.Time `json:"last_login,omitempty"`
@@ -126,6 +135,7 @@ func (a *Admin) ToResponse() *AdminResponse {
 		ID:        a.ID.String(),
 		Email:     a.Email,
 		FullName:  a.FullName,
+		Phone:     a.Phone,
 		Role:      a.Role,
 		IsActive:  a.IsActive,
 		LastLogin: a.LastLogin,

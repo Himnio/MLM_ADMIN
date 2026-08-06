@@ -114,7 +114,7 @@ export default function ReferralSearchView() {
                 </div>
                 <div className="stat-card">
                   <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">Total Signups</p>
-                  <p className="text-xl font-bold text-emerald-600 mt-1 flex items-center gap-2"><User size={18} />{totalRegs}</p>
+                  <p className="text-xl font-bold text-primary mt-1 flex items-center gap-2"><User size={18} />{totalRegs}</p>
                 </div>
               </div>
 

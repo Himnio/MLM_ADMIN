@@ -41,29 +41,29 @@ export default function MemberDashboardPage() {
 
     fetch(`${API_BASE}/member/profile`, {
       headers: { Authorization: `Bearer ${token}` },
-    }).then(r => {
-      if (!r.ok) {
-        localStorage.removeItem('member_token');
-        localStorage.removeItem('member_user');
-        sessionStorage.removeItem('member_password');
-        router.push('/member/login');
-        return;
-      }
-      setAuthenticated(true);
+    })
+      .then(async r => {
+        const data = await r.json().catch(() => null);
+        if (!r.ok || !data?.success) {
+          localStorage.removeItem('member_token');
+          localStorage.removeItem('member_user');
+          sessionStorage.removeItem('member_password');
+          router.push('/member/login');
+          return;
+        }
+        setAuthenticated(true);
 
-      const stored = localStorage.getItem('member_user');
-      if (stored) {
-        try {
-          const u = JSON.parse(stored);
-          setProfileName(`${u.first_name || ''} ${u.last_name || ''}`.trim());
-          if (u.must_change_password) {
-            setMustChangePassword(true);
-            setShowPasswordModal(true);
-            setOldPassword(sessionStorage.getItem('member_password') || '');
-          }
-        } catch {}
-      }
-    }).catch(() => {
+        // Always use the authoritative profile from the server for the header name.
+        const u = data.data || {};
+        setProfileName(`${u.first_name || ''} ${u.last_name || ''}`.trim());
+        localStorage.setItem('member_user', JSON.stringify(u));
+        if (u.must_change_password) {
+          setMustChangePassword(true);
+          setShowPasswordModal(true);
+          setOldPassword(sessionStorage.getItem('member_password') || '');
+        }
+      })
+      .catch(() => {
       localStorage.removeItem('member_token');
       localStorage.removeItem('member_user');
       sessionStorage.removeItem('member_password');
@@ -171,6 +171,7 @@ export default function MemberDashboardPage() {
         onLogout={handleLogout}
         title={sectionTitles[activeSection]}
         profileName={profileName}
+        onProfileUpdated={p => setProfileName(`${p.first_name || ''} ${p.last_name || ''}`.trim())}
       >
         {renderSection()}
       </DistributorLayout>

@@ -63,13 +63,13 @@ export default function DistributorReferralView() {
   };
 
   if (loading) return <div className="flex justify-center py-16"><Loader2 size={32} className="animate-spin text-primary" /></div>;
-  if (error) return <div className="py-16 text-center text-red-500">{error}</div>;
+  if (error) return <div className="py-16 text-center text-danger">{error}</div>;
 
   const referralLink = info?.referral_code ? getReferralLink(info.referral_code) : '';
 
   return (
     <div className="space-y-6 animate-fade-in max-w-2xl">
-      <div className="stat-card bg-gradient-to-br from-primary-dark via-primary to-purple-600 text-white border-0">
+      <div className="stat-card bg-primary text-white border-0">
         <div className="flex items-center gap-3 mb-2">
           <Link2 size={20} />
           <h2 className="text-lg font-semibold">Your Referral Link</h2>

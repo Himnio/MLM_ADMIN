@@ -154,6 +154,23 @@ func (h *DashboardHandler) GetLevelDistribution(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Level distribution retrieved successfully", data)
 }
 
+// @Summary Distributors by level
+// @Description Get all distributors grouped by their tree level (1-12)
+// @Tags dashboard
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} utils.Response{data=models.DistributorsByLevelResponse}
+// @Router /api/v1/dashboard/distributors-by-level [get]
+func (h *DashboardHandler) GetDistributorsByLevel(c *gin.Context) {
+	data, err := h.dashboardService.GetDistributorsByLevel()
+	if err != nil {
+		h.logger.Error(err, "Failed to get distributors by level", nil)
+		utils.InternalServerErrorResponse(c, "Failed to get distributors by level", err.Error())
+		return
+	}
+	utils.SuccessResponse(c, http.StatusOK, "Distributors by level retrieved successfully", data)
+}
+
 // @Summary Top earners
 // @Description Get top earning members
 // @Tags dashboard

@@ -319,7 +319,7 @@ export default function ReferralLinkView() {
                             <button onClick={() => copyToClipboard(link, true)} className="shrink-0 p-1 hover:bg-surface-hover rounded transition-colors" title="Copy link">
                               <Copy size={14} className="text-text-muted" />
                             </button>
-                            {copiedLink === link && <span className="text-xs text-emerald-600 font-medium shrink-0">Copied!</span>}
+                            {copiedLink === link && <span className="text-xs text-success font-medium shrink-0">Copied!</span>}
                           </div>
                         </td>
                         <td className="text-sm text-text-muted hidden sm:table-cell">{new Date(c.created_at).toLocaleDateString()}</td>

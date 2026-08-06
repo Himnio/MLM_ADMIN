@@ -156,12 +156,10 @@ export default function DashboardView() {
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
       {/* Referral Invite Card - Top Priority */}
       {myReferralCode && (
-        <div className="stat-card relative overflow-hidden border-0">
-          <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(90deg, #6366F1, #4F46E5, #7C3AED)' }} />
-          <div className="absolute inset-0 opacity-40 pointer-events-none" style={{ background: 'radial-gradient(600px circle at 85% 50%, rgba(99,102,241,0.08), transparent 45%)' }} />
+        <div className="stat-card relative overflow-hidden">
           <div className="relative flex items-center justify-between gap-3 p-4 sm:p-5">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/25">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
                 <Share2 size={18} className="text-white" />
               </div>
               <div className="min-w-0">
@@ -172,16 +170,16 @@ export default function DashboardView() {
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
                 onClick={shareReferralLink}
-                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-white text-indigo-600 text-sm font-semibold hover:bg-indigo-50 transition-all duration-200 shadow-lg shadow-indigo-500/20 active:scale-95"
+                className="btn-secondary btn-sm"
               >
-                <Share2 size={16} />
+                <Share2 size={15} />
                 Share
               </button>
               <button
                 onClick={copyReferralLink}
-                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg shadow-indigo-500/30 active:scale-95"
+                className="btn-primary btn-sm"
               >
-                {copied ? <CheckCheck size={16} /> : <Copy size={16} />}
+                {copied ? <CheckCheck size={15} /> : <Copy size={15} />}
                 {copied ? 'Copied!' : 'Copy'}
               </button>
             </div>
@@ -190,16 +188,14 @@ export default function DashboardView() {
       )}
 
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#4F46E5] via-[#6366F1] to-[#7C3AED] p-6 sm:p-8">
-        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-white/[0.06] blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-white/[0.03] blur-3xl" />
-        <div className="relative z-10">
+      <div className="relative overflow-hidden rounded-2xl bg-card border border-border shadow-card">
+        <div className="relative z-10 p-6 sm:p-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-white">Dashboard Overview</h2>
-              <p className="text-sm text-white/70 mt-1">Track your Rudra network performance at a glance</p>
+              <h2 className="text-xl sm:text-2xl font-bold text-text-primary">Dashboard Overview</h2>
+              <p className="text-sm text-text-muted mt-1">Track your Rudra network performance at a glance</p>
             </div>
-            <span className="inline-flex items-center px-3.5 py-1.5 rounded-lg bg-white/10 text-white text-xs font-medium backdrop-blur-sm border border-white/10 w-fit">
+            <span className="inline-flex items-center px-3.5 py-1.5 rounded-lg bg-surface-hover text-text-secondary text-xs font-medium border border-border w-fit">
               {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
           </div>
@@ -211,9 +207,9 @@ export default function DashboardView() {
                 { label: 'Referrals', value: overview.total_referrals.toLocaleString() },
                 { label: 'Growth', value: `${overview.growth_rate}%` },
               ].map((s, i) => (
-                <div key={i} className="rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 p-3.5 sm:p-4">
-                  <p className="text-[10px] sm:text-xs font-medium text-white/60 uppercase tracking-wider">{s.label}</p>
-                  <p className="text-base sm:text-lg font-bold text-white mt-1">{s.value}</p>
+                <div key={i} className="rounded-xl bg-surface border border-border p-3.5 sm:p-4">
+                  <p className="text-[10px] sm:text-xs font-medium text-text-muted uppercase tracking-wider">{s.label}</p>
+                  <p className="text-base sm:text-lg font-bold text-text-primary mt-1">{s.value}</p>
                 </div>
               ))}
             </div>
@@ -361,10 +357,10 @@ export default function DashboardView() {
               {topEarners.map((e, i) => (
                 <div key={e.member_id} className="flex items-center justify-between p-3 rounded-xl hover:bg-surface-hover transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold text-white flex-shrink-0 ${
-                      i === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-sm' :
-                      i === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-500' :
-                      i === 2 ? 'bg-gradient-to-br from-amber-600 to-amber-800' :
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+                      i === 0 ? 'bg-primary text-white' :
+                      i === 1 ? 'bg-surface-hover text-text-primary border border-border' :
+                      i === 2 ? 'bg-surface-hover text-text-secondary border border-border' :
                       'bg-surface-hover text-text-muted'
                     }`}>
                       {i + 1}
@@ -374,7 +370,7 @@ export default function DashboardView() {
                       <p className="text-xs text-text-muted">{e.direct_count} direct referrals</p>
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex-shrink-0 ml-2">{formatCurrency(e.total_income)}</span>
+                  <span className="text-sm font-bold text-success flex-shrink-0 ml-2">{formatCurrency(e.total_income)}</span>
                 </div>
               ))}
             </div>
@@ -392,9 +388,9 @@ export default function DashboardView() {
               {activities.map((a) => (
                 <div key={a.id} className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-surface-hover transition-colors">
                   <div className={`w-3 h-3 rounded-full mt-1 flex-shrink-0 ${
-                    a.type === 'income' ? 'bg-emerald-500' :
-                    a.type === 'member' ? 'bg-blue-500' :
-                    a.type === 'referral' ? 'bg-purple-500' : 'bg-gray-400'
+                    a.type === 'income' ? 'bg-success' :
+                    a.type === 'member' ? 'bg-info' :
+                    a.type === 'referral' ? 'bg-primary' : 'bg-text-muted'
                   }`} />
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-text-primary truncate">{a.details || a.action}</p>

@@ -11,6 +11,7 @@ import ReferralSearchView from '@/components/ReferralSearchView';
 import ReferralsView from '@/components/ReferralsView';
 import IncomeView from '@/components/IncomeView';
 import ReportsView from '@/components/ReportsView';
+import DistributorLevelsView from '@/components/DistributorLevelsView';
 import LoginPage from '@/components/LoginPage';
 import AdminLayout from '@/components/AdminLayout';
 import AdminDistributorView from '@/components/AdminDistributorView';
@@ -18,6 +19,7 @@ import AdminDistributorView from '@/components/AdminDistributorView';
 const sectionTitles: Record<SectionKey, string> = {
   dashboard: 'Dashboard',
   members: 'Distributors Management',
+  'distributor-levels': 'Distributor Levels',
   'referral-link': 'Referral Links',
   'referral-search': 'Referral Search',
   referrals: 'Rudra Tree',
@@ -64,6 +66,7 @@ export default function Home() {
     switch (activeSection) {
       case 'dashboard': return <DashboardView />;
       case 'members': return <AdminDistributorView />;
+      case 'distributor-levels': return <DistributorLevelsView />;
       case 'referral-link': return <ReferralLinkView />;
       case 'referral-search': return <ReferralSearchView />;
       case 'referrals': return <ReferralsView />;

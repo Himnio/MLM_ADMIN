@@ -36,18 +36,13 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
   return (
     <div className="min-h-screen flex relative overflow-hidden">
       {/* Left panel - decorative */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 items-center justify-center p-12">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-indigo-500 rounded-full blur-[100px]" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-500 rounded-full blur-[120px]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-500 rounded-full blur-[100px]" />
-        </div>
+      <div className="hidden lg:flex lg:w-1/2 relative bg-primary items-center justify-center p-12">
         <div className="relative z-10 text-center">
-          <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-2xl">
+          <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-white/10 flex items-center justify-center border border-white/15">
             <span className="text-4xl font-bold text-white">R</span>
           </div>
           <h2 className="text-3xl font-bold text-white mb-3">Rudra Admin Panel</h2>
-          <p className="text-indigo-200/80 text-lg max-w-md">
+          <p className="text-white/70 text-lg max-w-md">
             Manage your multi-level marketing network with powerful analytics and real-time insights.
           </p>
           <div className="mt-12 grid grid-cols-3 gap-6 text-center">
@@ -56,9 +51,9 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
               { value: '$2M+', label: 'Revenue' },
               { value: '99.9%', label: 'Uptime' },
             ].map((s) => (
-              <div key={s.label} className="p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+              <div key={s.label} className="p-4 rounded-xl bg-white/5 border border-white/10">
                 <div className="text-xl font-bold text-white">{s.value}</div>
-                <div className="text-xs text-indigo-200/60 mt-1">{s.label}</div>
+                <div className="text-xs text-white/60 mt-1">{s.label}</div>
               </div>
             ))}
           </div>
@@ -70,7 +65,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         <div className="w-full max-w-md animate-fade-in">
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-10">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-xl shadow-primary/30">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary flex items-center justify-center">
               <span className="text-3xl font-bold text-white">R</span>
             </div>
             <h2 className="text-2xl font-bold text-text-primary">Welcome Back</h2>

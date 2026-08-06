@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"rudra-admin-backend/internal/auth"
@@ -23,6 +24,7 @@ type AuthService interface {
 	ChangePassword(adminID uuid.UUID, oldPassword, newPassword string) error
 	RegisterAdmin(email, password, fullName, role string) (*models.Admin, error)
 	GetAdminProfile(adminID uuid.UUID) (*models.Admin, error)
+	UpdateAdminProfile(adminID uuid.UUID, input *models.UpdateAdminInput) (*models.Admin, error)
 }
 
 type authService struct {
@@ -241,6 +243,38 @@ func (s *authService) GetAdminProfile(adminID uuid.UUID) (*models.Admin, error) 
 
 	if admin == nil {
 		return nil, errors.New("admin not found")
+	}
+
+	return admin, nil
+}
+
+// UpdateAdminProfile updates an admin's own profile fields
+func (s *authService) UpdateAdminProfile(adminID uuid.UUID, input *models.UpdateAdminInput) (*models.Admin, error) {
+	admin, err := s.adminRepo.GetByID(adminID)
+	if err != nil {
+		return nil, err
+	}
+
+	if admin == nil {
+		return nil, errors.New("admin not found")
+	}
+
+	if input == nil || input.IsEmpty() {
+		return nil, errors.New("no fields to update")
+	}
+
+	if input.FullName != nil {
+		admin.FullName = *input.FullName
+	}
+	if input.Email != nil && strings.TrimSpace(*input.Email) != "" {
+		admin.Email = strings.ToLower(strings.TrimSpace(*input.Email))
+	}
+	if input.Phone != nil {
+		admin.Phone = strings.TrimSpace(*input.Phone)
+	}
+
+	if err := s.adminRepo.Update(admin); err != nil {
+		return nil, err
 	}
 
 	return admin, nil
